@@ -327,7 +327,12 @@ function updateCardsView(){
     .querySelectorAll(".rank-card")
     .forEach(function(card, index){
 
-      const isOwned = ownedCards.includes(index);
+      const data = cardsData[index];
+const isOwned =
+    ownedCards.includes(index) ||
+    (data &&
+     state.cards[data.id] &&
+     state.cards[data.id].unlocked);
 
       if(cardsTab === "inventory"){
 
