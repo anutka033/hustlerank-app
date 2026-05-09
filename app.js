@@ -661,32 +661,32 @@ const dropCards = [
   {
     name: "Новичок",
     rarity: "ЭПИЧЕСКАЯ",
-    img: "/images/epic-smile.png"
+    img: "images/epic-smile.png"
   },
   {
     name: "Фокус",
     rarity: "РЕДКАЯ",
-    img: "/images/focus-mind.png"
+    img: "images/focus-mind.png"
   },
   {
     name: "Лидер",
     rarity: "ЛЕГЕНДАРНАЯ",
-    img: "/images/leader-core.png"
+    img: "images/leader-core.png"
   },
   {
     name: "Void King",
     rarity: "ЛЕГЕНДАРНАЯ",
-    img: "/images/void-king.png"
+    img: "images/void-king.png"
   },
   {
     name: "Storm Paw",
     rarity: "МИФИЧЕСКАЯ",
-    img: "/images/mystic-stormpaw.png"
+    img: "images/mystic-stormpaw.png"
   },
   {
     name: "Void Mage",
     rarity: "МИФИЧЕСКАЯ",
-    img: "/images/mystic-voidmage.png"
+    img: "images/mystic-voidmage.png"
   }
 ];
 
