@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>HustleRank</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
@@ -157,34 +158,99 @@
     <div id="dropsScreen" class="screen">
       <h1 class="page-title">Дропы</h1>
 
-      <div class="big-drop">
-        <img src="./images/ai-ava.png" alt="AI Инструменты">
-        <h3>AI Инструменты</h3>
-        <p>Откроется на Level 5.</p>
-      </div>
+<h2 class="drop-section-title">Void Drop</h2>
 
-      <div class="big-drop">
-        <img src="./images/sekret-cod.png" alt="Секретный гайд">
-        <h3>Секретный гайд</h3>
-        <p>Откроется на Level 3.</p>
-      </div>
+<section class="drop-case compact-drop">
+  <div class="drop-case-box">
+  <img src="images/cards-drop.png" alt="Cards">
+</div>
 
-      <div class="big-drop">
-        <img src="./images/finance.png" alt="Финансовая схема">
-        <h3>Финансовая схема</h3>
-        <p>Откроется на Level 7.</p>
-      </div>
-    </div>
+  <div class="drop-case-info">
+    <p>Случайная карта в коллекцию</p>
+  </div>
 
+  <button class="open-drop-btn" id="openDropBtn">
+    Открыть за ⭐ 100
+  </button>
+</section>
+
+<section class="drop-chances">
+  <h3>Шансы</h3>
+
+  <div class="chance-row">
+    <span>Обычная</span>
+    <b>55%</b>
+  </div>
+
+  <div class="chance-row">
+    <span>Редкая</span>
+    <b>25%</b>
+  </div>
+
+  <div class="chance-row">
+    <span>Эпическая</span>
+    <b>12%</b>
+  </div>
+
+  <div class="chance-row">
+    <span>Легендарная</span>
+    <b>6%</b>
+  </div>
+
+  <div class="chance-row mythic-text">
+    <span>Мифическая</span>
+    <b>2%</b>
+  </div>
+</section>
+</div>
     <div id="friendsScreen" class="screen">
-      <h1 class="page-title">Друзья</h1>
+  <h1 class="page-title">Друзья</h1>
 
-      <div class="friends-card">
-        <h3>Приглашай друзей</h3>
-        <p>Получай бонусы за каждого приглашённого игрока.</p>
-        <button>Скопировать ссылку</button>
-      </div>
+  <section class="ref-hero">
+    <div>
+      <h2>Приглашай друзей</h2>
+      <p>Получай 25 ⭐ и 500 💎 за каждого приглашённого друга.</p>
     </div>
+
+    <div class="ref-gift">🎁</div>
+  </section>
+
+  <section class="ref-card">
+    <p class="ref-label">Награда за друга</p>
+
+    <div class="ref-rewards">
+      <span>⭐ 25</span>
+      <span>💎 500</span>
+    </div>
+
+    <div class="ref-actions">
+      <button id="inviteFriendBtn">👥 Пригласить друга</button>
+      <button id="copyRefBtn">📋</button>
+    </div>
+  </section>
+
+  <section class="friends-head">
+    <h2>Друзья</h2>
+    <span>Приглашено: <b id="friendsCount">0</b></span>
+  </section>
+
+  <section class="claim-box">
+    <div>
+      <p>Ты можешь забрать</p>
+      <strong>⭐ <span id="claimStars">0</span> · 💎 <span id="claimCrystals">0</span></strong>
+    </div>
+
+    <button id="claimRefBtn">Забрать</button>
+  </section>
+
+  <section class="friends-list">
+    <div class="friend-empty" id="friendEmpty">
+      Пока нет приглашённых друзей
+    </div>
+
+    <div id="friendsContainer"></div>
+  </section>
+</div>
 
     <div id="cardsScreen" class="screen">
 
@@ -255,7 +321,27 @@
 
     <button class="unlock-btn gold-btn">⭐ 150</button>
 </div>
+<div class="rank-card mythic">
+  <div class="rank-top">
+    <span class="card-level">5</span>
+    <span class="rarity">МИФИЧЕСКАЯ</span>
+  </div>
 
+  <img src="./images/mystic-stormpaw.png" alt="Stormpaw">
+
+  <button class="unlock-btn mythic-btn">⭐ 650</button>
+</div>
+
+<div class="rank-card mythic">
+  <div class="rank-top">
+    <span class="card-level">6</span>
+    <span class="rarity">МИФИЧЕСКАЯ</span>
+  </div>
+
+  <img src="./images/mystic-voidmage.png" alt="Voidmage">
+
+  <button class="unlock-btn mythic-btn">⭐ 955</button>
+</div>
   </div>
 
   <div class="status-box">
@@ -270,12 +356,47 @@
 </div>
 
     <nav class="bottom-nav">
-      <button class="active" data-screen="home">🏠<span>Главная</span></button>
-      <button data-screen="tasks">📋<span>Задания</span></button>
-      <button data-screen="drops">🛍<span>Дропы</span></button>
-      <button data-screen="friends">👥<span>Друзья</span></button>
-      <button data-screen="cards">🃏<span>Карточки</span></button>
+      <button class="active" data-screen="home">
+  <i class="fa-solid fa-house"></i>
+  <span>Главная</span>
+</button>
+
+<button data-screen="tasks">
+  <i class="fa-solid fa-list-check"></i>
+  <span>Задания</span>
+</button>
+
+<button data-screen="drops">
+  <i class="fa-solid fa-briefcase"></i>
+  <span>Дропы</span>
+</button>
+
+<button data-screen="friends">
+  <i class="fa-solid fa-user-group"></i>
+  <span>Друзья</span>
+</button>
+
+<button data-screen="cards">
+  <i class="fa-solid fa-layer-group"></i>
+  <span>Карточки</span>
+</button>
     </nav>
+    <div class="drop-modal" id="dropModal">
+  <div class="drop-modal-box">
+    <div class="drop-loading" id="dropLoading">
+  <div class="drop-spinner"></div>
+  <p>Открываем дроп...</p>
+</div>
+    <div class="drop-result-rarity" id="dropResultRarity">МИФИЧЕСКАЯ</div>
+
+    <img id="dropResultImg" src="" alt="">
+
+    <h2 id="dropResultName">Void Mage</h2>
+    <p id="dropResultText">Карта добавлена в коллекцию</p>
+
+    <button id="closeDropModal">Забрать</button>
+  </div>
+</div>
 <div class="card-modal" id="cardModal">
   <div class="card-modal-bg" id="cardModalBg"></div>
 
@@ -310,8 +431,10 @@
     <small>Серия</small>
     <strong>#017 / 500</strong>
   </div>
-
 </div>
+<button class="gift-card-btn" id="giftCardBtn">
+  🎁 Подарить карту
+</button>
       </div>
 
     </div>
@@ -357,5 +480,32 @@
   </main>
 
   <script src="app.js"></script>
+
+<div class="gift-modal" id="giftModal">
+  <div class="gift-modal-box">
+
+    <h3>🎁 Подарить карту</h3>
+
+    <p>Введите ID получателя</p>
+
+    <input
+      type="text"
+      id="giftUserId"
+      placeholder="Например: 48291"
+    >
+
+    <div class="gift-actions">
+      <button id="sendGiftBtn" class="send-btn">
+        Отправить
+      </button>
+
+      <button id="cancelGiftBtn" class="cancel-btn">
+        Отмена
+      </button>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>

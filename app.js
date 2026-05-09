@@ -15,9 +15,11 @@ const state = {
 
 const cardsData = [
   { id: "novice", price: 10 },
-  { id: "focus", price: 25 },
-  { id: "leader", price: 75 },
-  { id: "voidking", price: 150 }
+{ id: "focus", price: 25 },
+{ id: "leader", price: 75 },
+{ id: "voidking", price: 150 },
+{ id: "stormpaw", price: 650 },
+{ id: "voidmage", price: 955 }
 ];
 
 const levelEl = document.getElementById("level");
@@ -464,6 +466,23 @@ const modalCards = [
   quote: "Пока остальные искали свет — он научился видеть в темноте.",
   img: "images/void-king.png"
 },
+{
+  name: "Storm Paw",
+  rarity: "МИФИЧЕСКАЯ",
+  status: "Статус: Повелитель бури",
+  price: 650,
+  quote: "Те, кто управляют молнией, сначала научились управлять собой.",
+  img: "images/mystic-stormpaw.png"
+},
+
+{
+  name: "Void Mage",
+  rarity: "МИФИЧЕСКАЯ",
+  status: "Статус: Архимаг пустоты",
+  price: 955,
+  quote: "Истинная сила приходит тогда, когда страх перестаёт управлять тобой.",
+  img: "images/mystic-voidmage.png"
+}
 ];
 
 document.querySelectorAll(".rank-card").forEach(function(card, index){
@@ -483,11 +502,13 @@ document.querySelectorAll(".rank-card").forEach(function(card, index){
     
 
     cardModal.classList.add("show");
+    document.querySelector(".bottom-nav").classList.add("hide-nav");
   });
 });
 
 function closeCardModal(){
   cardModal.classList.remove("show");
+  document.querySelector(".bottom-nav").classList.remove("hide-nav");
 }
 
 if (modalClose) modalClose.addEventListener("click", closeCardModal);
@@ -500,12 +521,14 @@ const shopClose = document.getElementById("shopClose");
 function openShop(){
   if (shopModal) {
     shopModal.classList.add("show");
+    document.querySelector(".bottom-nav").classList.add("hide-nav");
   }
 }
 
 function closeShop(){
   if (shopModal) {
     shopModal.classList.remove("show");
+    document.querySelector(".bottom-nav").classList.remove("hide-nav");
   }
 }
 
@@ -554,5 +577,235 @@ document.querySelectorAll(".rank-card").forEach(card => {
   card.addEventListener("mouseleave", () => {
     card.style.transform = "";
   });
+
+});
+updateUI();
+updateCardsView();
+document.addEventListener("input", function (event) {
+  if (event.target.id === "giftUserId") {
+    const sendBtn = document.getElementById("sendGiftBtn");
+    const value = event.target.value.trim();
+
+    sendBtn.disabled = value.length !== 5;
+    sendBtn.style.opacity = value.length === 5 ? "1" : ".5";
+    sendBtn.style.cursor = value.length === 5 ? "pointer" : "not-allowed";
+  }
+});
+
+document.addEventListener("click", function (event) {
+  if (event.target.closest("#giftCardBtn")) {
+    const input = document.getElementById("giftUserId");
+    const sendBtn = document.getElementById("sendGiftBtn");
+
+    input.value = "";
+    sendBtn.disabled = true;
+    sendBtn.style.opacity = ".5";
+    sendBtn.style.cursor = "not-allowed";
+
+    document.getElementById("giftModal").classList.add("show");
+  }
+
+  if (event.target.closest("#cancelGiftBtn")) {
+    document.getElementById("giftModal").classList.remove("show");
+  }
+
+  if (event.target.closest("#sendGiftBtn")) {
+    const userId = document.getElementById("giftUserId").value.trim();
+
+    if (userId.length !== 5) {
+      alert("ID должен быть ровно 5 символов");
+      return;
+    }
+
+    alert("🎁 Карта отправлена игроку #" + userId);
+    document.getElementById("giftModal").classList.remove("show");
+  }
+});
+const invitedFriends = [];
+
+const friendsContainer =
+  document.getElementById("friendsContainer");
+
+const friendEmpty =
+  document.getElementById("friendEmpty");
+
+function renderFriends(){
+
+  friendsContainer.innerHTML = "";
+
+  if(invitedFriends.length === 0){
+    friendEmpty.style.display = "block";
+    return;
+  }
+
+  friendEmpty.style.display = "none";
+
+  invitedFriends.forEach(friend => {
+    friendsContainer.innerHTML += `
+      <div class="friend-item">
+        <div class="friend-left">
+          <div class="friend-avatar">${friend.name[0]}</div>
+          <div class="friend-name">${friend.name}</div>
+        </div>
+
+        <div class="friend-reward">
+          +25 ⭐ +500 💎
+        </div>
+      </div>
+    `;
+  });
+}
+
+renderFriends();
+const dropCards = [
+  {
+    name: "Новичок",
+    rarity: "ЭПИЧЕСКАЯ",
+    img: "images/epic-smile.png"
+  },
+  {
+    name: "Фокус",
+    rarity: "РЕДКАЯ",
+    img: "images/focus-mind.png"
+  },
+  {
+    name: "Лидер",
+    rarity: "ЛЕГЕНДАРНАЯ",
+    img: "images/leader-core.png"
+  },
+  {
+    name: "Void King",
+    rarity: "ЛЕГЕНДАРНАЯ",
+    img: "images/void-king.png"
+  },
+  {
+    name: "Storm Paw",
+    rarity: "МИФИЧЕСКАЯ",
+    img: "images/mystic-stormpaw.png"
+  },
+  {
+    name: "Void Mage",
+    rarity: "МИФИЧЕСКАЯ",
+    img: "images/mystic-voidmage.png"
+  }
+];
+
+const openDropBtn = document.getElementById("openDropBtn");
+console.log(openDropBtn);
+const dropModal = document.getElementById("dropModal");
+const closeDropModal = document.getElementById("closeDropModal");
+closeDropModal.addEventListener("click", function () {
+
+  const img = dropResultImg.cloneNode(true);
+
+  const cardsTab =
+    document.querySelector('[data-screen="cards"]');
+
+  img.classList.add("fly-card");
+
+  document.body.appendChild(img);
+
+  const imgRect =
+    dropResultImg.getBoundingClientRect();
+
+  const targetRect =
+    cardsTab.getBoundingClientRect();
+
+  img.style.left = imgRect.left + "px";
+  img.style.top = imgRect.top + "px";
+
+  img.style.width = imgRect.width + "px";
+  img.style.height = imgRect.height + "px";
+
+  setTimeout(() => {
+
+    img.style.left =
+      targetRect.left +
+      targetRect.width / 2 + "px";
+
+    img.style.top =
+      targetRect.top +
+      targetRect.height / 2 + "px";
+
+    img.style.width = "30px";
+    img.style.height = "40px";
+
+    img.style.opacity = "0";
+
+    img.style.transform =
+      "rotate(18deg) scale(.3)";
+dropModal.classList.remove("show");
+  }, 50);
+
+  setTimeout(() => {
+
+    img.remove();
+
+  }, 850);
+
+});
+
+const dropResultRarity = document.getElementById("dropResultRarity");
+const dropResultImg = document.getElementById("dropResultImg");
+const dropResultName = document.getElementById("dropResultName");
+
+openDropBtn.addEventListener("click", function () {
+
+  const randomCard =
+    dropCards[Math.floor(Math.random() * dropCards.length)];
+
+  const modalBox =
+    document.querySelector(".drop-modal-box");
+
+  const loading =
+    document.getElementById("dropLoading");
+
+  dropModal.classList.add("show");
+
+  modalBox.classList.add("opening");
+
+  loading.classList.add("show");
+
+  modalBox.classList.remove(
+    "result-mythic",
+    "result-legendary",
+    "result-epic",
+    "result-rare"
+  );
+
+  setTimeout(() => {
+
+    loading.classList.remove("show");
+
+    modalBox.classList.remove("opening");
+
+    dropResultRarity.textContent =
+      randomCard.rarity;
+
+    dropResultImg.src =
+      randomCard.img;
+
+    dropResultName.textContent =
+      randomCard.name;
+
+    if(randomCard.rarity === "МИФИЧЕСКАЯ"){
+
+      modalBox.classList.add("result-mythic");
+
+    } else if(randomCard.rarity === "ЛЕГЕНДАРНАЯ"){
+
+      modalBox.classList.add("result-legendary");
+
+    } else if(randomCard.rarity === "ЭПИЧЕСКАЯ"){
+
+      modalBox.classList.add("result-epic");
+
+    } else {
+
+      modalBox.classList.add("result-rare");
+
+    }
+
+  }, 4500);
 
 });
