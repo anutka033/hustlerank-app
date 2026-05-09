@@ -120,22 +120,22 @@ function updateAvatar() {
 
   if (state.level >= 25) {
     avatarEl.classList.add("avatar-110");
-    avatarImg.src = "images/avatar-voidking.png";
+    avatarImg.src = "/images/avatar-voidking.png";
   } else if (state.level >= 16) {
     avatarEl.classList.add("avatar-110");
-    avatarImg.src = "images/avatar-gold.png";
+    avatarImg.src = "/images/avatar-gold.png";
   } else if (state.level >= 10) {
     avatarEl.classList.add("avatar-17");
-    avatarImg.src = "images/avatar-diamond.png";
+    avatarImg.src = "/images/avatar-diamond.png";
   } else if (state.level >= 7) {
     avatarEl.classList.add("avatar-17");
-    avatarImg.src = "images/avatar-bronze.png";
+    avatarImg.src = "/images/avatar-bronze.png";
   } else if (state.level >= 4) {
     avatarEl.classList.add("avatar-14");
-    avatarImg.src = "images/avatar-red.png";
+    avatarImg.src = "/images/avatar-red.png";
   } else {
     avatarEl.classList.add("avatar-11");
-    avatarImg.src = "images/avatar.png";
+    avatarImg.src = "/images/avatar.png";
   }
 }
 
@@ -440,7 +440,7 @@ const modalCards = [
     status: "Статус: Первый шаг",
     price: 10,
    quote: "Каждый король когда-то был никем. Важно не где ты начал, а сколько раз ты не остановился.",
-    img: "images/epic-smile.png"
+    img: "/images/epic-smile.png"
   },
   {
   name: "Фокус",
@@ -448,7 +448,7 @@ const modalCards = [
   status: "Статус: Концентрация",
   price: 25,
   quote: "Шум забирает слабых. Тишина собирает тех, кто знает, зачем он идёт.",
-  img: "images/focus-mind.png"
+  img: "/images/focus-mind.png"
 },
   {
   name: "Лидер",
@@ -456,7 +456,7 @@ const modalCards = [
   status: "Статус: Контроль",
   price: 75,
   quote: "Лидер — это тот, кто идёт первым, даже когда остальные боятся сделать шаг.",
-  img: "images/leader-core.png"
+  img: "/images/leader-core.png"
 },
   {
   name: "Void King",
@@ -464,7 +464,7 @@ const modalCards = [
   status: "Статус: Повелитель пустоты",
   price: 150,
   quote: "Пока остальные искали свет — он научился видеть в темноте.",
-  img: "images/void-king.png"
+  img: "/images/void-king.png"
 },
 {
   name: "Storm Paw",
@@ -472,7 +472,7 @@ const modalCards = [
   status: "Статус: Повелитель бури",
   price: 650,
   quote: "Те, кто управляют молнией, сначала научились управлять собой.",
-  img: "images/mystic-stormpaw.png"
+  img: "/images/mystic-stormpaw.png"
 },
 
 {
@@ -481,7 +481,7 @@ const modalCards = [
   status: "Статус: Архимаг пустоты",
   price: 955,
   quote: "Истинная сила приходит тогда, когда страх перестаёт управлять тобой.",
-  img: "images/mystic-voidmage.png"
+  img: "/images/mystic-voidmage.png"
 }
 ];
 
@@ -661,32 +661,32 @@ const dropCards = [
   {
     name: "Новичок",
     rarity: "ЭПИЧЕСКАЯ",
-    img: "images/epic-smile.png"
+    img: "/images/epic-smile.png"
   },
   {
     name: "Фокус",
     rarity: "РЕДКАЯ",
-    img: "images/focus-mind.png"
+    img: "/images/focus-mind.png"
   },
   {
     name: "Лидер",
     rarity: "ЛЕГЕНДАРНАЯ",
-    img: "images/leader-core.png"
+    img: "/images/leader-core.png"
   },
   {
     name: "Void King",
     rarity: "ЛЕГЕНДАРНАЯ",
-    img: "images/void-king.png"
+    img: "/images/void-king.png"
   },
   {
     name: "Storm Paw",
     rarity: "МИФИЧЕСКАЯ",
-    img: "images/mystic-stormpaw.png"
+    img: "/images/mystic-stormpaw.png"
   },
   {
     name: "Void Mage",
     rarity: "МИФИЧЕСКАЯ",
-    img: "images/mystic-voidmage.png"
+    img: "/images/mystic-voidmage.png"
   }
 ];
 
