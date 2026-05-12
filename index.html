@@ -11,37 +11,29 @@
 <body>
   <main class="app">
 
-    <header class="topbar">
-      <button class="plain">Закрыть</button>
-
-      <div class="brand">
-        <h1>HustleRank</h1>
-        <p>мини-приложение</p>
-      </div>
-
-      <button class="circle">•••</button>
-    </header>
-
     <div id="homeScreen" class="screen active-screen">
-
+      
       <section class="hero">
         <div class="avatar">
-          <img src=".images/avatar.png" alt="Аватар">
+          <img src="./images/avatar.png" alt="Аватар">
         </div>
 
         <div class="hero-info">
-          <div class="level-row">
-            <h2>Level <span id="level">1</span></h2>
-            <span class="bolt">⚡️</span>
-          </div>
+          <div class="top-row">
 
-          <p id="rankName">Новичок</p>
+  <div class="player-info">
+    <h2 id="playerId">@voidking</h2>
+    <p class="player-sub">
+    <p class="player-xp" id="xpText">
+  16394 / 1830000 XP
+</p>
+  <span id="rankName">Legend</span>
+  <span>•</span>
+  <span>Lv <b id="level">21</b></span>
+</p>
+  </div>
 
-          <div class="xpbar">
-            <div id="xpFill"></div>
-          </div>
-
-          <strong id="xpText">0 / 100 XP</strong>
+</div>
         </div>
 
         <div class="right-stats">
@@ -50,111 +42,108 @@
     <span>⭐️ <b id="stars">0</b></span>
     <button id="openShopBtn" class="stars-plus">+</button>
   </div>
-  <p>Рейтинг: <b id="rating">#---</b></p>
 </div>
 
-          <div class="coins-row">
-            <span>💎 <b id="coins">0</b></span>
-            <button id="addCoinsBtn">+</button>
-          </div>
+          <div class="rating-box coins-box">
+  <div class="stars-line">
+    <span>💎 <b id="coins">0</b></span>
+  </div>
+</div>
 
           <div class="income-row">
-            ⏱️ <span id="incomePerHour">+0/час</span>
           </div>
         </div>
       </section>
 
-      <section class="daily-card">
-        <div class="gift">🎁</div>
-
-        <div>
-          <h3 id="bonusTitle">Ежедневный бонус</h3>
-          <p id="bonusText">Забери 50 XP и 1 Gem каждый день</p>
-        </div>
-
-        <button id="bonusBtn">Забрать</button>
-      </section>
+    
 
       <button class="earn-card" id="earnBtn">
         <span class="earn-icon">⚡️</span>
 
         <span>
           <b>Заработать XP</b>
-          <small id="earnText">+5000 XP за нажатие</small>
+          <small id="earnText">Перейти к заданиям</small>
         </span>
 
         <span class="arrow">›</span>
       </button>
+      
+    
+<div class="daily-drop" id="dailyDrop">
+  <div class="drop-icon">🎁</div>
 
-      <section class="section-head">
-        <h2>Активные дропы</h2>
-        <button data-open="drops">Смотреть все ›</button>
-      </section>
+  <div class="drop-info">
+    <span class="drop-title">Daily Drop</span>
+    <span class="drop-timer" id="dailyDropTimer">Готово</span>
+  </div>
 
-      <section class="drops">
-        <article class="drop" data-level="5">
-          <span class="badge hot">🔥 HOT</span>
-          <img src=".images/ai-ava.png" class="drop-image" alt="AI Инструменты">
-          <span class="lock">🔒 Доступ с Level 5</span>
-          <h3>AI Инструменты</h3>
-          <p>Топ нейросети для заработка</p>
-          <div class="timer red">⏱️ 02:45:12</div>
-          <small>Осталось: 34 шт.</small>
-        </article>
+  <button class="daily-claim-btn" id="dailyClaimBtn">
+    Забрать
+  </button>
+</div>
+</div>
+<div class="side-actions left-actions">
+  <button class="side-action">
+    <span class="side-icon">🎁</span>
+    <span>Бонус</span>
+  </button>
 
-        <article class="drop" data-level="3">
-          <span class="badge new">NEW</span>
-          <img src=".images/sekret-cod.png" class="drop-image" alt="Секретный гайд">
-          <span class="lock">🔒 Доступ с Level 3</span>
-          <h3>Секретный гайд</h3>
-          <p>Как выйти на доход от 5000$/мес</p>
-          <div class="timer green">⏱️ 05:12:45</div>
-          <small>Осталось: 58 шт.</small>
-        </article>
+  <button class="side-action">
+    <span class="side-icon">🃏</span>
+    <span>Карты</span>
+  </button>
 
-        <article class="drop" data-level="7">
-          <span class="badge sale">SALE</span>
-          <img src=".images/finance.png" class="drop-image" alt="Финансовая схема">
-          <span class="lock">🔒 Доступ с Level 7</span>
-          <h3>Финансовая схема</h3>
-          <p>Стратегии умножения капитала</p>
-          <div class="timer yellow">⏱️ 12:30:22</div>
-          <small>Осталось: 12 шт.</small>
-        </article>
-      </section>
+  <button class="side-action">
+    <span class="side-icon">⚡</span>
+    <span>Буст</span>
+  </button>
+</div>
 
-      <section class="vip">
-        <div class="crown">👑</div>
+<div class="side-actions right-actions">
+  <button class="side-action">
+    <span class="side-icon">👑</span>
+    <span>VIP</span>
+  </button>
 
-        <div>
-          <h3>Стань VIP</h3>
-          <p>Больше XP, эксклюзивные дропы и ранний доступ</p>
-        </div>
+  <button class="side-action" id="dailyDrop">
+    <span class="side-icon">📦</span>
+    <span>Drop</span>
+  </button>
 
-        <button>Подробнее</button>
-      </section>
-    </div>
-
+  <button class="side-action">
+    <span class="side-icon">🎟️</span>
+    <span>Розыгрыш</span>
+  </button>
+</div>
     <div id="tasksScreen" class="screen">
       <h1 class="page-title">Задания</h1>
-
-      <div class="task-card">
-        <div>
-          <h3>Заработай 100 XP</h3>
-          <p>Нажимай кнопку XP и повышай уровень.</p>
-        </div>
-        <span>+100 XP</span>
-      </div>
-
-<div class="task-card">
-        <div>
-          <h3>Купи первую карточку</h3>
-          <p>Открой доход в час.</p>
-        </div>
-        <span>+1 Gem</span>
-      </div>
+<div class="task-card telegram-task">
+  <div class="task-left">
+    <div class="task-icon">
+      <i class="fa-brands fa-telegram"></i>
     </div>
 
+    <div class="task-info">
+      <h3>Подписаться на Telegram</h3>
+
+      <p>
+        +50 ⭐ • +500 💎 • +1500 XP
+      </p>
+    </div>
+  </div>
+
+  <div class="task-actions">
+  <button id="telegramTaskBtn" class="task-btn">
+    Выполнить
+  </button>
+
+  <button id="claimTelegramTaskBtn" class="task-btn claim-task-btn hidden">
+    Забрать
+  </button>
+  </div>
+</div>
+
+ </div>
     <div id="dropsScreen" class="screen">
       <h1 class="page-title">Дропы</h1>
 
@@ -266,10 +255,33 @@
   </div>
 
   <div class="cards-tabs">
-  <button class="cards-tab active" data-cards-tab="shop">Магазин карточек</button>
-  <button class="cards-tab" data-cards-tab="inventory">Инвентарь</button>
-</div>
 
+  <button class="tab-btn active"
+          id="shopTab"
+          data-cards-tab="shop">
+    Магазин 
+  </button>
+
+  <button class="tab-btn"
+          id="inventoryTab"
+          data-cards-tab="inventory">
+    Инвентарь
+  </button>
+
+  <button class="tab-btn"
+          id="marketTab"
+          data-cards-tab="market">
+    Рынок
+  </button>
+
+</div>
+<div id="marketScreen" class="market-screen">
+  <div class="market-soon">
+    <h2>Рынок скоро откроется</h2>
+    <p>Скоро здесь можно будет продавать свои карты за звёзды.</p>
+    <p>А пока собирай коллекцию, покупай новые карты и открывай редкие статусы.</p>
+  </div>
+</div>
   <div class="new-cards-grid">
 
     <div class="rank-card epic">
@@ -338,12 +350,46 @@
     <span class="rarity">МИФИЧЕСКАЯ</span>
   </div>
 
-  <img src="./images/mystic-voidmage.png" alt="Voidmage">
+  <img src="./images/voidmage.png" alt="Voidmage">
 
   <button class="unlock-btn mythic-btn">⭐ 955</button>
 </div>
+<div class="rank-card common">
+  <img src="./images/shadow-keeper.png" alt="Хранитель Тени">
+
+  <button class="unlock-btn common-btn">⭐ 30</button>
+</div>
+
+<div class="rank-card common">
+  <img src="./images/hope-seed.png" alt="Семя Надежды">
+
+  <button class="unlock-btn common-btn">⭐ 30</button>
+</div>
+
+<div class="rank-card common">
+  <img src="./images/will-shard.png" alt="Осколок Воли">
+
+  <button class="unlock-btn common-btn">⭐ 30</button>
+</div>
+
+<div class="rank-card legendary">
+  <img src="./images/void-emperor.png" alt="Император Пустоты">
+
+  <button class="unlock-btn gold-btn">⭐ 250</button>
+</div>
+<div class="rank-card legendary limited-card">
+  <div class="rank-top">
+    <span class="card-level">∞</span>
+    <span class="rarity">LIMITED</span>
   </div>
 
+  <img src="./images/solar-emperor.png" alt="Solar Emperor">
+
+  <button class="unlock-btn gold-btn">
+    ⭐ 5000 • 150 шт
+  </button>
+</div>
+</div>
   <div class="status-box">
     <div>
       <h3>👑 Прокачивай карты — открывай статусы</h3>
@@ -352,7 +398,6 @@
 
     <button>Подробнее</button>
   </div>
-
 </div>
 
     <nav class="bottom-nav">
@@ -401,6 +446,7 @@
   <div class="card-modal-bg" id="cardModalBg"></div>
 
   <div class="flip-card">
+    <button id="flipBackBtn" class="flip-back-btn">↩</button>
     <div class="flip-inner" id="flipInner">
 
       <div class="flip-front">
@@ -409,6 +455,7 @@
       </div>
 
       <div class="flip-back">
+        
         <button class="modal-close" id="modalClose">×</button>
 
         <span id="modalRarity" class="modal-rarity">RARE</span>
@@ -432,8 +479,8 @@
     <strong>#017 / 500</strong>
   </div>
 </div>
-<button class="gift-card-btn" id="giftCardBtn">
-  🎁 Подарить карту
+<button class="gift-card-btn" id="modalActionBtn">
+  🛒 Купить карту
 </button>
       </div>
 
@@ -476,10 +523,46 @@
   </div>
 </div>
     <div class="toast" id="toast"></div>
+<div class="daily-modal" id="dailyModal">
 
+  <div class="daily-modal-box">
+<button class="daily-close" id="dailyCloseBtn">✕</button>
+    <div class="daily-glow"></div>
+
+    <div class="daily-big-icon">🎁</div>
+
+    <h2>Daily Drop</h2>
+
+    <p>Ты получил ежедневную награду</p>
+
+    <div class="daily-reward">
+      <span>⭐ +50</span>
+      <span>⚡ +500 XP</span>
+    </div>
+
+    <button id="claimDailyBtn">
+      Забрать
+    </button>
+
+  </div>
+
+</div>
   </main>
+<div class="buy-confirm-modal" id="buyConfirmModal">
+  <div class="buy-confirm-box">
+    <h3>Подтвердить покупку</h3>
 
-  <script src="app.js"></script>
+    <p>
+      Купить карту за <span id="buyConfirmPrice">0</span> ⭐?
+    </p>
+
+    <div class="buy-confirm-actions">
+      <button id="confirmBuyBtn">Да</button>
+      <button id="cancelBuyBtn">Нет</button>
+    </div>
+  </div>
+</div>
+  
 
 <div class="gift-modal" id="giftModal">
   <div class="gift-modal-box">
@@ -506,6 +589,6 @@
 
   </div>
 </div>
-
+<script src="app.js"></script>
 </body>
 </html>
