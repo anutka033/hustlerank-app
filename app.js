@@ -5,8 +5,8 @@ function safeNumber(value, fallback = 0) {
 
 const state = {
   xp: safeNumber(localStorage.getItem("xp"), 0),
-  maxXp: safeNumber(localStorage.getItem("maxXp"), 100),
-  level: safeNumber(localStorage.getItem("level"), 1),
+  maxXp: Math.max(100, safeNumber(localStorage.getItem("maxXp"), 100)),
+  level: Math.max(1, safeNumber(localStorage.getItem("level"), 1)),
   coins: safeNumber(localStorage.getItem("coins"), 0),
   stars: safeNumber(localStorage.getItem("stars"), 0),
   bonusTaken: localStorage.getItem("bonusTaken") === "true",
