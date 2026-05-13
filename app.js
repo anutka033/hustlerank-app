@@ -117,12 +117,18 @@ function showToast(text) {
 function checkLevelUp() {
   let leveledUp = false;
 
-  while (state.xp >= state.maxXp) {
-    state.xp -= state.maxXp;
-    state.level += 1;
-    state.maxXp = Math.floor(state.maxXp * 1.45);
-    leveledUp = true;
+  while (state.maxXp > 0 && state.xp >= state.maxXp) {
+  state.xp -= state.maxXp;
+  state.level += 1;
+
+  state.maxXp = Math.floor(state.maxXp * 1.45);
+
+  if (!state.maxXp || state.maxXp < 1) {
+    state.maxXp = 100;
   }
+
+  leveledUp = true;
+}
 
   if (leveledUp && avatarEl) {
     avatarEl.classList.remove("level-up-flash");
