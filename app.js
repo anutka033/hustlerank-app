@@ -1462,3 +1462,18 @@ async function loadIncomingCards() {
     alert("🎁 Вам пришла новая карта!");
   }
 }
+supabaseClient
+  .channel("incoming-trades-" + state.playerId)
+  .on(
+    "postgres_changes",
+    {
+      event: "INSERT",
+      schema: "public",
+      table: "trades",
+      filter: "receiver_id=eq." + state.playerId
+    },
+    function () {
+      loadIncomingCards();
+    }
+  )
+  .subscribe();
