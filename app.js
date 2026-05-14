@@ -927,10 +927,9 @@ document.addEventListener("click", async function (event) {
     const sendBtn = document.getElementById("sendGiftBtn");
     selectedGiftCard = selectedCard;
 
-    input.value = "";
-    sendBtn.disabled = true;
-    sendBtn.style.opacity = ".9";
-    sendBtn.style.cursor = "not-allowed";
+    sendBtn.disabled = false;
+sendBtn.style.opacity = "1";
+sendBtn.style.cursor = "pointer";
 
     document.getElementById("giftModal").classList.add("show");
   }
