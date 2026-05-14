@@ -1,3 +1,5 @@
+const SUPABASE_URL = "https://yxwsgvsejgmzocgnuukn.supabase.co";
+const SUPABASE_KEY = "sb_publishable_CAb0_OQcsJmBLymP1qmAvA_OWW_bJED";
 function safeNumber(value, fallback = 0) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
@@ -121,7 +123,7 @@ function checkLevelUp() {
   state.xp -= state.maxXp;
   state.level += 1;
 
-  state.maxXp = Math.floor(state.maxXp * 1.45);
+  state.maxXp = Math.floor(state.maxXp * 2);
 
   if (!state.maxXp || state.maxXp < 1) {
     state.maxXp = 100;
@@ -159,7 +161,7 @@ function updateAvatar() {
     avatarImg.src = "images/avatar-diamond.png";
   } else if (state.level >= 7) {
     avatarEl.classList.add("avatar-17");
-    avatarImg.src = "images/avatar-bronze.png";
+    avatarImg.src = "images/avatar-red.png";
   } else if (state.level >= 4) {
     avatarEl.classList.add("avatar-14");
     avatarImg.src = "images/avatar-red.png";
