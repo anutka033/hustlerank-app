@@ -929,7 +929,7 @@ document.addEventListener("click", async function (event) {
 
     input.value = "";
     sendBtn.disabled = true;
-    sendBtn.style.opacity = ".5";
+    sendBtn.style.opacity = ".9";
     sendBtn.style.cursor = "not-allowed";
 
     document.getElementById("giftModal").classList.add("show");
