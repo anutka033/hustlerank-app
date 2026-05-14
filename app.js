@@ -989,27 +989,38 @@ const friendsContainer =
 const friendEmpty =
   document.getElementById("friendEmpty");
 
-function renderFriends(){
-
+function renderFriends() {
   friendsContainer.innerHTML = "";
 
-  if(invitedFriends.length === 0){
+  document.getElementById("friendsCount").textContent = invitedFriends.length;
+
+  if (invitedFriends.length === 0) {
     friendEmpty.style.display = "block";
     return;
   }
 
   friendEmpty.style.display = "none";
 
-  invitedFriends.forEach(friend => {
+  invitedFriends.forEach(function(friend) {
     friendsContainer.innerHTML += `
       <div class="friend-item">
         <div class="friend-left">
           <div class="friend-avatar">${friend.name[0]}</div>
-          <div class="friend-name">${friend.name}</div>
+
+          <div>
+            <div class="friend-top">
+              <span class="friend-level">${friend.level || 1} lvl</span>
+              <span class="friend-name">${friend.name}</span>
+            </div>
+
+            <div class="friend-income">
+              Доход в час: ${friend.income || 0}
+            </div>
+          </div>
         </div>
 
         <div class="friend-reward">
-          +25 ⭐ +500 💎
+          +${friend.reward || 0}
         </div>
       </div>
     `;
