@@ -762,6 +762,7 @@ else {
 
   modalActionBtn.onclick = function () {
     giftModal.classList.add("show");
+    selectedGiftCard = data;
   };
 }
     
@@ -922,6 +923,7 @@ document.addEventListener("click", function (event) {
   if (event.target.closest("#giftCardBtn")) {
     const input = document.getElementById("giftUserId");
     const sendBtn = document.getElementById("sendGiftBtn");
+    selectedGiftCard = selectedCard;
 
     input.value = "";
     sendBtn.disabled = true;
