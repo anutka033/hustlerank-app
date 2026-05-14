@@ -7,6 +7,7 @@ function safeNumber(value, fallback = 0) {
 
 const state = {
   xp: safeNumber(localStorage.getItem("xp"), 0),
+  playerId: localStorage.getItem("playerId") || Math.floor(100000000 + Math.random() * 900000000).toString(),
   maxXp: Math.max(100, safeNumber(localStorage.getItem("maxXp"), 100)),
   level: Math.max(1, safeNumber(localStorage.getItem("level"), 1)),
   coins: safeNumber(localStorage.getItem("coins"), 0),
@@ -16,7 +17,8 @@ const state = {
 boughtCards: JSON.parse(localStorage.getItem("boughtCards") || "[]"),
   cards: JSON.parse(localStorage.getItem("cards") || "{}")
 };
-
+localStorage.setItem("playerId", state.playerId);
+document.getElementById("playerId").textContent = "ID: " + state.playerId;
 const cardsData = [
   { id: "novice", price: 10 },
   { id: "focus", price: 25 },
