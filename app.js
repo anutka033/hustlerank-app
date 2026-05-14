@@ -921,7 +921,7 @@ document.addEventListener("input", function (event) {
   }
 });
 
-document.addEventListener("click", function (event) {
+document.addEventListener("click", async function (event) {
   if (event.target.closest("#giftCardBtn")) {
     const input = document.getElementById("giftUserId");
     const sendBtn = document.getElementById("sendGiftBtn");
@@ -939,17 +939,50 @@ document.addEventListener("click", function (event) {
     document.getElementById("giftModal").classList.remove("show");
   }
 
-  if (event.target.closest("#sendGiftBtn")) {
-    const userId = document.getElementById("giftUserId").value.trim();
+ if (event.target.closest("#sendGiftBtn")) {
+  const receiverId = document.getElementById("giftUserId").value.trim();
 
-    if (userId.length !== 9) {
-      alert("ID должен быть ровно 9 символов");
-      return;
-    }
-
-    alert("🎁 Карта отправлена игроку #" + userId);
-    document.getElementById("giftModal").classList.remove("show");
+  if (receiverId.length !== 9) {
+    alert("ID должен быть ровно 9 цифр");
+    return;
   }
+
+  if (!selectedGiftCard) {
+    alert("Сначала выбери карту");
+    return;
+  }
+
+  if (receiverId === state.playerId) {
+    alert("Нельзя отправить карту самому себе");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("trades")
+    .insert({
+      sender_id: state.playerId,
+      receiver_id: receiverId,
+      card_id: selectedGiftCard.id,
+      status: "sent"
+    });
+
+  if (error) {
+    alert("Ошибка отправки: " + error.message);
+    return;
+  }
+
+  state.boughtCards = state.boughtCards.filter(function (card) {
+    return card.id !== selectedGiftCard.id;
+  });
+
+  save();
+  updateCardsView();
+
+  selectedGiftCard = null;
+  document.getElementById("giftModal").classList.remove("show");
+
+  alert("🎁 Карта отправлена игроку ID: " + receiverId);
+}
 });
 const invitedFriends = [];
 
