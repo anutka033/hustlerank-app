@@ -928,26 +928,7 @@ document.addEventListener("input", function (event) {
 });
 
 document.addEventListener("click", async function (event) {
-  if (event.target.closest("#giftCardBtn")) {
-    const input = document.getElementById("giftUserId");
-    const sendBtn = document.getElementById("sendGiftBtn");
-    selectedGiftCard = selectedCard;
-
-    sendBtn.disabled = false;
-sendBtn.style.opacity = "1";
-sendBtn.style.cursor = "pointer";
-
-    document.getElementById("giftModal").classList.add("show");
-  }
-
-  if (event.target.closest("#cancelGiftBtn")) {
-    document.getElementById("giftModal").classList.remove("show");
-  }
-
  if (event.target.closest("#sendGiftBtn")) {
-  console.log("receiverId:", receiverId);
-console.log("selectedGiftCard:", selectedGiftCard);
-console.log("playerId:", state.playerId);
   const receiverId = document.getElementById("giftUserId").value.trim();
 
   if (receiverId.length !== 9) {
@@ -976,7 +957,6 @@ console.log("playerId:", state.playerId);
 
   if (error) {
     alert("Ошибка отправки: " + error.message);
-console.error(error);
     return;
   }
 
