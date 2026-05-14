@@ -915,9 +915,9 @@ document.addEventListener("input", function (event) {
     const sendBtn = document.getElementById("sendGiftBtn");
     const value = event.target.value.trim();
 
-    sendBtn.disabled = value.length !== 5;
-    sendBtn.style.opacity = value.length === 5 ? "1" : ".5";
-    sendBtn.style.cursor = value.length === 5 ? "pointer" : "not-allowed";
+    sendBtn.disabled = value.length !== 9;
+    sendBtn.style.opacity = value.length === 9 ? "1" : ".5";
+    sendBtn.style.cursor = value.length === 9 ? "pointer" : "not-allowed";
   }
 });
 
@@ -942,8 +942,8 @@ document.addEventListener("click", function (event) {
   if (event.target.closest("#sendGiftBtn")) {
     const userId = document.getElementById("giftUserId").value.trim();
 
-    if (userId.length !== 5) {
-      alert("ID должен быть ровно 5 символов");
+    if (userId.length !== 9) {
+      alert("ID должен быть ровно 9 символов");
       return;
     }
 
