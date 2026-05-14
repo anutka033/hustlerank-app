@@ -940,6 +940,9 @@ sendBtn.style.cursor = "pointer";
 
  if (event.target.closest("#sendGiftBtn")) {
   alert("sendGiftBtn нажалась");
+  console.log("receiverId:", receiverId);
+console.log("selectedGiftCard:", selectedGiftCard);
+console.log("playerId:", state.playerId);
   const receiverId = document.getElementById("giftUserId").value.trim();
 
   if (receiverId.length !== 9) {
@@ -968,6 +971,7 @@ sendBtn.style.cursor = "pointer";
 
   if (error) {
     alert("Ошибка отправки: " + error.message);
+console.error(error);
     return;
   }
 
