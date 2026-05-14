@@ -960,9 +960,13 @@ document.addEventListener("click", async function (event) {
     return;
   }
 
-  state.boughtCards = state.boughtCards.filter(function (card) {
-    return card.id !== selectedGiftCard.id;
-  });
+  state.inventory = state.inventory.filter(function (card) {
+  return card.id !== selectedGiftCard.id;
+});
+
+state.boughtCards = state.boughtCards.filter(function (card) {
+  return card.id !== selectedGiftCard.id;
+});
 
   save();
   updateCardsView();
