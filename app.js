@@ -939,6 +939,7 @@ sendBtn.style.cursor = "pointer";
   }
 
  if (event.target.closest("#sendGiftBtn")) {
+  alert("sendGiftBtn нажалась");
   const receiverId = document.getElementById("giftUserId").value.trim();
 
   if (receiverId.length !== 9) {
