@@ -939,7 +939,6 @@ sendBtn.style.cursor = "pointer";
   }
 
  if (event.target.closest("#sendGiftBtn")) {
-  alert("sendGiftBtn нажалась");
   console.log("receiverId:", receiverId);
 console.log("selectedGiftCard:", selectedGiftCard);
 console.log("playerId:", state.playerId);
