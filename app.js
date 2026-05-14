@@ -1,9 +1,11 @@
 const SUPABASE_URL = "https://yxwsgvsejgmzocgnuukn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_CAb0_OQcsJmBLymP1qmAvA_OWW_bJED";
-const supabase = window.supabase.createClient(
+
+const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
+
 function safeNumber(value, fallback = 0) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
@@ -963,7 +965,7 @@ console.log("playerId:", state.playerId);
     return;
   }
 
-  const { error } = await supabase
+  const { error } = await supabaseClient
     .from("trades")
     .insert({
       sender_id: state.playerId,
@@ -1437,7 +1439,7 @@ if (dailyDropEndTime > Date.now()) {
 updateDailyTimer();
 loadIncomingCards();
 async function loadIncomingCards() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("trades")
     .select("*")
     .eq("receiver_id", state.playerId)

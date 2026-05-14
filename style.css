@@ -2347,11 +2347,11 @@ overflow: hidden;
 }
 
 .player-info h2{
-  font-size:22px;
-  line-height:1;
-  white-space:nowrap;
-  margin-top:18px;
+  font-size:20px;
+  font-weight:800;
+  color:white;
 }
+
 
 .player-info p{
   font-size:13px;
@@ -3314,4 +3314,26 @@ bottom:80px;
 .rarity-limited{
   border-color:#00fff0;
   box-shadow:0 0 35px rgba(0,255,240,.9);
+}
+#playerId{
+  display:inline-flex;
+  align-items:center;
+
+  font-size:13px;
+  font-weight:700;
+  color:white;
+
+  padding:4px 10px;
+  border-radius:10px;
+
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+
+  backdrop-filter:blur(8px);
+
+  width:fit-content;
+  white-space:nowrap;
+
+  margin-top:22px;
+  margin-bottom:4px;
 }
