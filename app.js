@@ -955,11 +955,13 @@ document.addEventListener("click", async function (event) {
       status: "sent"
     });
 
-  if (error) {
-    alert("Ошибка отправки: " + error.message);
-    return;
-  }
+ if (error) {
 
+  alert("Ошибка отправки: " + error.message);
+
+  return;
+
+}
   state.inventory = state.inventory.filter(function (card) {
   return card.id !== selectedGiftCard.id;
 });
@@ -967,7 +969,9 @@ document.addEventListener("click", async function (event) {
 state.boughtCards = state.boughtCards.filter(function (card) {
   return card.id !== selectedGiftCard.id;
 });
-
+if (state.cards[selectedGiftCard.id]) {
+  state.cards[selectedGiftCard.id].unlocked = false;
+}
   save();
   updateCardsView();
 
