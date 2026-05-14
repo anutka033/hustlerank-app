@@ -1428,3 +1428,40 @@ if (dailyDropEndTime > Date.now()) {
 }
 
 updateDailyTimer();
+loadIncomingCards();
+async function loadIncomingCards() {
+  const { data, error } = await supabase
+    .from("trades")
+    .select("*")
+    .eq("receiver_id", state.playerId)
+    .eq("status", "sent");
+
+  if (error || !data) {
+    return;
+  }
+
+  let received = false;
+
+  data.forEach(function (trade) {
+    const alreadyExists = state.boughtCards.some(function(card) {
+      return card.id === trade.card_id;
+    });
+
+    if (!alreadyExists) {
+      const foundCard = cardsData.find(function(card) {
+        return card.id === trade.card_id;
+      });
+
+      if (foundCard) {
+        state.boughtCards.push(foundCard);
+        received = true;
+      }
+    }
+  });
+
+  if (received) {
+    save();
+    updateCardsView();
+    alert("🎁 Вам пришла новая карта!");
+  }
+}
