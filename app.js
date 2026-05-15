@@ -1039,27 +1039,29 @@ registerReferral();
 const inviteFriendBtn = document.getElementById("inviteFriendBtn");
 const copyRefBtn = document.getElementById("copyRefBtn");
 
-inviteFriendBtn.addEventListener("click", async () => {
+inviteFriendBtn.addEventListener("click", async function () {
 
   const response = await fetch("/api/share", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      userId: playerId,
-    }),
+      userId: playerId
+    })
   });
 
   const data = await response.json();
 
-  const shareText = encodeURIComponent(data.text);
-  const shareUrl = encodeURIComponent(data.referralLink);
+  if (data.preparedMessageId && window.Telegram?.WebApp?.shareMessage) {
+    Telegram.WebApp.shareMessage(data.preparedMessageId);
+    return;
+  }
 
-  window.open(
-    `https://t.me/share/url?url=${shareUrl}&text=${shareText}`,
-    "_blank"
-  );
+  const fallbackUrl =
+    `https://t.me/share/url?url=${encodeURIComponent(data.referralLink)}&text=${encodeURIComponent(data.text)}`;
+
+  window.open(fallbackUrl, "_blank");
 });
 
 copyRefBtn.addEventListener("click", function () {
