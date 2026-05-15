@@ -38,20 +38,15 @@ const cardsData = [
   { id: "voidemperor", price: 250 },
   { id: "solaremperor", price: 5000 },
   { id: "common01", price: 10 },
-{ id: "common02", price: 10 },
-{ id: "common03", price: 10 },
-
-{ id: "rare01", price: 35 },
-{ id: "rare02", price: 40 },
-{ id: "rare03", price: 45 },
-
-{ id: "epic02", price: 90 },
-
-{ id: "legendary01", price: 950 },
-
-{ id: "mythic01", price: 2500 },
-
-{ id: "limited01", price: 9000 },
+  { id: "common02", price: 10 },
+  { id: "common03", price: 10 },
+  { id: "rare01", price: 35 },
+  { id: "rare02", price: 40 },
+  { id: "rare03", price: 45 },
+  { id: "epic02", price: 90 },
+  { id: "legendary01", price: 950 },
+  { id: "mythic01", price: 2500 },
+  { id: "limited01", price: 9000 },
 ];
 
 const levelEl = document.getElementById("level");
@@ -476,7 +471,9 @@ function updateCardsView(){
 
       cardModal.classList.add("show");
       cardModal.classList.remove("view-front");
-      viewCardBtn.textContent = "👁 Смотреть карту";
+      if (viewCardBtn) {
+  viewCardBtn.textContent = "👁 Смотреть карту";
+}
       document.querySelector(".bottom-nav").classList.add("hide-nav");
     });
 
@@ -982,7 +979,52 @@ if (state.cards[selectedGiftCard.id]) {
 }
 });
 const invitedFriends = [];
+const playerId =
+localStorage.getItem("playerId") ||
+Math.random().toString(36).substring(2, 10);
 
+localStorage.setItem("playerId", playerId);
+
+const REF_BASE_URL = "https://hustlerank-app.vercel.app/";
+
+const referralLink = `${REF_BASE_URL}?ref=${playerId}`;
+
+const inviteFriendBtn = document.getElementById("inviteFriendBtn");
+const copyRefBtn = document.getElementById("copyRefBtn");
+
+inviteFriendBtn.addEventListener("click", async function () {
+
+    const text =
+`🔥 Играй со мной в Hustle Rank!
+
+Вот моя ссылка:
+${referralLink}`;
+
+    if (navigator.share) {
+
+        await navigator.share({
+            title: "Hustle Rank",
+            text: text
+        });
+
+    } else {
+
+        navigator.clipboard.writeText(referralLink);
+        alert("Ссылка скопирована!");
+    }
+});
+
+copyRefBtn.addEventListener("click", function () {
+
+    navigator.clipboard.writeText(referralLink);
+
+    copyRefBtn.textContent = "✅";
+
+    setTimeout(function () {
+        copyRefBtn.textContent = "📋";
+    }, 1500);
+
+});
 const friendsContainer =
   document.getElementById("friendsContainer");
 
@@ -1028,38 +1070,7 @@ function renderFriends() {
 }
 
 renderFriends();
-const dropCards = [
-  {
-    name: "Новичок",
-    rarity: "ЭПИЧЕСКАЯ",
-    img: "images/epic-smile.png"
-  },
-  {
-    name: "Фокус",
-    rarity: "РЕДКАЯ",
-    img: "images/focus-mind.png"
-  },
-  {
-    name: "Лидер",
-    rarity: "ЛЕГЕНДАРНАЯ",
-    img: "images/leader-core.png"
-  },
-  {
-    name: "Void King",
-    rarity: "ЛЕГЕНДАРНАЯ",
-    img: "images/void-king.png"
-  },
-  {
-    name: "Storm Paw",
-    rarity: "МИФИЧЕСКАЯ",
-    img: "images/mystic-stormpaw.png"
-  },
-  {
-    name: "Void Mage",
-    rarity: "МИФИЧЕСКАЯ",
-    img: "images/mystic-voidmage.png"
-  }
-];
+
 
 const openDropBtn = document.getElementById("openDropBtn");
 console.log(openDropBtn);
@@ -1089,10 +1100,18 @@ closeDropModal.addEventListener("click", function () {
   });
 
   if (fullCard && !state.boughtCards.some(function (card) {
-    return card.id === fullCard.id;
-  })) {
-    state.boughtCards.push(fullCard);
-  }
+  return card.id === fullCard.id;
+})) {
+  state.boughtCards.push({
+    id: fullCard.id,
+    title: fullCard.name,
+    name: fullCard.name,
+    image: fullCard.img,
+    img: fullCard.img,
+    rarity: fullCard.rarity,
+    price: fullCard.price || 0
+  });
+}
 
   save();
   updateUI();
