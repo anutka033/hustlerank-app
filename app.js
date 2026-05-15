@@ -987,10 +987,19 @@ localStorage.setItem("playerId", playerId);
 
 const REF_BASE_URL = "https://hustlerank-app.vercel.app/";
 
-const referralLink = `${REF_BASE_URL}?ref=${playerId}`;
+const referralLink = `https://t.me/HustleRank033Bot?startapp=ref_${playerId}`;
 
 const urlParams = new URLSearchParams(window.location.search);
-const referrerId = urlParams.get("ref");
+
+let referrerId = urlParams.get("ref");
+
+if (window.Telegram && Telegram.WebApp) {
+  const startParam = Telegram.WebApp.initDataUnsafe?.start_param;
+
+  if (startParam && startParam.startsWith("ref_")) {
+    referrerId = startParam.replace("ref_", "");
+  }
+}
 
 async function registerReferral() {
 
