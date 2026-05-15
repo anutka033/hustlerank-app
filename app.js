@@ -877,14 +877,29 @@ if (shopClose) {
 }
 
 document.querySelectorAll(".shop-pack").forEach(function(pack){
-  pack.addEventListener("click", function(){
-    const amount = Number(pack.dataset.stars);
 
-    state.stars += amount;
-    updateUI();
-    closeShop();
-    showToast("+" + amount + " ⭐");
+  pack.addEventListener("click", async function(){
+
+    const stars = Number(pack.dataset.stars);
+
+    const response = await fetch("/api/create-invoice", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        stars,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.invoiceLink) {
+      Telegram.WebApp.openInvoice(data.invoiceLink);
+    }
+
   });
+
 });
 updateUI();
 document.querySelectorAll(".rank-card").forEach(card => {
