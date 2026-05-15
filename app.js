@@ -988,7 +988,7 @@ localStorage.setItem("playerId", playerId);
 const REF_BASE_URL = "https://hustlerank-app.vercel.app/";
 
 const referralLink = `https://t.me/HustleRank033Bot?startapp=ref_${playerId}`;
-
+alert(referralLink);
 const urlParams = new URLSearchParams(window.location.search);
 
 let referrerId = urlParams.get("ref");
