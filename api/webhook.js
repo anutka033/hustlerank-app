@@ -1,24 +1,47 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+  const BOT_TOKEN = process.env.BOT_TOKEN;
+
+  const update = req.body;
+
+  if (update.pre_checkout_query) {
+    const queryId = update.pre_checkout_query.id;
+
+    await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/answerPreCheckoutQuery`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pre_checkout_query_id: queryId,
+          ok: true,
+        }),
+      }
+    );
+
+    return res.status(200).send("ok");
   }
 
-  try {
-    const update = req.body;
+  if (update.message?.successful_payment) {
+    const chatId = update.message.chat.id;
 
-    const payment = update.message?.successful_payment;
+    await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: "⭐ Оплата прошла успешно! Звёзды начислены.",
+        }),
+      }
+    );
 
-    if (!payment) {
-      return res.status(200).json({ ok: true });
-    }
-
-    const payload = JSON.parse(payment.invoice_payload);
-
-    console.log("PAID:", payload.playerId, payload.starsAmount);
-
-    return res.status(200).json({ ok: true });
-
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(200).send("payment received");
   }
+
+  return res.status(200).send("ok");
 }
