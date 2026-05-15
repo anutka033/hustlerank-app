@@ -24,6 +24,13 @@ export default async function handler(req, res) {
   }
 
   if (update.message?.successful_payment) {
+    const payload = JSON.parse(
+  update.message.successful_payment.invoice_payload
+);
+
+const starsAmount = payload.starsAmount;
+
+console.log("Успешная покупка:", starsAmount);
     const chatId = update.message.chat.id;
 
     await fetch(
