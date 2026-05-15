@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { playerId, starsAmount, priceStars } = req.body;
+    const { starsAmount, priceStars } = req.body;
 
     const BOT_TOKEN = process.env.BOT_TOKEN;
 
@@ -19,7 +19,6 @@ export default async function handler(req, res) {
           title: `${starsAmount} игровых звёзд`,
           description: `Покупка ${starsAmount} звёзд в Hustle Rank`,
           payload: JSON.stringify({
-            playerId,
             starsAmount
           }),
           currency: "XTR",
