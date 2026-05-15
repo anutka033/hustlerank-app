@@ -988,7 +988,7 @@ localStorage.setItem("playerId", playerId);
 const REF_BASE_URL = "https://hustlerank-app.vercel.app/";
 
 const referralLink = `https://t.me/HustleRank033Bot?startapp=ref_${playerId}`;
-alert(referralLink);
+
 const urlParams = new URLSearchParams(window.location.search);
 
 let referrerId = urlParams.get("ref");
@@ -1039,26 +1039,27 @@ registerReferral();
 const inviteFriendBtn = document.getElementById("inviteFriendBtn");
 const copyRefBtn = document.getElementById("copyRefBtn");
 
-inviteFriendBtn.addEventListener("click", async function () {
+inviteFriendBtn.addEventListener("click", async () => {
 
-    const text =
-`🔥 Играй со мной в Hustle Rank!
+  const response = await fetch("/api/share", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      userId: playerId,
+    }),
+  });
 
-Вот моя ссылка:
-${referralLink}`;
+  const data = await response.json();
 
-    if (navigator.share) {
+  const shareText = encodeURIComponent(data.text);
+  const shareUrl = encodeURIComponent(data.referralLink);
 
-        await navigator.share({
-            title: "Hustle Rank",
-            text: text
-        });
-
-    } else {
-
-        navigator.clipboard.writeText(referralLink);
-        alert("Ссылка скопирована!");
-    }
+  window.open(
+    `https://t.me/share/url?url=${shareUrl}&text=${shareText}`,
+    "_blank"
+  );
 });
 
 copyRefBtn.addEventListener("click", function () {
