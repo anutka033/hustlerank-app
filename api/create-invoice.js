@@ -4,7 +4,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { starsAmount, priceStars } = req.body;
+    const { playerId, starsAmount, priceStars } = req.body;
+
+    if (!starsAmount || !priceStars) {
+      return res.status(400).json({
+        error: "Нет starsAmount или priceStars"
+      });
+    }
 
     const BOT_TOKEN = process.env.BOT_TOKEN;
 
@@ -19,8 +25,10 @@ export default async function handler(req, res) {
           title: `${starsAmount} игровых звёзд`,
           description: `Покупка ${starsAmount} звёзд в Hustle Rank`,
           payload: JSON.stringify({
+            playerId,
             starsAmount
           }),
+          provider_token: "",
           currency: "XTR",
           prices: [
             {

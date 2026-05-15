@@ -900,9 +900,10 @@ document.querySelectorAll(".shop-pack").forEach((pack) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          starsAmount,
-          priceStars
-        })
+  playerId: state.playerId,
+  starsAmount,
+  priceStars
+})
       });
 
       const data = await response.json();
@@ -928,7 +929,7 @@ document.querySelectorAll(".shop-pack").forEach((pack) => {
 
       } else {
 
-        alert("Ошибка invoice");
+        alert("Ошибка invoice: " + JSON.stringify(data));
 
       }
 
@@ -936,7 +937,7 @@ document.querySelectorAll(".shop-pack").forEach((pack) => {
 
       console.log(err);
 
-      alert("Ошибка покупки");
+      alert("Ошибка покупки: " + err.message);
 
     }
 
