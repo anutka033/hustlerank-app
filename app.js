@@ -989,6 +989,44 @@ const REF_BASE_URL = "https://hustlerank-app.vercel.app/";
 
 const referralLink = `${REF_BASE_URL}?ref=${playerId}`;
 
+const urlParams = new URLSearchParams(window.location.search);
+const referrerId = urlParams.get("ref");
+
+async function registerReferral() {
+
+    if (
+        !referrerId ||
+        referrerId === playerId ||
+        localStorage.getItem("referralRegistered")
+    ) {
+        return;
+    }
+
+    const { data: existingReferral } = await supabaseClient
+        .from("referrals")
+        .select("*")
+        .eq("invited_id", playerId)
+        .maybeSingle();
+
+    if (existingReferral) {
+        return;
+    }
+
+    await supabaseClient
+        .from("referrals")
+        .insert({
+            referrer_id: referrerId,
+            invited_id: playerId,
+            invited_level: state.level || 1,
+            reward_claimed: false
+        });
+
+    localStorage.setItem("referralRegistered", "true");
+
+    alert("🎉 Вы зарегистрированы как приглашённый друг!");
+}
+
+registerReferral();
 const inviteFriendBtn = document.getElementById("inviteFriendBtn");
 const copyRefBtn = document.getElementById("copyRefBtn");
 
@@ -1070,8 +1108,98 @@ function renderFriends() {
 }
 
 renderFriends();
+async function loadReferrals() {
 
+    const { data, error } = await supabaseClient
+        .from("referrals")
+        .select("*")
+        .eq("referrer_id", playerId);
 
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    invitedFriends.length = 0;
+
+    let availableStars = 0;
+    let availableCrystals = 0;
+
+    data.forEach(function(ref) {
+
+        invitedFriends.push({
+            name: "Игрок",
+            level: ref.invited_level,
+            income: 0,
+            reward: ref.reward_claimed ? "✅" : "🎁"
+        });
+
+        if (
+            ref.invited_level >= 3 &&
+            !ref.reward_claimed
+        ) {
+            availableStars += 250;
+            availableCrystals += 500;
+        }
+    });
+
+    document.getElementById("friendsCount").textContent = data.length;
+
+    document.getElementById("claimStars").textContent =
+        availableStars;
+
+    document.getElementById("claimCrystals").textContent =
+        availableCrystals;
+
+    renderFriends();
+}
+
+loadReferrals();
+document
+.getElementById("claimRefBtn")
+.addEventListener("click", async function () {
+
+    const { data } = await supabaseClient
+        .from("referrals")
+        .select("*")
+        .eq("referrer_id", playerId);
+
+    let rewardCount = 0;
+
+    for (const ref of data) {
+
+        if (
+            ref.invited_level >= 3 &&
+            !ref.reward_claimed
+        ) {
+
+            rewardCount++;
+
+            await supabaseClient
+                .from("referrals")
+                .update({
+                    reward_claimed: true
+                })
+                .eq("id", ref.id);
+        }
+    }
+
+    if (rewardCount <= 0) {
+
+        alert("Нет наград");
+        return;
+    }
+
+    state.stars += rewardCount * 250;
+    state.crystals += rewardCount * 500;
+
+    save();
+    updateUI();
+
+    alert("🎉 Награда получена!");
+
+    loadReferrals();
+});
 const openDropBtn = document.getElementById("openDropBtn");
 console.log(openDropBtn);
 const dropModal = document.getElementById("dropModal");
