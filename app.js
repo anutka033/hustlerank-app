@@ -876,26 +876,68 @@ if (shopClose) {
   shopClose.addEventListener("click", closeShop);
 }
 
-document.querySelectorAll(".shop-pack").forEach(function(pack){
+const starPrices = {
+  150: 5,
+  500: 15,
+  1200: 30,
+  3500: 80,
+  12000: 250
+};
 
-  pack.addEventListener("click", async function(){
+document.querySelectorAll(".shop-pack").forEach((pack) => {
 
-    const stars = Number(pack.dataset.stars);
+  pack.addEventListener("click", async () => {
 
-    const response = await fetch("/api/create-invoice", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        stars,
-      }),
-    });
+    const starsAmount = Number(pack.dataset.stars);
 
-    const data = await response.json();
+    const priceStars = starPrices[starsAmount];
 
-    if (data.invoiceLink) {
-      Telegram.WebApp.openInvoice(data.invoiceLink);
+    try {
+
+      const response = await fetch("/api/create-invoice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          starsAmount,
+          priceStars
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.invoiceLink) {
+
+        Telegram.WebApp.openInvoice(
+          data.invoiceLink,
+          (status) => {
+
+            if (status === "paid") {
+
+              state.stars += starsAmount;
+
+              updateUI();
+
+              showToast("⭐ Покупка успешна");
+
+            }
+
+          }
+        );
+
+      } else {
+
+        alert("Ошибка invoice");
+
+      }
+
+    } catch (err) {
+
+      console.log(err);
+
+      alert("Ошибка покупки");
+
     }
 
   });
