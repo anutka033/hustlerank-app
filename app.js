@@ -25,6 +25,13 @@ const state = {
 boughtCards: JSON.parse(localStorage.getItem("boughtCards") || "[]"),
   cards: JSON.parse(localStorage.getItem("cards") || "{}")
 };
+if (state.vip && !state.vipUntil) {
+  state.vipUntil =
+    Date.now() + (30 * 24 * 60 * 60 * 1000);
+}
+
+let vipFreeDropClaimed =
+  localStorage.getItem("vipFreeDropClaimed") === "true";
 localStorage.setItem("playerId", state.playerId);
 document.getElementById("playerId").textContent = "ID: " + state.playerId;
 const cardsData = [
@@ -283,24 +290,18 @@ if (avatar) {
   updateDrops();
   updateCards();
   save();
-  const vipBadge = document.getElementById("vipBadge");
+ }
+const vipBtn = document.getElementById("vipBtn");
 
-if (
-  state.vip &&
-  state.vipUntil > Date.now()
-) {
-
-  vipBadge.style.display = "inline-flex";
-
-} else {
-
-  vipBadge.style.display = "none";
-
-  state.vip = false;
-
+if (vipBtn) {
+  if (isVipActive()) {
+    vipBtn.classList.add("disabled");
+    vipBtn.innerHTML = "<span>👑</span> VIP";
+  } else {
+    vipBtn.classList.remove("disabled");
+    vipBtn.innerHTML = "<span>👑</span> VIP";
+  }
 }
-}
-
 function openScreen(name) {
   Object.values(screens).forEach(function (screen) {
     if (screen) screen.classList.remove("active-screen");
@@ -1624,8 +1625,6 @@ const dailyDropTimer = document.getElementById("dailyDropTimer");
 
 let dailyDropEndTime =
   Number(localStorage.getItem("dailyDropEndTime")) || 0;
-let vipFreeDropClaimed =
-  localStorage.getItem("vipFreeDropClaimed") === "true";
 function updateDailyTimer() {
   if (!dailyClaimBtn || !dailyDropTimer) return;
 
@@ -1780,21 +1779,26 @@ menuToggle.textContent = "❯";
 }
 
 });
-const vipBtn = document.getElementById("vipBtn");
+const vipMenuBtn = document.getElementById("vipBtn");
 const vipModal = document.getElementById("vipModal");
 const vipCancelBtn = document.getElementById("vipCancelBtn");
 const vipBuyBtn = document.getElementById("vipBuyBtn");
-console.log("vipBtn:", vipBtn);
+console.log("vipMenuBtn:", vipMenuBtn);
 console.log("vipModal:", vipModal);
 console.log("vipCancelBtn:", vipCancelBtn);
 console.log("vipBuyBtn:", vipBuyBtn);
 
-if (vipBtn && vipModal && vipCancelBtn && vipBuyBtn) {
+if (vipMenuBtn && vipModal && vipCancelBtn && vipBuyBtn) {
 
   // открыть VIP окно
-  vipBtn.addEventListener("click", () => {
-    vipModal.classList.add("show");
-  });
+  vipMenuBtn.addEventListener("click", () => {
+  if (isVipActive()) {
+    showToast("👑 VIP уже активен");
+    return;
+  }
+
+  vipModal.classList.add("show");
+});
 
   // закрыть VIP окно
   vipCancelBtn.addEventListener("click", () => {
@@ -1803,7 +1807,11 @@ if (vipBtn && vipModal && vipCancelBtn && vipBuyBtn) {
 
   // купить VIP
   vipBuyBtn.addEventListener("click", async () => {
-
+if (isVipActive()) {
+  showToast("👑 VIP уже активен");
+  vipModal.classList.remove("show");
+  return;
+}
     try {
 
       const response = await fetch("/api/create-invoice", {
@@ -1837,6 +1845,9 @@ if (vipBtn && vipModal && vipCancelBtn && vipBuyBtn) {
 
               state.vip = true;
               state.vipUntil = vipEnd;
+              vipFreeDropClaimed = false;
+
+localStorage.setItem("vipFreeDropClaimed", "false");
 
               save();
 
@@ -1864,4 +1875,6 @@ if (vipBtn && vipModal && vipCancelBtn && vipBuyBtn) {
 
   });
 
-}
+  }
+  
+  
