@@ -1709,5 +1709,17 @@ supabaseClient
 const sideMenu = document.getElementById("sideMenu");
 
 menuToggle.addEventListener("click", () => {
+
 sideMenu.classList.toggle("open");
+
+if(sideMenu.classList.contains("open")){
+
+menuToggle.textContent = "❮";
+
+}else{
+
+menuToggle.textContent = "❯";
+
+}
+
 });
