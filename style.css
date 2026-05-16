@@ -3614,3 +3614,136 @@ opacity: 0.7;
 position: relative;
 overflow: hidden;
 }
+.vip-badge{
+display:none;
+
+margin-top:6px;
+padding:4px 12px;
+
+border-radius:999px;
+
+background:linear-gradient(
+45deg,
+#ffcc33,
+#ffea70,
+#ffb300
+);
+
+color:#1a1200;
+font-size:12px;
+font-weight:800;
+letter-spacing:1px;
+
+box-shadow:
+0 0 10px rgba(255,215,0,0.7),
+0 0 20px rgba(255,215,0,0.35);
+
+animation:vipGlow 2s infinite alternate;
+}
+
+@keyframes vipGlow{
+from{
+box-shadow:
+0 0 8px rgba(255,215,0,0.5),
+0 0 18px rgba(255,215,0,0.25);
+}
+
+to{
+box-shadow:
+0 0 16px rgba(255,215,0,0.9),
+0 0 28px rgba(255,215,0,0.55);
+}
+}
+.vip-modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(10px);
+  z-index:99999;
+}
+
+.vip-modal.show{
+  display:flex;
+}
+
+.vip-modal-box{
+  width:320px;
+  padding:26px;
+  border-radius:28px;
+  text-align:center;
+  color:white;
+  position:relative;
+  overflow:hidden;
+
+  background:linear-gradient(180deg,#2b2108,#130f05);
+  border:1px solid rgba(255,215,80,.55);
+
+  box-shadow:
+    0 0 30px rgba(255,215,80,.45),
+    inset 0 0 30px rgba(255,215,80,.12);
+}
+
+.vip-crown{
+  font-size:46px;
+  margin-bottom:8px;
+  filter:drop-shadow(0 0 14px rgba(255,215,80,.9));
+}
+
+.vip-modal-box h2{
+  margin:0;
+  font-size:28px;
+  color:#ffe77a;
+}
+
+.vip-subtitle{
+  margin:8px 0 18px;
+  color:#ffd86b;
+  font-weight:700;
+}
+
+.vip-benefits{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-bottom:20px;
+  text-align:left;
+}
+
+.vip-benefits div{
+  padding:11px 12px;
+  border-radius:16px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,215,80,.18);
+  font-size:14px;
+  font-weight:700;
+}
+
+.vip-buy-btn{
+  width:100%;
+  border:none;
+  border-radius:18px;
+  padding:15px;
+  background:linear-gradient(135deg,#ffcc33,#ff9f1a);
+  color:#241300;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 0 22px rgba(255,200,60,.45);
+}
+
+.vip-close{
+  position:absolute;
+  top:12px;
+  right:12px;
+  width:32px;
+  height:32px;
+  border:none;
+  border-radius:50%;
+  background:rgba(255,255,255,.12);
+  color:white;
+  font-size:22px;
+  cursor:pointer;
+}

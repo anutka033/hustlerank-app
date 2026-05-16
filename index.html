@@ -27,6 +27,7 @@
 
   <div class="player-info">
     <h2 id="playerId">ID: </h2>
+<span id="vipBadge" class="vip-badge">👑 VIP</span>
     <p class="player-sub">
     <p class="player-xp" id="xpText">
   16394 / 1830000 XP
@@ -96,7 +97,7 @@
 Бонус
 </button>
 
-<button class="menu-btn">
+<button class="menu-btn" id="vipBtn">
 <span>👑</span>
 VIP
 </button>
@@ -598,7 +599,29 @@ VIP
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="app.js"></script>
+<div class="vip-modal" id="vipModal">
+  <div class="vip-modal-box">
+    <button class="vip-close" id="vipCancelBtn">×</button>
+
+    <div class="vip-crown">👑</div>
+
+    <h2>VIP статус</h2>
+    <p class="vip-subtitle">Премиум-привилегии на 30 дней</p>
+
+    <div class="vip-benefits">
+      <div>⭐ Ежедневный бонус x2</div>
+      <div>🎁 +1 бесплатный дроп каждый день</div>
+      <div>⚡ +25% XP за задания</div>
+      <div>💎 +100 кристаллов сразу</div>
+      <div>🃏 Повышенный шанс редких карт</div>
+    </div>
+
+    <button class="vip-buy-btn" id="vipBuyBtn">
+      Купить за 99 ⭐ Telegram Stars
+    </button>
+  </div>
+</div>
 </body>
 </html>

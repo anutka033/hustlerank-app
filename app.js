@@ -18,6 +18,8 @@ const state = {
   level: Math.max(1, safeNumber(localStorage.getItem("level"), 1)),
   coins: safeNumber(localStorage.getItem("coins"), 0),
   stars: safeNumber(localStorage.getItem("stars"), 0),
+  vip: localStorage.getItem("vip") === "true",
+  vipUntil: Number(localStorage.getItem("vipUntil")) || 0,
   bonusTaken: localStorage.getItem("bonusTaken") === "true",
   inventory: JSON.parse(localStorage.getItem("inventory") || "[]"),
 boughtCards: JSON.parse(localStorage.getItem("boughtCards") || "[]"),
@@ -84,6 +86,8 @@ function save() {
   localStorage.setItem("level", state.level);
   localStorage.setItem("coins", state.coins);
   localStorage.setItem("stars", state.stars);
+  localStorage.setItem("vip", state.vip);
+  localStorage.setItem("vipUntil", state.vipUntil);
   localStorage.setItem("bonusTaken", state.bonusTaken);
   localStorage.setItem("cards", JSON.stringify(state.cards));
   localStorage.setItem("inventory", JSON.stringify(state.inventory || []));
@@ -266,6 +270,22 @@ if (avatar) {
   updateDrops();
   updateCards();
   save();
+  const vipBadge = document.getElementById("vipBadge");
+
+if (
+  state.vip &&
+  state.vipUntil > Date.now()
+) {
+
+  vipBadge.style.display = "inline-flex";
+
+} else {
+
+  vipBadge.style.display = "none";
+
+  state.vip = false;
+
+}
 }
 
 function openScreen(name) {
@@ -1723,3 +1743,84 @@ menuToggle.textContent = "❯";
 }
 
 });
+const vipBtn = document.getElementById("vipBtn");
+const vipModal = document.getElementById("vipModal");
+const vipCancelBtn = document.getElementById("vipCancelBtn");
+const vipBuyBtn = document.getElementById("vipBuyBtn");
+
+if (vipBtn && vipModal && vipCancelBtn && vipBuyBtn) {
+
+  // открыть VIP окно
+  vipBtn.addEventListener("click", () => {
+    vipModal.classList.add("show");
+  });
+
+  // закрыть VIP окно
+  vipCancelBtn.addEventListener("click", () => {
+    vipModal.classList.remove("show");
+  });
+
+  // купить VIP
+  vipBuyBtn.addEventListener("click", async () => {
+
+    try {
+
+      const response = await fetch("/api/create-invoice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          playerId: playerId,
+          starsAmount: 1,
+          priceStars: 99,
+          vipPurchase: true
+        })
+
+      });
+
+      const data = await response.json();
+
+      if (data.invoiceLink) {
+
+        Telegram.WebApp.openInvoice(
+          data.invoiceLink,
+
+          (status) => {
+
+            if (status === "paid") {
+
+              const vipEnd =
+                Date.now() + (30 * 24 * 60 * 60 * 1000);
+
+              state.vip = true;
+              state.vipUntil = vipEnd;
+
+              save();
+
+              vipModal.classList.remove("show");
+
+              showToast("👑 VIP активирован!");
+
+              updateUI();
+
+            }
+
+          }
+
+        );
+
+      }
+
+    } catch (err) {
+
+      console.log(err);
+
+      alert("Ошибка VIP");
+
+    }
+
+  });
+
+}
