@@ -111,6 +111,19 @@ function xpPerClick() {
   if (state.level >= 2) return 10;
   return 5;
 }
+function isVipActive() {
+  return state.vip && state.vipUntil > Date.now();
+}
+
+function addXp(amount) {
+  const finalXp = isVipActive()
+    ? Math.floor(amount * 1.25)
+    : amount;
+
+  state.xp += finalXp;
+
+  return finalXp;
+}
 
 function showToast(text) {
   if (!toast) return;
@@ -1424,7 +1437,26 @@ const rouletteTrack = document.getElementById("rouletteTrack");
 
 openDropBtn.addEventListener("click", function () {
 if (isDropRolling) return;
+let freeVipDrop = false;
 
+if (isVipActive() && !vipFreeDropClaimed) {
+  freeVipDrop = true;
+  vipFreeDropClaimed = true;
+  localStorage.setItem("vipFreeDropClaimed", "true");
+}
+
+if (!freeVipDrop) {
+  if (state.stars < 100) {
+    showToast("Недостаточно ⭐ для дропа");
+    return;
+  }
+
+  state.stars -= 100;
+  save();
+  updateUI();
+} else {
+  showToast("🎁 VIP бесплатный дроп");
+}
 isDropRolling = true;
 lastDropCard = null;
 
@@ -1566,9 +1598,12 @@ if (claimTelegramTaskBtn) {
   claimTelegramTaskBtn.addEventListener("click", function () {
     if (telegramTaskClaimed) return;
 
-    state.stars += 50;
-    state.coins += 500;
-    state.xp += 1500;
+    const gainedStars = isVipActive() ? 100 : 50;
+const gainedCoins = isVipActive() ? 1000 : 500;
+
+state.stars += gainedStars;
+state.coins += gainedCoins;
+    const gainedXp = addXp(1500);
 
     telegramTaskClaimed = true;
 
@@ -1581,7 +1616,7 @@ if (claimTelegramTaskBtn) {
     }
 
     updateUI();
-    showToast("+50 ⭐ +500 💎 +1500 XP");
+    showToast("+" + gainedStars + " ⭐ + " + gainedCoins + " 💎 +" + gainedXp + " XP");
   });
 }
 const dailyClaimBtn = document.getElementById("dailyClaimBtn");
@@ -1589,7 +1624,8 @@ const dailyDropTimer = document.getElementById("dailyDropTimer");
 
 let dailyDropEndTime =
   Number(localStorage.getItem("dailyDropEndTime")) || 0;
-
+let vipFreeDropClaimed =
+  localStorage.getItem("vipFreeDropClaimed") === "true";
 function updateDailyTimer() {
   if (!dailyClaimBtn || !dailyDropTimer) return;
 
@@ -1653,8 +1689,9 @@ if (dailyClaimBtn) {
 if (dailyDropEndTime > Date.now()) {
   return;
 }
-    state.stars += 50;
-    state.xp += 500;
+    const gainedStars = isVipActive() ? 100 : 50;
+state.stars += gainedStars;
+    const gainedXp = addXp(500);
 
     updateUI();
 
@@ -1668,7 +1705,7 @@ if (dailyDropEndTime > Date.now()) {
 
     updateDailyTimer();
 
-    showToast("+50 ⭐ и +500 XP");
+    showToast("+" + gainedStars + " ⭐ и +" + gainedXp + " XP");
   });
 }
 
@@ -1778,7 +1815,7 @@ if (vipBtn && vipModal && vipCancelBtn && vipBuyBtn) {
         body: JSON.stringify({
           playerId: playerId,
           starsAmount: 1,
-          priceStars: 5,
+          priceStars: 150,
           vipPurchase: true
         })
 
