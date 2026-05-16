@@ -1747,6 +1747,10 @@ const vipBtn = document.getElementById("vipBtn");
 const vipModal = document.getElementById("vipModal");
 const vipCancelBtn = document.getElementById("vipCancelBtn");
 const vipBuyBtn = document.getElementById("vipBuyBtn");
+console.log("vipBtn:", vipBtn);
+console.log("vipModal:", vipModal);
+console.log("vipCancelBtn:", vipCancelBtn);
+console.log("vipBuyBtn:", vipBuyBtn);
 
 if (vipBtn && vipModal && vipCancelBtn && vipBuyBtn) {
 
@@ -1774,7 +1778,7 @@ if (vipBtn && vipModal && vipCancelBtn && vipBuyBtn) {
         body: JSON.stringify({
           playerId: playerId,
           starsAmount: 1,
-          priceStars: 99,
+          priceStars: 5,
           vipPurchase: true
         })
 
