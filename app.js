@@ -289,9 +289,7 @@ if (avatar) {
   updateBonus();
   updateDrops();
   updateCards();
-  save();
- 
-const vipBtn = document.getElementById("vipBtn");
+  const vipBtn = document.getElementById("vipBtn");
 
 if (vipBtn) {
   if (isVipActive()) {
@@ -302,6 +300,7 @@ if (vipBtn) {
     vipBtn.innerHTML = "<span>👑</span> VIP";
   }
 }
+  save();
 }
 function openScreen(name) {
   Object.values(screens).forEach(function (screen) {
