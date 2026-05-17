@@ -290,7 +290,7 @@ if (avatar) {
   updateDrops();
   updateCards();
   save();
- }
+ 
 const vipBtn = document.getElementById("vipBtn");
 
 if (vipBtn) {
@@ -301,6 +301,7 @@ if (vipBtn) {
     vipBtn.classList.remove("disabled");
     vipBtn.innerHTML = "<span>👑</span> VIP";
   }
+}
 }
 function openScreen(name) {
   Object.values(screens).forEach(function (screen) {
