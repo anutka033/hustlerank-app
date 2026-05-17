@@ -3580,7 +3580,7 @@ bottom:80px;
 .side-menu{
   position:absolute;
   left:-200px;
-  top:250px;
+  top: 310px;
   width:200px;
   padding:18px;
   border-radius:0 22px 22px 0;
@@ -3921,7 +3921,6 @@ body{
 }
 .screen{
   padding-top: calc(env(safe-area-inset-top) + 70px);
-  box-sizing: border-box;
 }
 
 #homeScreen{
