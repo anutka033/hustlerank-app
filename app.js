@@ -1043,6 +1043,17 @@ document.addEventListener("input", function (event) {
 });
 
 document.addEventListener("click", async function (event) {
+  if (event.target.closest("#cancelGiftBtn")) {
+  document.getElementById("giftModal").classList.remove("show");
+  selectedGiftCard = null;
+
+  const giftUserId = document.getElementById("giftUserId");
+  if (giftUserId) {
+    giftUserId.value = "";
+  }
+
+  return;
+}
  if (event.target.closest("#sendGiftBtn")) {
   const receiverId = document.getElementById("giftUserId").value.trim();
 
