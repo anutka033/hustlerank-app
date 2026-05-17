@@ -1,3 +1,17 @@
+const tg = window.Telegram?.WebApp;
+
+if (tg) {
+  tg.ready();
+  tg.expand();
+
+  setTimeout(() => {
+    try {
+      tg.requestFullscreen?.();
+    } catch (e) {
+      console.log("Fullscreen не поддерживается:", e);
+    }
+  }, 300);
+}
 const SUPABASE_URL = "https://yxwsgvsejgmzocgnuukn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_CAb0_OQcsJmBLymP1qmAvA_OWW_bJED";
 
