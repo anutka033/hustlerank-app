@@ -3840,3 +3840,10 @@ box-shadow:
 white-space:nowrap;
 z-index:20;
 }
+.avatar.vip-avatar{
+border:4px solid #ffd84d;
+
+box-shadow:
+0 0 12px rgba(255,215,0,0.55),
+0 0 28px rgba(255,215,0,0.35);
+}

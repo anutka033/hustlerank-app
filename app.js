@@ -1853,6 +1853,8 @@ if (isVipActive()) {
                 Date.now() + (30 * 24 * 60 * 60 * 1000);
 
               state.vip = true;
+              document.querySelector(".avatar")
+.classList.add("vip-avatar");
               state.vipUntil = vipEnd;
               vipFreeDropClaimed = false;
 
