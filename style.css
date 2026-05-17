@@ -2954,7 +2954,7 @@ bottom:80px;
         url("./images/bg-new.png");
 
     background-size: 100% 100%;
-    background-position: center top;
+    background-position: center -80px;
     background-repeat: no-repeat;
 
     min-height: 100vh;
