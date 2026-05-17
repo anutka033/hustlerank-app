@@ -3860,3 +3860,6 @@ box-shadow:
 0 0 14px rgba(255,215,0,0.75),
 0 0 34px rgba(255,215,0,0.45) !important;
 }
+.avatar.vip-avatar{
+border:4px solid #ffd84d !important;
+}
