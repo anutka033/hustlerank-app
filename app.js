@@ -1823,7 +1823,7 @@ if (isVipActive()) {
         body: JSON.stringify({
           playerId: playerId,
           starsAmount: 1,
-          priceStars: 150,
+          priceStars: 15,
           vipPurchase: true
         })
 
