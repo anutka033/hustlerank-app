@@ -2951,9 +2951,9 @@ bottom:80px;
             rgba(8,8,15,.20),
             rgba(8,8,15,.35)
         ),
-        url("./images/bg-main.png");
+        url("./images/bg-new.png");
 
-    background-size: cover;
+    background-size: 100% 100%;
     background-position: center top;
     background-repeat: no-repeat;
 
