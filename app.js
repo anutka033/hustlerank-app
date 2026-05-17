@@ -4,13 +4,13 @@ if (tg) {
   tg.ready();
   tg.expand();
 
-  setTimeout(() => {
+  document.addEventListener("click", async () => {
     try {
-      tg.requestFullscreen?.();
+      await tg.requestFullscreen?.();
     } catch (e) {
-      console.log("Fullscreen не поддерживается:", e);
+      console.log("Fullscreen error:", e);
     }
-  }, 300);
+  }, { once: true });
 }
 const SUPABASE_URL = "https://yxwsgvsejgmzocgnuukn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_CAb0_OQcsJmBLymP1qmAvA_OWW_bJED";
