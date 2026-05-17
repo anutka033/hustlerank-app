@@ -2511,14 +2511,14 @@ overflow: hidden;
 }
 
 .player-sub{
-  margin-top:4px;
-  display:flex;
-  align-items:center;
-  gap:6px;
+  display: flex;
+  flex-direction: column;
 
-  color:#c6b7ff;
-  font-size:14px;
-  font-weight:600;
+  align-items: flex-start;
+
+  gap: 2px;
+
+  margin-top: 2px;
 }
 .player-xp{
 background:rgba(255,255,255,0.08);
@@ -3862,4 +3862,24 @@ box-shadow:
 }
 .avatar.vip-avatar{
 border:4px solid #ffd84d !important;
+}
+.player-level{
+  margin-top: 0px;
+
+  padding: 2px 8px;
+
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.05);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  color: white;
+
+  font-size: 8px;
+  font-weight: 550;
+
+  width: fit-content;
+
+  backdrop-filter: blur(10px);
 }
