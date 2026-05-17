@@ -270,6 +270,9 @@ function updateUI() {
 
   const percent = Math.min(100, Math.floor((state.xp / state.maxXp) * 100));
 const avatar = document.querySelector(".avatar");
+if (avatar) {
+  avatar.classList.toggle("vip-avatar", isVipActive());
+}
 const deg = percent * 3.6;
 
 if (avatar) {
