@@ -290,6 +290,15 @@ if (avatar) {
   updateDrops();
   updateCards();
   const vipBtn = document.getElementById("vipBtn");
+  const vipBadge = document.getElementById("vipBadge");
+
+if (vipBadge) {
+    if (isVipActive()) {
+        vipBadge.style.display = "inline-flex";
+    } else {
+        vipBadge.style.display = "none";
+    }
+}
 
 if (vipBtn) {
   if (isVipActive()) {
@@ -1823,7 +1832,7 @@ if (isVipActive()) {
         body: JSON.stringify({
           playerId: playerId,
           starsAmount: 1,
-          priceStars: 15,
+          priceStars: 150,
           vipPurchase: true
         })
 
