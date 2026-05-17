@@ -3924,7 +3924,7 @@ body{
 }
 
 #homeScreen{
-  padding-top: calc(env(safe-area-inset-top) + 72px);
+  padding-top: calc(env(safe-area-inset-top) + 65px);
 }
 
 .bottom-nav{
