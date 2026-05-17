@@ -2521,11 +2521,26 @@ overflow: hidden;
   font-weight:600;
 }
 .player-xp{
-  margin-top:6px;
-  font-size:12px;
-  font-weight:700;
-  color:#b67dff;
-  letter-spacing:.3px;
+background:rgba(255,255,255,0.08);
+border:1px solid rgba(255,255,255,0.12);
+backdrop-filter:blur(12px);
+
+padding:1px 4px;
+
+border-radius:12px;
+
+font-size:8px;
+font-weight:500;
+line-height:1.2;
+
+color:#d96cff;
+
+display:inline-block;
+
+box-shadow:
+0 0 10px rgba(180,70,255,0.14);
+
+max-width:140px;
 }
 .right-stats{
   align-self:center;
