@@ -3930,3 +3930,58 @@ body{
 .bottom-nav{
   bottom: calc(env(safe-area-inset-bottom) + 10px);
 }
+/* Особое свечение редких карт только в инвентаре */
+[data-cards-tab="inventory"].active ~ .new-cards-grid .rank-card[data-card-id="solarempire"],
+[data-cards-tab="inventory"].active ~ .new-cards-grid .rank-card[data-card-id="limited01"],
+.rank-card.inventory-premium {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 220, 90, 0.95);
+  box-shadow:
+    0 0 18px rgba(255, 210, 70, 0.9),
+    0 0 38px rgba(180, 80, 255, 0.75),
+    inset 0 0 22px rgba(255, 255, 255, 0.16);
+  animation: premiumGlow 2.4s ease-in-out infinite;
+}
+
+[data-cards-tab="inventory"].active ~ .new-cards-grid .rank-card[data-card-id="solarempire"]::before,
+[data-cards-tab="inventory"].active ~ .new-cards-grid .rank-card[data-card-id="limited01"]::before,
+.rank-card.inventory-premium::before {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -80%;
+  width: 55%;
+  height: 180%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.75),
+    transparent
+  );
+  transform: rotate(18deg);
+  animation: premiumShine 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+@keyframes premiumGlow {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.18);
+  }
+}
+
+@keyframes premiumShine {
+  0% {
+    left: -80%;
+  }
+  55% {
+    left: 130%;
+  }
+  100% {
+    left: 130%;
+  }
+}

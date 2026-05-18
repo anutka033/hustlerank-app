@@ -462,7 +462,7 @@ function updateCardsView(){
   });
 
   if(cardsTab !== "inventory") return;
-
+  
   let ownedFullCards = [];
 
   modalCards.forEach(function(card){
@@ -835,7 +835,11 @@ else {
   };
 }
     
-
+if (data.id === "limited01") {
+  cardModal.classList.add("limited-aura");
+} else {
+  cardModal.classList.remove("limited-aura");
+}
     cardModal.classList.add("show");
     cardModal.classList.remove("view-front");
 viewCardBtn.textContent = "👁 Смотреть карту";
