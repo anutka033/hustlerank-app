@@ -3930,58 +3930,90 @@ body{
 .bottom-nav{
   bottom: calc(env(safe-area-inset-bottom) + 10px);
 }
-/* Особое свечение редких карт только в инвентаре */
-[data-cards-tab="inventory"].active ~ .new-cards-grid .rank-card[data-card-id="solarempire"],
-[data-cards-tab="inventory"].active ~ .new-cards-grid .rank-card[data-card-id="limited01"],
-.rank-card.inventory-premium {
+.inventory-premium{
+
   position: relative;
+
   overflow: hidden;
-  border: 2px solid rgba(255, 220, 90, 0.95);
+
+  border: 2px solid #ffd54a;
+
   box-shadow:
-    0 0 18px rgba(255, 210, 70, 0.9),
-    0 0 38px rgba(180, 80, 255, 0.75),
-    inset 0 0 22px rgba(255, 255, 255, 0.16);
-  animation: premiumGlow 2.4s ease-in-out infinite;
+
+    0 0 15px rgba(255,215,80,.9),
+
+    0 0 30px rgba(180,80,255,.7),
+
+    0 0 60px rgba(255,120,255,.45);
+
+  animation: premiumPulse 2s ease-in-out infinite;
+
 }
 
-[data-cards-tab="inventory"].active ~ .new-cards-grid .rank-card[data-card-id="solarempire"]::before,
-[data-cards-tab="inventory"].active ~ .new-cards-grid .rank-card[data-card-id="limited01"]::before,
-.rank-card.inventory-premium::before {
+.inventory-premium::before{
+
   content: "";
+
   position: absolute;
-  top: -40%;
-  left: -80%;
-  width: 55%;
-  height: 180%;
+
+  top: -50%;
+
+  left: -120%;
+
+  width: 70%;
+
+  height: 220%;
+
   background: linear-gradient(
+
     120deg,
+
     transparent,
-    rgba(255, 255, 255, 0.75),
+
+    rgba(255,255,255,.75),
+
     transparent
+
   );
-  transform: rotate(18deg);
-  animation: premiumShine 3s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 3;
+
+  transform: rotate(20deg);
+
+  animation: premiumShine 3s linear infinite;
+
 }
 
-@keyframes premiumGlow {
-  0%, 100% {
+@keyframes premiumPulse{
+
+  0%,100%{
+
+    transform: scale(1);
+
     filter: brightness(1);
+
   }
-  50% {
-    filter: brightness(1.18);
+
+  50%{
+
+    transform: scale(1.02);
+
+    filter: brightness(1.15);
+
   }
+
 }
 
-@keyframes premiumShine {
-  0% {
-    left: -80%;
+@keyframes premiumShine{
+
+  0%{
+
+    left: -120%;
+
   }
-  55% {
-    left: 130%;
+
+  100%{
+
+    left: 180%;
+
   }
-  100% {
-    left: 130%;
-  }
+
 }
