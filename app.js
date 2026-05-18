@@ -546,7 +546,9 @@ document.querySelectorAll(".rank-card").forEach(function (card, index) {
     const button = event.target.closest("button");
     if (button) return;
 
-    const data = cardsData[index];
+    const cardId = card.dataset.cardId;
+
+const data = cardsData.find(c => c.id === cardId);
     if (!data) return;
 
     const current = state.cards[data.id] || {
