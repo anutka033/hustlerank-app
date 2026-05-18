@@ -252,8 +252,9 @@ function updateCards() {
     cardStars.textContent = state.stars.toLocaleString("ru-RU");
   }
 
-  rankCards.forEach(function (card, index) {
-    const data = cardsData[index];
+  rankCards.forEach(function(card) {
+    const cardId = card.dataset.cardId;
+    const data = cardsData.find(c => c.id === cardId);
     if (!data) return;
 
     const button = card.querySelector(".unlock-btn, .locked-btn");
@@ -444,8 +445,9 @@ function updateCardsView(){
 
   const htmlCards = document.querySelectorAll(".rank-card:not(.case-owned-card)");
 
-  htmlCards.forEach(function(card, index){
-    const data = cardsData[index];
+  htmlCards.forEach(function(card){
+    const cardId = card.dataset.cardId;
+    const data = cardsData.find(c => c.id === cardId);
 
     const isOwned =
       data &&
