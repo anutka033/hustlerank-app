@@ -92,24 +92,22 @@
     </div>
 
     
-    <div id="tasksScreen" class="screen">
-      <h1 class="page-title">Задания</h1>
-      <div class="task-card telegram-task">
-        <div class="task-left">
-          <div class="task-icon">
-            <i class="fa-brands fa-telegram"></i>
-          </div>
-          <div class="task-info">
-            <h3>Подписаться на Telegram</h3>
-            <p>+50 ⭐ • +500 💎 • +1500 XP</p>
-          </div>
+    <!-- Екран завдань -->
+<div id="tasksScreen" class="screen">
+    <div class="cards-header">
+        <div>
+            <h1>Завдання</h1>
+            <p>Виконуй місії та отримуй цінні ресурси</p>
         </div>
-        <div class="task-actions">
-          <button id="telegramTaskBtn" class="task-btn">Выполнить</button>
-          <button id="claimTelegramTaskBtn" class="task-btn claim-task-btn hidden">Забрать</button>
+        <div class="stars-box">
+            <span id="taskStars">0</span> ⭐
         </div>
-      </div>
     </div>
+
+    <!-- Контейнер для списку завдань. JavaScript вставить сюди карти автоматично -->
+    <div class="tasks-list"></div>
+</div>
+
 
     
     <div id="dropsScreen" class="screen">

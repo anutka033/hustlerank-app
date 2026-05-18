@@ -270,6 +270,44 @@ const modalCards = [
   },
 ];
 
+const tasks = [
+  {
+    id: "tg_channel",
+    title: "Підписка на канал",
+    desc: "Приєднуйся до нашої спільноти",
+    icon: "📢",
+    reward: { xp: 500, crystals: 20, stars: 0 },
+    link: "https://t.me/hustlerank", 
+    type: "social"
+  },
+  {
+    id: "daily_checkin",
+    title: "Щоденний бонус",
+    desc: "Заходь у гру кожен день",
+    icon: "📅",
+    reward: { xp: 200, crystals: 5, stars: 1 },
+    type: "daily"
+  },
+  {
+    id: "card_collector",
+    title: "Колекціонер",
+    desc: "Збери 5 будь-яких карт",
+    icon: "🃏",
+    reward: { xp: 1000, crystals: 50, stars: 5 },
+    type: "achievement",
+    check: ( ) => Object.keys(state.cards).filter(id => state.cards[id].unlocked).length >= 5
+  },
+  {
+    id: "invite_friends",
+    title: "Запроси друга",
+    desc: "Грай разом з друзями",
+    icon: "👥",
+    reward: { xp: 1500, crystals: 100, stars: 10 },
+    link: "https://t.me/HustleRank033Bot", 
+    type: "social"
+  }
+];
+
 const levelEl = document.getElementById("level");
 const rankName = document.getElementById("rankName");
 const xpText = document.getElementById("xpText");
@@ -513,6 +551,7 @@ function openScreen(name) {
 
   if (screens[name]) {
     screens[name].classList.add("active-screen");
+    if (name === "tasks") renderTasks();
   }
   updateSideActionsVisibility();
   updateDailyDropVisibility();
@@ -1439,3 +1478,83 @@ updateDailyTimer();
 loadReferrals();
 loadIncomingCards();
 setInterval(updateDailyTimer, 1000);
+// --- ЛОГІКА СИСТЕМИ ЗАВДАНЬ ---
+
+// 1. Функція, яка малює список завдань на екрані
+function renderTasks() {
+  const tasksContainer = document.querySelector("#tasksScreen .tasks-list");
+  if (!tasksContainer) return;
+  
+  tasksContainer.innerHTML = ""; // Очищуємо список перед малюванням
+
+  tasks.forEach(task => {
+    const isCompleted = localStorage.getItem(`task_${task.id}_completed`) === "true";
+    
+    const taskCard = document.createElement("div");
+    taskCard.className = `task-card ${isCompleted ? "completed" : ""}`;
+    taskCard.innerHTML = `
+      <div class="task-left">
+        <div class="task-icon">${task.icon}</div>
+        <div class="task-info">
+          <h3>${task.title}</h3>
+          <p>${task.desc}</p>
+          <div class="task-rewards">
+            ${task.reward.xp ? `<span>+${task.reward.xp} XP</span>` : ""}
+            ${task.reward.crystals ? `<span>+${task.reward.crystals} 💎</span>` : ""}
+            ${task.reward.stars ? `<span>+${task.reward.stars} ⭐</span>` : ""}
+          </div>
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="task-btn" id="btn_${task.id}" ${isCompleted ? "disabled" : ""}>
+          ${isCompleted ? "Виконано" : "Виконати"}
+        </button>
+      </div>
+    `;
+
+    const btn = taskCard.querySelector(`#btn_${task.id}`);
+    btn.addEventListener("click", () => handleTaskAction(task));
+
+    tasksContainer.appendChild(taskCard);
+  });
+}
+
+// 2. Функція, яка обробляє натискання на кнопку завдання
+function handleTaskAction(task) {
+  if (localStorage.getItem(`task_${task.id}_completed`) === "true") return;
+
+  if (task.link) {
+    window.open(task.link, "_blank");
+    // Змінюємо кнопку на "Перевірити" після переходу
+    const btn = document.getElementById(`btn_${task.id}`);
+    if (btn) {
+        btn.textContent = "Перевірити";
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            completeTask(task);
+        };
+    }
+  } else if (task.check) {
+    // Якщо є спеціальна перевірка (наприклад, на кількість карт)
+    if (task.check()) {
+      completeTask(task);
+    } else {
+      showToast("Умова ще не виконана!");
+    }
+  } else {
+    // Якщо це просте завдання (як щоденний бонус)
+    completeTask(task);
+  }
+}
+
+// 3. Функція нарахування нагороди
+function completeTask(task) {
+  state.xp += task.reward.xp || 0;
+  state.crystals += task.reward.crystals || 0;
+  state.stars += task.reward.stars || 0;
+  
+  localStorage.setItem(`task_${task.id}_completed`, "true");
+  showToast(`Нагорода отримана!`);
+  updateUI(); // Оновлюємо цифри на екрані
+  renderTasks(); // Оновлюємо список завдань
+}
