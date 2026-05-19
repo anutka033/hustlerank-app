@@ -39,7 +39,10 @@ const state = {
   bonusTaken: localStorage.getItem("bonusTaken") === "true",
   inventory: JSON.parse(localStorage.getItem("inventory") || "[]"),
   boughtCards: JSON.parse(localStorage.getItem("boughtCards") || "[]"),
-  cards: JSON.parse(localStorage.getItem("cards") || "{}")
+  cards: JSON.parse(localStorage.getItem("cards") || "{}"),
+  lastLoginDate: localStorage.getItem("lastLoginDate") || "",
+  dailyStreak: safeNumber(localStorage.getItem("dailyStreak"), 0),
+  lastTreasuryClaim: safeNumber(localStorage.getItem("lastTreasuryClaim"), Date.now())
 };
 
 if (state.vip && !state.vipUntil) {
@@ -350,6 +353,9 @@ function save() {
   localStorage.setItem("cards", JSON.stringify(state.cards));
   localStorage.setItem("inventory", JSON.stringify(state.inventory || []));
   localStorage.setItem("boughtCards", JSON.stringify(state.boughtCards || []));
+  localStorage.setItem("lastLoginDate", state.lastLoginDate);
+  localStorage.setItem("dailyStreak", state.dailyStreak);
+  localStorage.setItem("lastTreasuryClaim", state.lastTreasuryClaim);
 }
 
 function rankByLevel(level) {
@@ -381,13 +387,9 @@ function addXp(amount) {
 }
 
 function showToast(text) {
-  if (!toast) return;
-  toast.textContent = text;
-  toast.classList.add("show");
-  setTimeout(function () {
-    toast.classList.remove("show");
-  }, 1300);
+    showPush("Сповіщення", text, "✨");
 }
+
 
 function checkLevelUp() {
   let leveledUp = false;
@@ -512,7 +514,7 @@ function updateUI() {
   if (rankName) rankName.textContent = rankByLevel(state.level);
   if (xpText) xpText.textContent = state.xp + " / " + state.maxXp + " XP";
   if (xpFill) xpFill.style.width = percent + "%";
-  if (coinsEl) coinsEl.textContent = state.coins.toLocaleString("ru-RU");
+  if (coinsEl) coinsEl.textContent = state.crystals.toLocaleString("ru-RU");
   if (starsEl) starsEl.textContent = state.stars.toLocaleString("ru-RU");
   if (ratingEl) ratingEl.textContent = state.level >= 2 ? "#" + (900 - state.level * 37) : "#---";
   if (incomePerHourEl) incomePerHourEl.textContent = "+0/час";
@@ -541,21 +543,35 @@ function updateUI() {
 }
 
 function openScreen(name) {
+  // 1. Ховаємо всі екрани
   Object.values(screens).forEach(function (screen) {
     if (screen) screen.classList.remove("active-screen");
   });
 
+  // 2. Знімаємо активність з усіх кнопок навігації
   navButtons.forEach(function (button) {
     button.classList.remove("active");
   });
 
+  // 3. Показуємо потрібний екран
   if (screens[name]) {
     screens[name].classList.add("active-screen");
     if (name === "tasks") renderTasks();
   }
-  updateSideActionsVisibility();
-  updateDailyDropVisibility();
+
+  // --- КЕРУВАННЯ ВИДИМІСТЮ СКАРБНИЦІ ---
+  const treasury = document.getElementById("treasuryWidget");
+  const sideMenu = document.getElementById("sideMenu");
+
+  if (name === "home") {
+    if (treasury) treasury.style.display = "flex";
+    if (sideMenu) sideMenu.style.display = "flex";
+  } else {
+    if (treasury) treasury.style.display = "none";
+    if (sideMenu) sideMenu.style.display = "none";
+  }
 }
+
 
 navButtons.forEach(function (button) {
   button.addEventListener("click", function () {
@@ -1557,4 +1573,80 @@ function completeTask(task) {
   showToast(`Нагорода отримана!`);
   updateUI(); // Оновлюємо цифри на екрані
   renderTasks(); // Оновлюємо список завдань
+}
+// --- ОСТАТОЧНА ЛОГІКА СКАРБНИЦІ ---
+const TREASURY_CONFIG = { perHour: 60, max: 100 };
+
+function updateTreasuryUI() {
+    const now = Date.now();
+    if (!state.lastTreasuryClaim) state.lastTreasuryClaim = now;
+    const hours = (now - state.lastTreasuryClaim) / (1000 * 60 * 60);
+    let count = Math.floor(hours * TREASURY_CONFIG.perHour);
+    if (count > TREASURY_CONFIG.max) count = TREASURY_CONFIG.max;
+    const el = document.getElementById("treasuryAmount");
+    if (el) el.textContent = count + " 💎";
+    return count;
+}
+
+// Прив'язка кліку безпосередньо до елементів
+document.addEventListener("click", function(e) {
+    // Натискання на сундучок
+    if (e.target.closest("#treasuryWidget")) {
+        const amount = updateTreasuryUI();
+        const modal = document.getElementById("treasuryModal");
+        const modalAmount = document.getElementById("modalTreasuryAmount");
+        if (modalAmount) modalAmount.textContent = amount;
+        if (modal) {
+            modal.style.display = "flex";
+            setTimeout(() => modal.classList.add("active"), 10);
+        }
+    }
+    
+    // Натискання на кнопку "Забрати"
+    if (e.target.closest("#confirmTreasuryBtn")) {
+        const amount = updateTreasuryUI();
+        if (amount > 0) {
+            state.crystals += amount;
+            state.lastTreasuryClaim = Date.now();
+            updateUI(); 
+            showToast("Забрано " + amount + " 💎");
+        }
+        const modal = document.getElementById("treasuryModal");
+        if (modal) {
+            modal.classList.remove("active");
+            setTimeout(() => modal.style.display = "none", 300);
+        }
+    }
+
+    // Закриття модалки
+    if (e.target.closest("#closeTreasuryModal") || e.target.id === "treasuryModal") {
+        const modal = document.getElementById("treasuryModal");
+        if (modal) {
+            modal.classList.remove("active");
+            setTimeout(() => modal.style.display = "none", 300);
+        }
+    }
+});
+
+// Запуск таймера оновлення
+setInterval(updateTreasuryUI, 60000);
+updateTreasuryUI();
+checkDailyStreak(); // Перевірка щоденного входу
+function showPush(title, message, icon = "🎁") {
+    const push = document.getElementById("customPush");
+    const titleEl = document.getElementById("pushTitle");
+    const messageEl = document.getElementById("pushMessage");
+    const iconEl = document.querySelector(".push-icon");
+
+    if (!push || !titleEl || !messageEl) return;
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    if (iconEl) iconEl.textContent = icon;
+
+    push.classList.add("active");
+
+    setTimeout(() => {
+        push.classList.remove("active");
+    }, 3000);
 }

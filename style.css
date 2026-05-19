@@ -3384,3 +3384,281 @@ body {
     box-shadow: 0 3px 8px rgba(236, 72, 153, 0.2);
     cursor: pointer;
 }
+/* --- СТИЛЬ ПЛАВАЮЧОЇ СКАРБНИЦІ (TREASURY) --- */
+.treasury-widget {
+    position: fixed;
+    /* Розташування зліва, симетрично до дейлі-дропа */
+    left: calc(50% - 210px); 
+    bottom: 84px; /* Висота над нижнім меню */
+    
+    width: 155px;
+    height: 58px;
+    padding: 10px 14px;
+    
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    /* Скляний ефект iOS + темний фон гри */
+    background: rgba(18, 18, 28, 0.75);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    
+    /* Преміальна золотиста рамка */
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 
+                0 0 15px rgba(255, 215, 0, 0.1);
+    
+    z-index: 999;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Анімація легкого плавання вгору-вниз */
+    animation: treasuryFloat 3s ease-in-out infinite;
+}
+
+@keyframes treasuryFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.treasury-widget:active {
+    transform: scale(0.94); /* Ефект натискання */
+}
+
+.chest-icon {
+    font-size: 26px;
+    /* Сяйво іконки */
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+}
+
+.chest-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.chest-title {
+    color: #ffd700; /* Золотий колір */
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chest-amount {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 1px;
+}
+/* --- СТИЛЬ МОДАЛЬНОГО ВІКНА СКАРБНИЦІ --- */
+
+/* Контейнер на все затінення */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: none; /* Ховаємо за замовчуванням */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999 !important;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+/* Сама картка вікна */
+.treasury-modal-content {
+    background: linear-gradient(180deg, rgba(30, 30, 45, 0.95) 0%, rgba(15, 15, 25, 0.98) 100%);
+    width: 90%;
+    max-width: 340px;
+    border-radius: 30px;
+    padding: 30px 20px;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(124, 58, 237, 0.1);
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.active .treasury-modal-content {
+    transform: scale(1);
+}
+
+/* Анімована іконка кристала */
+.reward-icon-anim {
+    font-size: 70px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 20px rgba(0, 122, 255, 0.5));
+    animation: rewardPulse 2s infinite ease-in-out;
+}
+
+@keyframes rewardPulse {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.15); filter: brightness(1.3) drop-shadow(0 0 30px rgba(0, 122, 255, 0.8)); }
+}
+
+.reward-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.reward-desc {
+    font-size: 14px;
+    color: #9ca3af;
+    margin-bottom: 25px;
+}
+
+/* Блок з цифрою нагороди */
+.reward-amount-box {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 30px;
+    border: 1px dashed rgba(255, 215, 0, 0.3);
+}
+
+.reward-amount-box span {
+    display: block;
+    font-size: 42px;
+    font-weight: 900;
+    color: #ffd700;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.reward-amount-box small {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #8e8e93;
+    letter-spacing: 2px;
+}
+.reminder-text {
+    font-size: 12px;
+    color: #ffd700; /* Золотистий колір для акценту */
+    background: rgba(255, 215, 0, 0.05);
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    border: 0.5px solid rgba(255, 215, 0, 0.1);
+}
+/* Робимо контейнер основою для позиціонування */
+.treasury-modal-content {
+    position: relative !important;
+    padding-top: 45px !important; /* Додаємо місце зверху, щоб хрестик не налізав на подарунок */
+}
+
+/* Прибираємо стандартний хедер, якщо він заважає */
+.treasury-modal-content .modal-header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+}
+
+/* Стиль самого хрестика */
+.treasury-modal-content .modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1); /* Напівпрозорий фон */
+    border-radius: 50%;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    transition: 0.2s;
+    z-index: 100;
+}
+
+.treasury-modal-content .modal-close:active {
+    transform: scale(0.9);
+    background: rgba(255, 255, 255, 0.2);
+}
+/* Custom Push Notification Style */
+.custom-push {
+    position: fixed;
+    top: -100px; /* Сховано за верхнім краєм */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 380px;
+    background: rgba(20, 20, 35, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 12px 16px;
+    z-index: 100000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.custom-push.active {
+    top: 20px; /* Випливає зверху */
+}
+
+.push-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.push-icon {
+    font-size: 24px;
+    background: rgba(255, 255, 255, 0.05);
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+.push-text b {
+    display: block;
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.push-text p {
+    margin: 0;
+    font-size: 12px;
+    color: #aaa;
+}
+
+/* Смужка прогресу (таймер на 3 секунди) */
+.push-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #7c3aed, #ec4899);
+    width: 0;
+    border-radius: 0 0 0 20px;
+}
+
+.custom-push.active .push-progress {
+    animation: pushTimer 3s linear forwards;
+}
+
+@keyframes pushTimer {
+    from { width: 100%; }
+    to { width: 0%; }
+}

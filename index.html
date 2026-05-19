@@ -64,6 +64,13 @@
         <span class="arrow">›</span>
       </button>
 
+<div id="treasuryWidget" class="treasury-widget">
+    <div class="chest-icon">🎁</div>
+    <div class="chest-info">
+        <span class="chest-title">Скарбниця</span>
+        <span id="treasuryAmount" class="chest-amount">0 💎</span>
+    </div>
+</div>
       <div class="daily-drop" id="dailyDrop">
         <div class="drop-icon">🎁</div>
         <div class="drop-info">
@@ -459,5 +466,41 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="app.js"></script>
+<!-- Оновлене модальне вікно Скарбниці -->
+<div id="treasuryModal" class="modal-overlay">
+    <div class="modal-content treasury-modal-content">
+        <div class="modal-header">
+            <span class="modal-close" id="closeTreasuryModal">×</span>
+        </div>
+        <div class="modal-body">
+            <div class="reward-icon-anim">🎁</div>
+            <h2 class="reward-title">Ваша Скарбниця</h2>
+            <p class="reward-desc">Накопичено пасивного доходу:</p>
+            
+            <div class="reward-amount-box">
+                <span id="modalTreasuryAmount">0</span>
+                <small>Кристалів</small>
+            </div>
+            
+            <!-- Нагадування -->
+            <p class="reminder-text">💡 Заходь у гру кожні 4 години, щоб скарбниця не переповнювалася!</p>
+            
+            <button class="modal-buy-btn" id="confirmTreasuryBtn">Забрати нагороду</button>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Premium Push Notification -->
+<div id="customPush" class="custom-push">
+    <div class="push-content">
+        <div class="push-icon">🎁</div>
+        <div class="push-text">
+            <b id="pushTitle">Нова карта!</b>
+            <p id="pushMessage">Ви отримали рідкісну карту в колекцію.</p>
+        </div>
+    </div>
+    <div class="push-progress"></div>
+</div>
+
 </body>
 </html>
