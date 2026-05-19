@@ -3388,7 +3388,7 @@ body {
 .treasury-widget {
     position: fixed;
     /* Розташування зліва, симетрично до дейлі-дропа */
-    left: calc(50% - 200px); 
+    left: calc(50% - 190px); 
     bottom: 84px; /* Висота над нижнім меню */
     
     width: 155px;
@@ -3610,7 +3610,7 @@ body {
 }
 
 .custom-push.active {
-    top: 75px; /* Випливає зверху */
+    top: 80px; /* Випливає зверху */
 }
 
 .push-content {
