@@ -75,8 +75,8 @@
         <div class="drop-icon">🎁</div>
         <div class="drop-info">
           <span class="drop-title">Daily Drop</span>
-          <span class="drop-timer" id="dailyDropTimer">Готово</span>
-        </div>
+          <span class="drop-reward" id="dailyDropTimer"></span>
+          </div>
         <button class="daily-claim-btn" id="dailyClaimBtn">Забрать</button>
       </div>
     </div>
@@ -90,9 +90,9 @@
       <button class="menu-btn" id="vipBtn">
         <span>👑</span> VIP
       </button>
-      <button class="menu-btn">
-        <span>🎉</span> Розыгрыш
-      </button>
+     <button class="menu-btn" id="giveawayBtn">
+  <span>🎉</span> Розыгрыш
+</button>
       <button class="menu-btn disabled">
         <span>🛡</span> Клан <small>Скоро</small>
       </button>
@@ -124,6 +124,18 @@
             <button class="game-play-btn">Грати</button>
         </div>
     </div>
+    <div class="game-card-ios soon-game-card">
+    <div class="game-icon-wrapper">
+        <img src="images/star-farm.png" alt="Star Farm" class="game-icon-ios">
+    </div>
+
+    <div class="game-details">
+        <div class="game-name">Ферма Зірок</div>
+        <div class="game-desc">Будуй ферму та добувай зорі</div>
+    </div>
+
+    <button class="game-play-btn soon-game-btn" disabled>Скоро</button>
+</div>
 </div>
 
 
@@ -178,7 +190,7 @@
       <section class="ref-card">
         <p class="ref-label">Бонус за друга, который достиг 3 уровня:</p>
         <div class="ref-rewards">
-          <span>⭐ +250</span>
+          <span>⭐ +25</span>
           <span>💎 +500</span>
         </div>
         <div class="ref-actions">
@@ -470,7 +482,40 @@
         <button class="vip-buy-btn" id="vipBuyBtn">Купить за 150 ⭐</button>
       </div>
     </div>
+<div class="giveaway-modal" id="giveawayModal">
+    <div class="giveaway-box">
+        <button class="giveaway-close" id="giveawayCloseBtn">✕</button>
 
+        <div class="giveaway-badge">🎉 Конкурс</div>
+
+        <h2>АльоФон</h2>
+
+        <div class="giveaway-phone">
+        <img src="images/iphone.png" alt="iPhone">
+        </div>
+
+        <p class="giveaway-desc">
+            Досягни 50 рівня, щоб взяти участь у розіграші iPhone.
+        </p>
+
+        <div class="giveaway-progress-info">
+            <span>Прогрес</span>
+            <b id="giveawayPercent">0%</b>
+        </div>
+
+        <div class="giveaway-progress">
+            <div id="giveawayProgressFill"></div>
+        </div>
+
+        <div class="giveaway-level-text">
+            Твій рівень: <b id="giveawayLevel">1</b> / 50
+        </div>
+
+        <button class="giveaway-main-btn" id="giveawayJoinBtn">
+            Недоступно
+        </button>
+    </div>
+</div>
   </main>
 
   

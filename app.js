@@ -819,7 +819,7 @@ async function loadReferrals() {
   data.forEach(function(ref) {
     invitedFriends.push({ name: "Игрок", level: ref.invited_level, income: 0, reward: ref.reward_claimed ? "✅" : "🎁" });
     if (ref.invited_level >= 3 && !ref.reward_claimed) {
-      availableStars += 250;
+      availableStars += 25;
       availableCrystals += 500;
     }
   });
@@ -846,7 +846,7 @@ if (claimRefBtn) {
       }
     }
     if (rewardCount <= 0) return alert("Нет наград");
-    state.stars += rewardCount * 250;
+    state.stars += rewardCount * 25;
     state.crystals += rewardCount * 500;
     save();
     updateUI();
@@ -1497,7 +1497,13 @@ if (gameXp > 0) {
 }
 
 function restartGame() {
-  startCountdown();
+    const overEl = document.getElementById("gameOverScreen");
+
+    if (overEl) {
+        overEl.style.display = "none";
+    }
+
+    startCountdown();
 }
 
 function exitGame() {
@@ -1531,4 +1537,47 @@ loadIncomingCards();
 setInterval(updateDailyTimer, 1000);
 setInterval(updateTreasuryUI, 60000);
 updateTreasuryUI();
+
+function updateGiveawayModal() {
+    const modal = document.getElementById("giveawayModal");
+    const percentEl = document.getElementById("giveawayPercent");
+    const fillEl = document.getElementById("giveawayProgressFill");
+    const levelEl = document.getElementById("giveawayLevel");
+    const joinBtn = document.getElementById("giveawayJoinBtn");
+
+    const currentLevel = state.level || 1;
+    const percent = Math.min(100, Math.floor((currentLevel / 50) * 100));
+
+    if (levelEl) levelEl.textContent = currentLevel;
+    if (percentEl) percentEl.textContent = percent + "%";
+    if (fillEl) fillEl.style.width = percent + "%";
+
+    if (joinBtn) {
+        if (currentLevel >= 50) {
+            joinBtn.textContent = "Участвовать";
+            joinBtn.disabled = false;
+        } else {
+            joinBtn.textContent = "Нужно 50 LVL";
+            joinBtn.disabled = true;
+        }
+    }
+}
+
+const giveawayBtn = document.getElementById("giveawayBtn");
+const giveawayModal = document.getElementById("giveawayModal");
+const giveawayCloseBtn = document.getElementById("giveawayCloseBtn");
+
+if (giveawayBtn && giveawayModal) {
+    giveawayBtn.addEventListener("click", function () {
+        updateGiveawayModal();
+        giveawayModal.style.display = "flex";
+    });
+}
+
+if (giveawayCloseBtn && giveawayModal) {
+    giveawayCloseBtn.addEventListener("click", function () {
+        giveawayModal.style.display = "none";
+    });
+}
 })();
+
