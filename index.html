@@ -98,8 +98,6 @@
       </button>
     </div>
 
-    
-    <!-- Екран завдань -->
 <div id="tasksScreen" class="screen">
     <div class="cards-header">
         <div>
@@ -111,8 +109,21 @@
         </div>
     </div>
 
-    <!-- Контейнер для списку завдань. JavaScript вставить сюди карти автоматично -->
     <div class="tasks-list"></div>
+
+    <div class="tasks-category-title">Ігри</div>
+    <div class="games-list">
+        <div class="game-card-ios" onclick="openScreen('game')">
+            <div class="game-icon-wrapper">
+                <img src="images/game-icon.png" alt="Game" class="game-icon-ios">
+            </div>
+            <div class="game-details">
+                <div class="game-name">Кристальна Лихоманка</div>
+                <div class="game-desc">Збирай кристали та отримуй нагороди</div>
+            </div>
+            <button class="game-play-btn">Грати</button>
+        </div>
+    </div>
 </div>
 
 
@@ -465,42 +476,127 @@
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="app.js"></script>
-<!-- Оновлене модальне вікно Скарбниці -->
+ <!-- Оновлене модальне вікно Скарбниці -->
 <div id="treasuryModal" class="modal-overlay">
     <div class="modal-content treasury-modal-content">
         <div class="modal-header">
             <span class="modal-close" id="closeTreasuryModal">×</span>
         </div>
+
         <div class="modal-body">
             <div class="reward-icon-anim">🎁</div>
+
             <h2 class="reward-title">Ваша Скарбниця</h2>
-            <p class="reward-desc">Накопичено пасивного доходу:</p>
-            
+
+            <p class="reward-desc">
+                Накопичено пасивного доходу:
+            </p>
+
             <div class="reward-amount-box">
                 <span id="modalTreasuryAmount">0</span>
                 <small>Кристалів</small>
             </div>
-            
-            <!-- Нагадування -->
-            <p class="reminder-text">💡 Заходь у гру кожні 4 години, щоб скарбниця не переповнювалася!</p>
-            
-            <button class="modal-buy-btn" id="confirmTreasuryBtn">Забрати нагороду</button>
+
+            <p class="reminder-text">
+                💡 Заходь у гру кожні 4 години, щоб скарбниця не переповнювалася!
+            </p>
+
+            <button class="modal-buy-btn" id="confirmTreasuryBtn">
+                Забрати нагороду
+            </button>
         </div>
     </div>
 </div>
 
-<!-- Custom Premium Push Notification -->
+<!-- Push -->
 <div id="customPush" class="custom-push">
     <div class="push-content">
         <div class="push-icon">🎁</div>
+
         <div class="push-text">
             <b id="pushTitle">Нова карта!</b>
-            <p id="pushMessage">Ви отримали рідкісну карту в колекцію.</p>
+
+            <p id="pushMessage">
+                Ви отримали рідкісну карту в колекцію.
+            </p>
         </div>
     </div>
+
     <div class="push-progress"></div>
 </div>
+
+<!-- ================= GAME SCREEN ================= -->
+
+<div id="gameScreen" class="screen" style="background:#000;">
+
+    <div id="gameCountdown"
+         class="game-countdown"
+         style="display:none;">
+        3
+    </div>
+
+    <div class="game-header-ui">
+
+        <div class="game-score-box">
+            💎 <span id="gameScore">0</span>
+        </div>
+        <div class="game-xp-box">
+    <span class="xp-icon">⚡</span>
+    <span id="gameXp">0</span>
+    <span class="xp-text">XP</span>
+</div>
+
+        <div class="game-lives-box">
+            ❤️ <span id="gameLives">3</span>
+        </div>
+
+        <button class="game-exit-x"
+                onclick="exitGame()">
+            ×
+        </button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="gameOverScreen"
+     class="game-overlay"
+     style="display:none;">
+
+    <div class="game-over-card">
+
+        <h2>Гру завершено!</h2>
+
+        <div class="game-reward-row">
+            <span>💎 Кристали</span>
+            <b id="finalScore">0</b>
+        </div>
+
+        <div class="game-reward-row">
+            <span>⚡ XP</span>
+            <b id="finalXp">0</b>
+        </div>
+
+        <button onclick="restartGame()"
+                class="restart-btn">
+            Спробувати ще
+        </button>
+
+        <button onclick="exitGame()"
+                class="exit-btn">
+            На головну
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<script src="app.js"></script>
 
 </body>
 </html>

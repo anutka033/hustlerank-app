@@ -1,3 +1,12 @@
+(() => {
+"use strict";
+
+if (window.__HUSTLERANK_APP_LOADED__) {
+  console.warn("HustleRank app.js вже був підключений. Повторний запуск зупинено.");
+  return;
+}
+window.__HUSTLERANK_APP_LOADED__ = true;
+
 const tg = window.Telegram?.WebApp;
 
 if (tg) {
@@ -6,9 +15,11 @@ if (tg) {
 
   document.addEventListener("click", async () => {
     try {
-      await tg.requestFullscreen?.();
+      if (typeof tg.requestFullscreen === "function") {
+        await tg.requestFullscreen();
+      }
     } catch (e) {
-      console.log("Fullscreen error:", e);
+      console.warn("Fullscreen не підтримується в цій версії Telegram WebApp:", e?.message || e);
     }
   }, { once: true });
 }
@@ -33,7 +44,7 @@ const state = {
   level: Math.max(1, safeNumber(localStorage.getItem("level"), 1)),
   coins: safeNumber(localStorage.getItem("coins"), 0),
   stars: safeNumber(localStorage.getItem("stars"), 0),
-  crystals: safeNumber(localStorage.getItem("crystals"), 0), // Додано поле crystals
+  crystals: safeNumber(localStorage.getItem("crystals"), 0),
   vip: localStorage.getItem("vip") === "true",
   vipUntil: Number(localStorage.getItem("vipUntil")) || 0,
   bonusTaken: localStorage.getItem("bonusTaken") === "true",
@@ -80,235 +91,34 @@ const cardsData = [
 ];
 
 const modalCards = [
-  {
-    id: "novice",
-    name: "Новичок",
-    rarity: "ЭПИЧЕСКАЯ",
-    status: "Статус: Первый шаг",
-    price: 10,
-    quote: "Каждый король когда-то был никем. Важно не где ты начал, а сколько раз ты не остановился.",
-    img: "images/epic-smile.png"
-  },
-  {
-    id: "focus",
-    name: "Фокус",
-    rarity: "РЕДКАЯ",
-    status: "Статус: Концентрация",
-    price: 25,
-    quote: "Шум забирает слабых. Тишина собирает тех, кто знает, зачем он идёт.",
-    img: "images/focus-mind.png"
-  },
-  {
-    id: "leader",
-    name: "Лидер",
-    rarity: "ЛЕГЕНДАРНАЯ",
-    status: "Статус: Контроль",
-    price: 75,
-    quote: "Лидер — это тот, кто идёт первым, даже когда остальные боятся сделать шаг.",
-    img: "images/leader-core.png"
-  },
-  {
-    id: "voidking",
-    name: "Void King",
-    rarity: "ЛЕГЕНДАРНАЯ",
-    status: "Статус: Повелитель пустоты",
-    price: 150,
-    quote: "Пока остальные искали свет — он научился видеть в темноте.",
-    img: "images/void-king.png"
-  },
-  {
-    id: "stormpaw",
-    name: "Storm Paw",
-    rarity: "МИФИЧЕСКАЯ",
-    status: "Статус: Повелитель бури",
-    price: 650,
-    quote: "Те, кто управляют молнией, сначала научились управлять собой.",
-    img: "images/mystic-stormpaw.png"
-  },
-  {
-    id: "voidmage",
-    name: "Void Mage",
-    rarity: "МИФИЧЕСКАЯ",
-    status: "Статус: Архимаг пустоты",
-    price: 955,
-    quote: "Истинная сила приходит тогда, когда страх перестаёт управлять тобой.",
-    img: "images/voidmage.png"
-  },
-  {
-    id: "shadowkeeper",
-    name: "Хранитель Тени",
-    rarity: "ОБЫЧНАЯ",
-    status: "Статус: Тихий разум",
-    price: 30,
-    quote: "Спокойствие сильнее шума.",
-    img: "images/shadow-keeper.png"
-  },
-  {
-    id: "hopeseed",
-    name: "Семя Надежды",
-    rarity: "ОБЫЧНАЯ",
-    status: "Статус: Первый рост",
-    price: 30,
-    quote: "Даже слабый свет ведёт вперёд.",
-    img: "images/hope-seed.png"
-  },
-  {
-    id: "willshard",
-    name: "Осколок Воли",
-    rarity: "ОБЫЧНАЯ",
-    status: "Статус: Внутренняя сила",
-    price: 30,
-    quote: "Сила рождается внутри.",
-    img: "images/will-shard.png"
-  },
-  {
-    id: "voidemperor",
-    name: "Император Пустоты",
-    rarity: "ЛЕГЕНДАРНАЯ",
-    status: "Статус: Власть тишины",
-    price: 250,
-    quote: "Мир склоняется перед тем, кто владеет собой.",
-    img: "images/void-emperor.png"
-  },
-  {
-    id: "solaremperor",
-    name: "Solar Emperor",
-    rarity: "LIMITED",
-    status: "Статус: Абсолютный свет",
-    price: 5000,
-    quote: "Даже звёзды склоняются перед вечностью.",
-    img: "images/solar-emperor.png",
-    specialGlow: true
-  },
-  {
-    id: "common01",
-    name: "Common One",
-    rarity: "ОБЫЧНАЯ",
-    status: "Статус: Базовая карта",
-    price: 10,
-    quote: "Каждый путь начинается с первого шага.",
-    img: "images/common-01.png"
-  },
-  {
-    id: "common02",
-    name: "Common Two",
-    rarity: "ОБЫЧНАЯ",
-    status: "Статус: Начало силы",
-    price: 10,
-    quote: "Слабый сегодня — сильный завтра.",
-    img: "images/common-02.png"
-  },
-  {
-    id: "common03",
-    name: "Common Three",
-    rarity: "ОБЫЧНАЯ",
-    status: "Статус: Первый опыт",
-    price: 10,
-    quote: "Опыт приходит через действия.",
-    img: "images/common-03.png"
-  },
-  {
-    id: "rare01",
-    name: "Rare One",
-    rarity: "РЕДКАЯ",
-    status: "Статус: Редкая энергия",
-    price: 35,
-    quote: "Редкость рождает ценность.",
-    img: "images/rare-01.png"
-  },
-  {
-    id: "rare02",
-    name: "Rare Two",
-    rarity: "РЕДКАЯ",
-    status: "Статус: Контроль",
-    price: 40,
-    quote: "Тишина сильнее шума.",
-    img: "images/rare-02.png"
-  },
-  {
-    id: "rare03",
-    name: "Rare Three",
-    rarity: "РЕДКАЯ",
-    status: "Статус: Стабильность",
-    price: 45,
-    quote: "Стабильность побеждает хаос.",
-    img: "images/rare-03.png"
-  },
-  {
-    id: "epic02",
-    name: "Epic Two",
-    rarity: "ЭПИЧЕСКАЯ",
-    status: "Статус: Высокий уровень",
-    price: 90,
-    quote: "Настоящая сила раскрывается со временем.",
-    img: "images/epic-02.png"
-  },
-  {
-    id: "legendary01",
-    name: "Legendary",
-    rarity: "ЛЕГЕНДАРНАЯ",
-    status: "Статус: Легенда",
-    price: 950,
-    quote: "Легендами становятся через испытания.",
-    img: "images/legendary-01.png"
-  },
-  {
-    id: "mythic01",
-    name: "Mythic",
-    rarity: "МИФИЧЕСКАЯ",
-    status: "Статус: Абсолют",
-    price: 2500,
-    quote: "Мифы создают те, кто не сдаются.",
-    img: "images/mythic-01.png"
-  },
-  {
-    id: "limited01",
-    name: "Limited",
-    rarity: "LIMITED",
-    status: "Статус: Эксклюзив",
-    price: 9000,
-    quote: "Редкость определяет ценность.",
-    img: "images/limited-01.png",
-    specialGlow: true
-  },
+  { id: "novice", name: "Новичок", rarity: "ЭПИЧЕСКАЯ", status: "Статус: Первый шаг", price: 10, quote: "Каждый король когда-то был никем. Важно не где ты начал, а сколько раз ты не остановился.", img: "images/epic-smile.png" },
+  { id: "focus", name: "Фокус", rarity: "РЕДКАЯ", status: "Статус: Концентрация", price: 25, quote: "Шум забирает слабых. Тишина собирает тех, кто знает, зачем он идёт.", img: "images/focus-mind.png" },
+  { id: "leader", name: "Лидер", rarity: "ЛЕГЕНДАРНАЯ", status: "Статус: Контроль", price: 75, quote: "Лидер — это тот, кто идёт первым, даже когда остальные боятся сделать шаг.", img: "images/leader-core.png" },
+  { id: "voidking", name: "Void King", rarity: "ЛЕГЕНДАРНАЯ", status: "Статус: Повелитель пустоты", price: 150, quote: "Пока остальные искали свет — он научился видеть в темноте.", img: "images/void-king.png" },
+  { id: "stormpaw", name: "Storm Paw", rarity: "МИФИЧЕСКАЯ", status: "Статус: Повелитель бури", price: 650, quote: "Те, кто управляют молнией, сначала научились управлять собой.", img: "images/mystic-stormpaw.png" },
+  { id: "voidmage", name: "Void Mage", rarity: "МИФИЧЕСКАЯ", status: "Статус: Архимаг пустоты", price: 955, quote: "Истинная сила приходит тогда, когда страх перестаёт управлять тобой.", img: "images/voidmage.png" },
+  { id: "shadowkeeper", name: "Хранитель Тени", rarity: "ОБЫЧНАЯ", status: "Статус: Тихий разум", price: 30, quote: "Спокойствие сильнее шума.", img: "images/shadow-keeper.png" },
+  { id: "hopeseed", name: "Семя Надежды", rarity: "ОБЫЧНАЯ", status: "Статус: Первый рост", price: 30, quote: "Даже слабый свет ведёт вперёд.", img: "images/hope-seed.png" },
+  { id: "willshard", name: "Осколок Воли", rarity: "ОБЫЧНАЯ", status: "Статус: Внутренняя сила", price: 30, quote: "Сила рождается внутри.", img: "images/will-shard.png" },
+  { id: "voidemperor", name: "Император Пустоты", rarity: "ЛЕГЕНДАРНАЯ", status: "Статус: Власть тишины", price: 250, quote: "Мир склоняется перед тем, кто владеет собой.", img: "images/void-emperor.png" },
+  { id: "solaremperor", name: "Solar Emperor", rarity: "LIMITED", status: "Статус: Абсолютный свет", price: 5000, quote: "Даже звёзды склоняются перед вечностью.", img: "images/solar-emperor.png", specialGlow: true },
+  { id: "common01", name: "Common One", rarity: "ОБЫЧНАЯ", status: "Статус: Базовая карта", price: 10, quote: "Каждый путь начинается с первого шага.", img: "images/common-01.png" },
+  { id: "common02", name: "Common Two", rarity: "ОБЫЧНАЯ", status: "Статус: Начало силы", price: 10, quote: "Слабый сегодня — сильный завтра.", img: "images/common-02.png" },
+  { id: "common03", name: "Common Three", rarity: "ОБЫЧНАЯ", status: "Статус: Первый опыт", price: 10, quote: "Опыт приходит через действия.", img: "images/common-03.png" },
+  { id: "rare01", name: "Rare One", rarity: "РЕДКАЯ", status: "Статус: Редкая энергия", price: 35, quote: "Редкость рождает ценность.", img: "images/rare-01.png" },
+  { id: "rare02", name: "Rare Two", rarity: "РЕДКАЯ", status: "Статус: Контроль", price: 40, quote: "Тишина сильнее шума.", img: "images/rare-02.png" },
+  { id: "rare03", name: "Rare Three", rarity: "РЕДКАЯ", status: "Статус: Стабильность", price: 45, quote: "Стабильность побеждает хаос.", img: "images/rare-03.png" },
+  { id: "epic02", name: "Epic Two", rarity: "ЭПИЧЕСКАЯ", status: "Статус: Высокий уровень", price: 90, quote: "Настоящая сила раскрывается со временем.", img: "images/epic-02.png" },
+  { id: "legendary01", name: "Legendary", rarity: "ЛЕГЕНДАРНАЯ", status: "Статус: Легенда", price: 950, quote: "Легендами становятся через испытания.", img: "images/legendary-01.png" },
+  { id: "mythic01", name: "Mythic", rarity: "МИФИЧЕСКАЯ", status: "Статус: Абсолют", price: 2500, quote: "Мифы создают те, кто не сдаются.", img: "images/mythic-01.png" },
+  { id: "limited01", name: "Limited", rarity: "LIMITED", status: "Статус: Эксклюзив", price: 9000, quote: "Редкость определяет ценность.", img: "images/limited-01.png", specialGlow: true },
 ];
 
 const tasks = [
-  {
-    id: "tg_channel",
-    title: "Підписка на канал",
-    desc: "Приєднуйся до нашої спільноти",
-    icon: "📢",
-    reward: { xp: 500, crystals: 20, stars: 0 },
-    link: "https://t.me/hustlerank", 
-    type: "social"
-  },
-  {
-    id: "daily_checkin",
-    title: "Щоденний бонус",
-    desc: "Заходь у гру кожен день",
-    icon: "📅",
-    reward: { xp: 200, crystals: 5, stars: 1 },
-    type: "daily"
-  },
-  {
-    id: "card_collector",
-    title: "Колекціонер",
-    desc: "Збери 5 будь-яких карт",
-    icon: "🃏",
-    reward: { xp: 1000, crystals: 50, stars: 5 },
-    type: "achievement",
-    check: ( ) => Object.keys(state.cards).filter(id => state.cards[id].unlocked).length >= 5
-  },
-  {
-    id: "invite_friends",
-    title: "Запроси друга",
-    desc: "Грай разом з друзями",
-    icon: "👥",
-    reward: { xp: 1500, crystals: 100, stars: 10 },
-    link: "https://t.me/HustleRank033Bot", 
-    type: "social"
-  }
+  { id: "tg_channel", title: "Підписка на канал", desc: "Приєднуйся до нашої спільноти", icon: "📢", reward: { xp: 500, crystals: 20, stars: 0 }, link: "https://t.me/hustlerank", type: "social" },
+  { id: "daily_checkin", title: "Щоденний бонус", desc: "Заходь у гру кожен день", icon: "📅", reward: { xp: 200, crystals: 5, stars: 1 }, type: "daily" },
+  { id: "card_collector", title: "Колекціонер", desc: "Збери 5 будь-яких карт", icon: "🃏", reward: { xp: 1000, crystals: 50, stars: 5 }, type: "achievement", check: () => Object.keys(state.cards).filter(id => state.cards[id].unlocked).length >= 5 },
+  { id: "invite_friends", title: "Запроси друга", desc: "Грай разом з друзями", icon: "👥", reward: { xp: 1500, crystals: 100, stars: 10 }, link: "https://t.me/HustleRank033Bot", type: "social" }
 ];
 
 const levelEl = document.getElementById("level");
@@ -327,7 +137,6 @@ const bonusBtn = document.getElementById("bonusBtn");
 const bonusTitle = document.getElementById("bonusTitle");
 const bonusText = document.getElementById("bonusText");
 const addCoinsBtn = document.getElementById("addCoinsBtn");
-const toast = document.getElementById("toast");
 const cardStars = document.getElementById("cardStars");
 
 const screens = {
@@ -335,7 +144,8 @@ const screens = {
   tasks: document.getElementById("tasksScreen"),
   drops: document.getElementById("dropsScreen"),
   friends: document.getElementById("friendsScreen"),
-  cards: document.getElementById("cardsScreen")
+  cards: document.getElementById("cardsScreen"),
+  game: document.getElementById("gameScreen")
 };
 
 const navButtons = document.querySelectorAll(".bottom-nav button");
@@ -368,14 +178,6 @@ function rankByLevel(level) {
   return "Новичок";
 }
 
-function xpPerClick() {
-  if (state.level >= 10) return 150;
-  if (state.level >= 7) return 90;
-  if (state.level >= 4) return 35;
-  if (state.level >= 2) return 10;
-  return 5;
-}
-
 function isVipActive() {
   return state.vip && state.vipUntil > Date.now();
 }
@@ -386,10 +188,27 @@ function addXp(amount) {
   return finalXp;
 }
 
-function showToast(text) {
-    showPush("Сповіщення", text, "✨");
+function showPush(title, message, icon = "🎁") {
+  const push = document.getElementById("customPush");
+  const titleEl = document.getElementById("pushTitle");
+  const messageEl = document.getElementById("pushMessage");
+  const iconEl = document.querySelector(".push-icon");
+
+  if (!push || !titleEl || !messageEl) {
+    console.log(title + ": " + message);
+    return;
+  }
+
+  titleEl.textContent = title;
+  messageEl.textContent = message;
+  if (iconEl) iconEl.textContent = icon;
+  push.classList.add("active");
+  setTimeout(() => push.classList.remove("active"), 3000);
 }
 
+function showToast(text) {
+  showPush("Сповіщення", text, "✨");
+}
 
 function checkLevelUp() {
   let leveledUp = false;
@@ -397,9 +216,7 @@ function checkLevelUp() {
     state.xp -= state.maxXp;
     state.level += 1;
     state.maxXp = Math.floor(state.maxXp * 2);
-    if (!state.maxXp || state.maxXp < 1) {
-      state.maxXp = 100;
-    }
+    if (!state.maxXp || state.maxXp < 1) state.maxXp = 100;
     leveledUp = true;
   }
 
@@ -407,9 +224,7 @@ function checkLevelUp() {
     avatarEl.classList.remove("level-up-flash");
     void avatarEl.offsetWidth;
     avatarEl.classList.add("level-up-flash");
-    setTimeout(function () {
-      avatarEl.classList.remove("level-up-flash");
-    }, 900);
+    setTimeout(() => avatarEl.classList.remove("level-up-flash"), 900);
     showToast("🎉 Level " + state.level + "!");
   }
 }
@@ -471,9 +286,7 @@ function updateDrops() {
 
 function updateCards() {
   const rankCards = document.querySelectorAll(".rank-card");
-  if (cardStars) {
-    cardStars.textContent = state.stars.toLocaleString("ru-RU");
-  }
+  if (cardStars) cardStars.textContent = state.stars.toLocaleString("ru-RU");
 
   rankCards.forEach(function(card) {
     const cardId = card.dataset.cardId;
@@ -506,8 +319,7 @@ function updateUI() {
   const avatar = document.querySelector(".avatar");
   if (avatar) {
     avatar.classList.toggle("vip-avatar", isVipActive());
-    const deg = percent * 3.6;
-    avatar.style.setProperty("--xpDeg", deg + "deg");
+    avatar.style.setProperty("--xpDeg", (percent * 3.6) + "deg");
   }
 
   if (levelEl) levelEl.textContent = state.level;
@@ -526,43 +338,37 @@ function updateUI() {
   updateCards();
 
   const vipBadge = document.getElementById("vipBadge");
-  if (vipBadge) {
-    vipBadge.style.display = isVipActive() ? "inline-flex" : "none";
-  }
+  if (vipBadge) vipBadge.style.display = isVipActive() ? "inline-flex" : "none";
 
   const vipBtn = document.getElementById("vipBtn");
   if (vipBtn) {
-    if (isVipActive()) {
-      vipBtn.classList.add("disabled");
-    } else {
-      vipBtn.classList.remove("disabled");
-    }
+    vipBtn.classList.toggle("disabled", isVipActive());
     vipBtn.innerHTML = "<span>👑</span> VIP";
   }
   save();
 }
 
 function openScreen(name) {
-  // 1. Ховаємо всі екрани
   Object.values(screens).forEach(function (screen) {
-    if (screen) screen.classList.remove("active-screen");
+    if (screen) {
+      screen.classList.remove("active-screen");
+      if (screen.id === "gameScreen") screen.style.display = "none";
+    }
   });
 
-  // 2. Знімаємо активність з усіх кнопок навігації
-  navButtons.forEach(function (button) {
-    button.classList.remove("active");
-  });
+  navButtons.forEach(button => button.classList.remove("active"));
 
-  // 3. Показуємо потрібний екран
-  if (screens[name]) {
-    screens[name].classList.add("active-screen");
-    if (name === "tasks") renderTasks();
+  const screen = screens[name] || document.getElementById(name + "Screen");
+  if (screen) {
+    screen.classList.add("active-screen");
+    if (screen.id === "gameScreen") screen.style.display = "block";
   }
 
-  // --- КЕРУВАННЯ ВИДИМІСТЮ СКАРБНИЦІ ---
+  if (name === "tasks") renderTasks();
+  if (name === "game") startCountdown();
+
   const treasury = document.getElementById("treasuryWidget");
   const sideMenu = document.getElementById("sideMenu");
-
   if (name === "home") {
     if (treasury) treasury.style.display = "flex";
     if (sideMenu) sideMenu.style.display = "flex";
@@ -571,7 +377,6 @@ function openScreen(name) {
     if (sideMenu) sideMenu.style.display = "none";
   }
 }
-
 
 navButtons.forEach(function (button) {
   button.addEventListener("click", function () {
@@ -587,19 +392,12 @@ document.querySelectorAll("[data-open]").forEach(function (button) {
     openScreen(screen);
     navButtons.forEach(function (navButton) {
       navButton.classList.remove("active");
-      if (navButton.dataset.screen === screen) {
-        navButton.classList.add("active");
-      }
+      if (navButton.dataset.screen === screen) navButton.classList.add("active");
     });
   });
 });
 
-if (earnBtn) {
-  earnBtn.addEventListener("click", function () {
-    const tasksBtn = document.querySelector('[data-screen="tasks"]');
-    if (tasksBtn) tasksBtn.click();
-  });
-}
+if (earnBtn) earnBtn.addEventListener("click", () => document.querySelector('[data-screen="tasks"]')?.click());
 
 if (bonusBtn) {
   bonusBtn.addEventListener("click", function () {
@@ -656,30 +454,21 @@ function updateCardsView(){
     const cardId = card.dataset.cardId;
     const data = modalCards.find(c => c.id === cardId);
     const isOwned = data && state.cards[data.id] && state.cards[data.id].unlocked;
-
-    if(cardsTab === "inventory"){
-      card.style.display = "none";
-    } else {
-      card.style.display = isOwned ? "none" : "";
-    }
+    card.style.display = cardsTab === "inventory" ? "none" : (isOwned ? "none" : "");
   });
 
   if(cardsTab !== "inventory") return;
 
   let ownedFullCards = [];
   modalCards.forEach(function(card){
-    if(state.cards[card.id] && state.cards[card.id].unlocked){
-      ownedFullCards.push(card);
-    }
+    if(state.cards[card.id] && state.cards[card.id].unlocked) ownedFullCards.push(card);
   });
 
   if(state.boughtCards){
     state.boughtCards.forEach(function(card){
       if(!card || !card.id) return;
       const fullCard = modalCards.find(item => item.id === card.id);
-      if(fullCard && !ownedFullCards.some(item => item.id === fullCard.id)){
-        ownedFullCards.push(fullCard);
-      }
+      if(fullCard && !ownedFullCards.some(item => item.id === fullCard.id)) ownedFullCards.push(fullCard);
     });
   }
 
@@ -688,9 +477,7 @@ function updateCardsView(){
   ownedFullCards.forEach(function(cardData){
     const card = document.createElement("div");
     card.className = "rank-card case-owned-card";
-    if(cardData.specialGlow){
-      card.classList.add("inventory-premium");
-    }
+    if(cardData.specialGlow) card.classList.add("inventory-premium");
     const rarity = (cardData.rarity || "").toLowerCase();
     if(rarity.includes("обы")) card.classList.add("common");
     if(rarity.includes("ред")) card.classList.add("rare");
@@ -700,150 +487,89 @@ function updateCardsView(){
     if(rarity.includes("limit")) card.classList.add("limited-card");
 
     card.innerHTML = `
-      <div class="rank-top">
-        <span class="rarity">${cardData.rarity}</span>
-      </div>
+      <div class="rank-top"><span class="rarity">${cardData.rarity}</span></div>
       <img src="${cardData.img}" alt="${cardData.name}">
       <button class="unlock-btn" disabled>🏆 В коллекции</button>
     `;
 
     card.addEventListener("click", function(){
-      const cardModal = document.getElementById("cardModal");
-      const modalCardImg = document.getElementById("modalCardImg");
-      const modalCardName = document.getElementById("modalCardName");
-      const modalName = document.getElementById("modalName");
-      const modalRarity = document.getElementById("modalRarity");
-      const modalStatus = document.getElementById("modalStatus");
-      const modalPrice = document.getElementById("modalPrice");
-      const modalQuote = document.getElementById("modalQuote");
-      const modalActionBtn = document.getElementById("modalActionBtn");
-
-      if (modalCardImg) modalCardImg.src = cardData.img;
-      if (modalCardName) modalCardName.textContent = cardData.name;
-      if (modalName) modalName.textContent = cardData.name;
-      if (modalRarity) modalRarity.textContent = cardData.rarity;
-      if (modalStatus) modalStatus.textContent = cardData.status;
-      if (modalPrice) modalPrice.textContent = cardData.price;
-      if (modalQuote) modalQuote.textContent = cardData.quote;
-
-      if (modalActionBtn) {
-        modalActionBtn.innerHTML = "🎁 Подарить карту";
-        modalActionBtn.onclick = function () {
-          selectedGiftCard = cardData;
-          const giftModal = document.getElementById("giftModal");
-          if (giftModal) giftModal.classList.add("show");
-        };
-      }
-
-      if (cardModal) {
-        cardModal.classList.add("show");
-        cardModal.classList.remove("view-front");
-      }
-      const viewCardBtn = document.getElementById("viewCardBtn");
-      if (viewCardBtn) viewCardBtn.textContent = "👁 Смотреть карту";
-      const nav = document.querySelector(".bottom-nav");
-      if (nav) nav.classList.add("hide-nav");
+      openCardModal(cardData, false);
     });
 
     grid.appendChild(card);
   });
 }
 
-document.querySelectorAll(".rank-card").forEach(function (card) {
-  card.addEventListener("click", function (event) {
-    const button = event.target.closest("button");
-    if (button) return;
+function openCardModal(data, canBuy) {
+  const cardModal = document.getElementById("cardModal");
+  const modalCardImg = document.getElementById("modalCardImg");
+  const modalCardName = document.getElementById("modalCardName");
+  const modalName = document.getElementById("modalName");
+  const modalRarity = document.getElementById("modalRarity");
+  const modalStatus = document.getElementById("modalStatus");
+  const modalPrice = document.getElementById("modalPrice");
+  const modalQuote = document.getElementById("modalQuote");
+  const actionBtn = document.getElementById("modalActionBtn");
 
+  if (modalCardImg) modalCardImg.src = data.img;
+  if (modalCardName) modalCardName.textContent = data.name;
+  if (modalName) modalName.textContent = data.name;
+  if (modalRarity) modalRarity.textContent = data.rarity;
+  if (modalStatus) modalStatus.textContent = data.status;
+  if (modalPrice) modalPrice.textContent = data.price;
+  if (modalQuote) modalQuote.textContent = data.quote;
+
+  if (actionBtn) {
+    if (canBuy) {
+      actionBtn.innerHTML = "🛒 Купить карту";
+      actionBtn.onclick = function () {
+        selectedCard = data;
+        const buyConfirmPrice = document.getElementById("buyConfirmPrice");
+        const buyConfirmModal = document.getElementById("buyConfirmModal");
+        if (buyConfirmPrice) buyConfirmPrice.textContent = data.price;
+        if (buyConfirmModal) buyConfirmModal.classList.add("show");
+      };
+    } else {
+      actionBtn.innerHTML = "🎁 Подарить карту";
+      actionBtn.onclick = function () {
+        selectedGiftCard = data;
+        document.getElementById("giftModal")?.classList.add("show");
+      };
+    }
+  }
+
+  if (cardModal) {
+    cardModal.classList.toggle("limited-aura", data.id === "limited01");
+    cardModal.classList.add("show");
+    cardModal.classList.remove("view-front");
+  }
+  const viewCardBtn = document.getElementById("viewCardBtn");
+  if (viewCardBtn) viewCardBtn.textContent = "👁 Смотреть карту";
+  document.querySelector(".bottom-nav")?.classList.add("hide-nav");
+}
+
+document.querySelectorAll(".rank-card").forEach(function(card){
+  card.addEventListener("click", function(event){
+    if (event.target.closest("button")) return;
+    const isInventoryOpen = document.querySelector('[data-cards-tab="inventory"]')?.classList.contains("active");
+    const isBuyButton = !isInventoryOpen && card.closest("#cardsScreen") && card.querySelector(".unlock-btn");
     const cardId = card.dataset.cardId;
     const data = modalCards.find(c => c.id === cardId);
     if (!data) return;
-
-    const current = state.cards[data.id] || { unlocked: false, level: 0 };
-    
-    if (current.unlocked) {
-      showToast("Карта уже куплена");
-    }
-    updateUI();
+    openCardModal(data, isBuyButton);
   });
 });
 
 const cardModal = document.getElementById("cardModal");
 const cardModalBg = document.getElementById("cardModalBg");
 const modalClose = document.getElementById("modalClose");
-const viewCardBtn = document.getElementById("viewCardBtn");
 const flipBackBtn = document.getElementById("flipBackBtn");
 
-if (flipBackBtn) {
-  flipBackBtn.addEventListener("click", function () {
-    if (cardModal) cardModal.classList.toggle("view-front");
-  });
-}
-
-document.querySelectorAll(".rank-card").forEach(function(card){
-  card.addEventListener("click", function(event){
-    const button = event.target.closest("button");
-    const isInventoryOpen = document.querySelector('[data-cards-tab="inventory"]')?.classList.contains("active");
-    const isBuyButton = !isInventoryOpen && card.closest("#cardsScreen") && card.querySelector(".unlock-btn");
-
-    const cardId = card.dataset.cardId;
-    const data = modalCards.find(c => c.id === cardId);
-    if (!data) return;
-
-    const cardModal = document.getElementById("cardModal");
-    const modalCardImg = document.getElementById("modalCardImg");
-    const modalCardName = document.getElementById("modalCardName");
-    const modalName = document.getElementById("modalName");
-    const modalRarity = document.getElementById("modalRarity");
-    const modalStatus = document.getElementById("modalStatus");
-    const modalPrice = document.getElementById("modalPrice");
-    const modalQuote = document.getElementById("modalQuote");
-    const actionBtn = document.getElementById("modalActionBtn");
-
-    if (modalCardImg) modalCardImg.src = data.img;
-    if (modalCardName) modalCardName.textContent = data.name;
-    if (modalName) modalName.textContent = data.name;
-    if (modalRarity) modalRarity.textContent = data.rarity;
-    if (modalStatus) modalStatus.textContent = data.status;
-    if (modalPrice) modalPrice.textContent = data.price;
-    if (modalQuote) modalQuote.textContent = data.quote;
-
-    if (actionBtn) {
-      if (isBuyButton) {
-        actionBtn.innerHTML = "🛒 Купить карту";
-        actionBtn.onclick = function () {
-          selectedCard = data;
-          const buyConfirmPrice = document.getElementById("buyConfirmPrice");
-          const buyConfirmModal = document.getElementById("buyConfirmModal");
-          if (buyConfirmPrice) buyConfirmPrice.textContent = data.price;
-          if (buyConfirmModal) buyConfirmModal.classList.add("show");
-        };
-      } else {
-        actionBtn.innerHTML = "🎁 Подарить карту";
-        actionBtn.onclick = function () {
-          const giftModal = document.getElementById("giftModal");
-          if (giftModal) giftModal.classList.add("show");
-          selectedGiftCard = data;
-        };
-      }
-    }
-    
-    if (cardModal) {
-      if (data.id === "limited01") cardModal.classList.add("limited-aura");
-      else cardModal.classList.remove("limited-aura");
-      cardModal.classList.add("show");
-      cardModal.classList.remove("view-front");
-    }
-    const viewCardBtn = document.getElementById("viewCardBtn");
-    if (viewCardBtn) viewCardBtn.textContent = "👁 Смотреть карту";
-    const nav = document.querySelector(".bottom-nav");
-    if (nav) nav.classList.add("hide-nav");
-  });
-});
+if (flipBackBtn) flipBackBtn.addEventListener("click", () => cardModal?.classList.toggle("view-front"));
 
 function closeCardModal(){
   if (cardModal) cardModal.classList.remove("show");
-  const nav = document.querySelector(".bottom-nav");
-  if (nav) nav.classList.remove("hide-nav");
+  document.querySelector(".bottom-nav")?.classList.remove("hide-nav");
 }
 
 if (modalClose) modalClose.addEventListener("click", closeCardModal);
@@ -870,12 +596,9 @@ if (confirmBuyBtn) {
     }
 
     state.stars -= selectedCard.price;
-    if (!state.cards[selectedCard.id]) {
-      state.cards[selectedCard.id] = { unlocked: false, level: 0 };
-    }
+    if (!state.cards[selectedCard.id]) state.cards[selectedCard.id] = { unlocked: false, level: 0 };
     state.cards[selectedCard.id].unlocked = true;
     state.cards[selectedCard.id].level = 1;
-    
     if (!state.boughtCards) state.boughtCards = [];
     state.boughtCards.push(selectedCard);
 
@@ -886,25 +609,19 @@ if (confirmBuyBtn) {
   });
 }
 
-if (cancelBuyBtn) {
-  cancelBuyBtn.addEventListener("click", function () {
-    if (buyConfirmModal) buyConfirmModal.classList.remove("show");
-  });
-}
+if (cancelBuyBtn) cancelBuyBtn.addEventListener("click", () => buyConfirmModal?.classList.remove("show"));
 
 function openShop(){
   if (shopModal) {
     shopModal.classList.add("show");
-    const nav = document.querySelector(".bottom-nav");
-    if (nav) nav.classList.add("hide-nav");
+    document.querySelector(".bottom-nav")?.classList.add("hide-nav");
   }
 }
 
 function closeShop(){
   if (shopModal) {
     shopModal.classList.remove("show");
-    const nav = document.querySelector(".bottom-nav");
-    if (nav) nav.classList.remove("hide-nav");
+    document.querySelector(".bottom-nav")?.classList.remove("hide-nav");
   }
 }
 
@@ -925,7 +642,7 @@ document.querySelectorAll(".shop-pack").forEach((pack) => {
         body: JSON.stringify({ playerId: state.playerId, starsAmount, priceStars })
       });
       const data = await response.json();
-      if (data.invoiceLink) {
+      if (data.invoiceLink && tg?.openInvoice) {
         tg.openInvoice(data.invoiceLink, (status) => {
           if (status === "paid") {
             state.stars += starsAmount;
@@ -953,9 +670,7 @@ document.querySelectorAll(".rank-card").forEach(card => {
     const rotateX = ((y / rect.height) - 0.5) * -12;
     card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
   });
-  card.addEventListener("mouseleave", () => {
-    card.style.transform = "";
-  });
+  card.addEventListener("mouseleave", () => card.style.transform = "");
 });
 
 document.addEventListener("input", function (event) {
@@ -972,8 +687,7 @@ document.addEventListener("input", function (event) {
 
 document.addEventListener("click", async function (event) {
   if (event.target.closest("#cancelGiftBtn")) {
-    const giftModal = document.getElementById("giftModal");
-    if (giftModal) giftModal.classList.remove("show");
+    document.getElementById("giftModal")?.classList.remove("show");
     selectedGiftCard = null;
     const giftUserId = document.getElementById("giftUserId");
     if (giftUserId) giftUserId.value = "";
@@ -983,56 +697,36 @@ document.addEventListener("click", async function (event) {
     const giftUserIdEl = document.getElementById("giftUserId");
     const receiverId = giftUserIdEl ? giftUserIdEl.value.trim() : "";
 
-    if (receiverId.length !== 9) {
-      alert("ID должен быть ровно 9 цифр");
-      return;
-    }
-    if (!selectedGiftCard) {
-      alert("Сначала выбери карту");
-      return;
-    }
-    if (receiverId === state.playerId) {
-      alert("Нельзя отправить карту самому себе");
-      return;
-    }
+    if (receiverId.length !== 9) return alert("ID должен быть ровно 9 цифр");
+    if (!selectedGiftCard) return alert("Сначала выбери карту");
+    if (receiverId === state.playerId) return alert("Нельзя отправить карту самому себе");
 
-    const { error } = await supabaseClient
-      .from("trades")
-      .insert({
-        sender_id: state.playerId,
-        receiver_id: receiverId,
-        card_id: selectedGiftCard.id,
-        status: "sent"
-      });
+    const { error } = await supabaseClient.from("trades").insert({
+      sender_id: state.playerId,
+      receiver_id: receiverId,
+      card_id: selectedGiftCard.id,
+      status: "sent"
+    });
 
-    if (error) {
-      alert("Ошибка отправки: " + error.message);
-      return;
-    }
+    if (error) return alert("Ошибка отправки: " + error.message);
 
     state.boughtCards = state.boughtCards.filter(card => card.id !== selectedGiftCard.id);
-    if (state.cards[selectedGiftCard.id]) {
-      state.cards[selectedGiftCard.id].unlocked = false;
-    }
+    if (state.cards[selectedGiftCard.id]) state.cards[selectedGiftCard.id].unlocked = false;
     save();
     updateCardsView();
     selectedGiftCard = null;
-    const giftModal = document.getElementById("giftModal");
-    if (giftModal) giftModal.classList.remove("show");
+    document.getElementById("giftModal")?.classList.remove("show");
     alert("🎁 Карта отправлена игроку ID: " + receiverId);
   }
 });
 
-const REF_BASE_URL = "https://hustlerank-app.vercel.app/";
 const referralLink = `https://t.me/HustleRank033Bot?startapp=ref_${state.playerId}`;
 const urlParams = new URLSearchParams(window.location.search);
 let referrerId = urlParams.get("ref");
 
 if (tg) {
   const startParam = tg.initDataUnsafe?.start_param;
-  if (startParam && startParam.startsWith("ref_")) {
-    referrerId = startParam.replace("ref_", "");
-  }
+  if (startParam && startParam.startsWith("ref_")) referrerId = startParam.replace("ref_", "");
 }
 
 async function registerReferral() {
@@ -1117,21 +811,13 @@ function renderFriends() {
 
 async function loadReferrals() {
   const { data, error } = await supabaseClient.from("referrals").select("*").eq("referrer_id", state.playerId);
-  if (error) {
-    console.log(error);
-    return;
-  }
+  if (error) return console.log(error);
   invitedFriends.length = 0;
   let availableStars = 0;
   let availableCrystals = 0;
 
   data.forEach(function(ref) {
-    invitedFriends.push({
-      name: "Игрок",
-      level: ref.invited_level,
-      income: 0,
-      reward: ref.reward_claimed ? "✅" : "🎁"
-    });
+    invitedFriends.push({ name: "Игрок", level: ref.invited_level, income: 0, reward: ref.reward_claimed ? "✅" : "🎁" });
     if (ref.invited_level >= 3 && !ref.reward_claimed) {
       availableStars += 250;
       availableCrystals += 500;
@@ -1159,10 +845,7 @@ if (claimRefBtn) {
         await supabaseClient.from("referrals").update({ reward_claimed: true }).eq("id", ref.id);
       }
     }
-    if (rewardCount <= 0) {
-      alert("Нет наград");
-      return;
-    }
+    if (rewardCount <= 0) return alert("Нет наград");
     state.stars += rewardCount * 250;
     state.crystals += rewardCount * 500;
     save();
@@ -1178,36 +861,6 @@ const closeDropModal = document.getElementById("closeDropModal");
 let lastDropCard = null;
 let isDropRolling = false;
 
-if (closeDropModal) {
-  closeDropModal.addEventListener("click", function () {
-    if (!lastDropCard) return;
-    if (!state.cards[lastDropCard.id]) {
-      state.cards[lastDropCard.id] = { unlocked: false, level: 0 };
-    }
-    state.cards[lastDropCard.id].unlocked = true;
-    state.cards[lastDropCard.id].level = 1;
-    if (!state.boughtCards) state.boughtCards = [];
-    
-    const fullCard = modalCards.find(card => card.id === lastDropCard.id);
-    if (fullCard && !state.boughtCards.some(card => card.id === fullCard.id)) {
-      state.boughtCards.push({
-        id: fullCard.id,
-        name: fullCard.name,
-        img: fullCard.img,
-        rarity: fullCard.rarity,
-        price: fullCard.price || 0
-      });
-    }
-    save();
-    updateUI();
-    updateCardsView();
-    showToast("Карта добавлена в инвентарь");
-    lastDropCard = null;
-    if (dropModal) dropModal.classList.remove("show");
-    closeDropModal.style.display = "none";
-  });
-}
-
 const caseCards = [
   { id: "common01", name: "Common One", img: "images/common-01.png", rarity: "common" },
   { id: "common02", name: "Common Two", img: "images/common-02.png", rarity: "common" },
@@ -1221,6 +874,28 @@ const caseCards = [
   { id: "limited01", name: "Limited", img: "images/limited-01.png", rarity: "limited" }
 ];
 
+if (closeDropModal) {
+  closeDropModal.addEventListener("click", function () {
+    if (!lastDropCard) return;
+    if (!state.cards[lastDropCard.id]) state.cards[lastDropCard.id] = { unlocked: false, level: 0 };
+    state.cards[lastDropCard.id].unlocked = true;
+    state.cards[lastDropCard.id].level = 1;
+    if (!state.boughtCards) state.boughtCards = [];
+
+    const fullCard = modalCards.find(card => card.id === lastDropCard.id);
+    if (fullCard && !state.boughtCards.some(card => card.id === fullCard.id)) {
+      state.boughtCards.push({ id: fullCard.id, name: fullCard.name, img: fullCard.img, rarity: fullCard.rarity, price: fullCard.price || 0 });
+    }
+    save();
+    updateUI();
+    updateCardsView();
+    showToast("Карта добавлена в инвентарь");
+    lastDropCard = null;
+    if (dropModal) dropModal.classList.remove("show");
+    closeDropModal.style.display = "none";
+  });
+}
+
 if (openDropBtn) {
   openDropBtn.addEventListener("click", function () {
     if (isDropRolling) return;
@@ -1232,10 +907,7 @@ if (openDropBtn) {
     }
 
     if (!freeVipDrop) {
-      if (state.stars < 100) {
-        showToast("Недостаточно ⭐ для дропа");
-        return;
-      }
+      if (state.stars < 100) return showToast("Недостаточно ⭐ для дропа");
       state.stars -= 100;
       save();
       updateUI();
@@ -1253,30 +925,18 @@ if (openDropBtn) {
     if (roulette) roulette.style.display = "flex";
     if (rouletteTrack) {
       rouletteTrack.innerHTML = "";
-      const items = [];
       for(let i = 0; i < 40; i++){
         const random = caseCards[Math.floor(Math.random() * caseCards.length)];
-        items.push(random);
-        rouletteTrack.innerHTML += `
-          <div class="roulette-card rarity-${random.rarity}">
-            <img src="${random.img}">
-          </div>
-        `;
+        rouletteTrack.innerHTML += `<div class="roulette-card rarity-${random.rarity}"><img src="${random.img}"></div>`;
       }
       const winner = caseCards[Math.floor(Math.random() * caseCards.length)];
       lastDropCard = winner;
-      items[34] = winner;
-      rouletteTrack.children[34].outerHTML = `
-        <div class="roulette-card rarity-${winner.rarity}">
-          <img src="${winner.img}">
-        </div>
-      `;
+      rouletteTrack.children[34].outerHTML = `<div class="roulette-card rarity-${winner.rarity}"><img src="${winner.img}"></div>`;
       rouletteTrack.style.transition = "none";
       rouletteTrack.style.transform = "translateX(0px)";
       setTimeout(() => {
         rouletteTrack.style.transition = "transform 5s cubic-bezier(.08,.6,0,1)";
-        const offset = (34 * 134) - 1300;
-        rouletteTrack.style.transform = `translateX(-${offset}px)`;
+        rouletteTrack.style.transform = `translateX(-${(34 * 134) - 1300}px)`;
       }, 100);
       setTimeout(() => {
         isDropRolling = false;
@@ -1284,24 +944,6 @@ if (openDropBtn) {
       }, 5200);
     }
   });
-}
-
-function updateDailyDropVisibility() {
-  const dailyDropWidget = document.querySelector(".daily-drop");
-  const homeScreen = document.getElementById("homeScreen");
-  if (!dailyDropWidget || !homeScreen) return;
-  const isHome = homeScreen.classList.contains("active-screen") || homeScreen.classList.contains("active");
-  dailyDropWidget.style.display = isHome ? "flex" : "none";
-}
-
-function updateSideActionsVisibility() {
-  const leftPanel = document.querySelector(".left-actions");
-  const rightPanel = document.querySelector(".right-actions");
-  const homeScreen = document.getElementById("homeScreen");
-  if (!leftPanel || !rightPanel || !homeScreen) return;
-  const isHome = homeScreen.classList.contains("active-screen") || homeScreen.classList.contains("active");
-  leftPanel.style.display = isHome ? "flex" : "none";
-  rightPanel.style.display = isHome ? "flex" : "none";
 }
 
 const telegramTaskBtn = document.getElementById("telegramTaskBtn");
@@ -1385,8 +1027,7 @@ function updateDailyTimer() {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  const timerText = String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
-  dailyClaimBtn.textContent = timerText;
+  dailyClaimBtn.textContent = String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
   dailyClaimBtn.style.pointerEvents = "none";
   dailyClaimBtn.style.opacity = "0.7";
 }
@@ -1444,10 +1085,7 @@ const vipBuyBtn = document.getElementById("vipBuyBtn");
 
 if (vipMenuBtn && vipModal && vipCancelBtn && vipBuyBtn) {
   vipMenuBtn.addEventListener("click", () => {
-    if (isVipActive()) {
-      showToast("👑 VIP уже активен");
-      return;
-    }
+    if (isVipActive()) return showToast("👑 VIP уже активен");
     vipModal.classList.add("show");
   });
   vipCancelBtn.addEventListener("click", () => vipModal.classList.remove("show"));
@@ -1464,7 +1102,7 @@ if (vipMenuBtn && vipModal && vipCancelBtn && vipBuyBtn) {
         body: JSON.stringify({ playerId: state.playerId, starsAmount: 1, priceStars: 150, vipPurchase: true })
       });
       const data = await response.json();
-      if (data.invoiceLink) {
+      if (data.invoiceLink && tg?.openInvoice) {
         tg.openInvoice(data.invoiceLink, (status) => {
           if (status === "paid") {
             state.vip = true;
@@ -1485,27 +1123,13 @@ if (vipMenuBtn && vipModal && vipCancelBtn && vipBuyBtn) {
   });
 }
 
-// Ініціалізація
-openScreen("home");
-if (navButtons[0]) navButtons[0].classList.add("active");
-updateUI();
-updateCardsView();
-updateDailyTimer();
-loadReferrals();
-loadIncomingCards();
-setInterval(updateDailyTimer, 1000);
-// --- ЛОГІКА СИСТЕМИ ЗАВДАНЬ ---
-
-// 1. Функція, яка малює список завдань на екрані
 function renderTasks() {
   const tasksContainer = document.querySelector("#tasksScreen .tasks-list");
   if (!tasksContainer) return;
-  
-  tasksContainer.innerHTML = ""; // Очищуємо список перед малюванням
+  tasksContainer.innerHTML = "";
 
   tasks.forEach(task => {
     const isCompleted = localStorage.getItem(`task_${task.id}_completed`) === "true";
-    
     const taskCard = document.createElement("div");
     taskCard.className = `task-card ${isCompleted ? "completed" : ""}`;
     taskCard.innerHTML = `
@@ -1522,131 +1146,389 @@ function renderTasks() {
         </div>
       </div>
       <div class="task-actions">
-        <button class="task-btn" id="btn_${task.id}" ${isCompleted ? "disabled" : ""}>
-          ${isCompleted ? "Виконано" : "Виконати"}
-        </button>
+        <button class="task-btn" id="btn_${task.id}" ${isCompleted ? "disabled" : ""}>${isCompleted ? "Виконано" : "Виконати"}</button>
       </div>
     `;
-
-    const btn = taskCard.querySelector(`#btn_${task.id}`);
-    btn.addEventListener("click", () => handleTaskAction(task));
-
+    taskCard.querySelector(`#btn_${task.id}`)?.addEventListener("click", () => handleTaskAction(task));
     tasksContainer.appendChild(taskCard);
   });
 }
 
-// 2. Функція, яка обробляє натискання на кнопку завдання
 function handleTaskAction(task) {
   if (localStorage.getItem(`task_${task.id}_completed`) === "true") return;
 
   if (task.link) {
     window.open(task.link, "_blank");
-    // Змінюємо кнопку на "Перевірити" після переходу
     const btn = document.getElementById(`btn_${task.id}`);
     if (btn) {
-        btn.textContent = "Перевірити";
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            completeTask(task);
-        };
+      btn.textContent = "Перевірити";
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        completeTask(task);
+      };
     }
   } else if (task.check) {
-    // Якщо є спеціальна перевірка (наприклад, на кількість карт)
-    if (task.check()) {
-      completeTask(task);
-    } else {
-      showToast("Умова ще не виконана!");
-    }
+    task.check() ? completeTask(task) : showToast("Умова ще не виконана!");
   } else {
-    // Якщо це просте завдання (як щоденний бонус)
     completeTask(task);
   }
 }
 
-// 3. Функція нарахування нагороди
 function completeTask(task) {
   state.xp += task.reward.xp || 0;
   state.crystals += task.reward.crystals || 0;
   state.stars += task.reward.stars || 0;
-  
   localStorage.setItem(`task_${task.id}_completed`, "true");
-  showToast(`Нагорода отримана!`);
-  updateUI(); // Оновлюємо цифри на екрані
-  renderTasks(); // Оновлюємо список завдань
+  showToast("Нагорода отримана!");
+  updateUI();
+  renderTasks();
 }
-// --- ОСТАТОЧНА ЛОГІКА СКАРБНИЦІ ---
+
 const TREASURY_CONFIG = { perHour: 60, max: 100 };
 
 function updateTreasuryUI() {
-    const now = Date.now();
-    if (!state.lastTreasuryClaim) state.lastTreasuryClaim = now;
-    const hours = (now - state.lastTreasuryClaim) / (1000 * 60 * 60);
-    let count = Math.floor(hours * TREASURY_CONFIG.perHour);
-    if (count > TREASURY_CONFIG.max) count = TREASURY_CONFIG.max;
-    const el = document.getElementById("treasuryAmount");
-    if (el) el.textContent = count + " 💎";
-    return count;
+  const now = Date.now();
+  if (!state.lastTreasuryClaim) state.lastTreasuryClaim = now;
+  const hours = (now - state.lastTreasuryClaim) / (1000 * 60 * 60);
+  let count = Math.floor(hours * TREASURY_CONFIG.perHour);
+  if (count > TREASURY_CONFIG.max) count = TREASURY_CONFIG.max;
+  const el = document.getElementById("treasuryAmount");
+  if (el) el.textContent = count + " 💎";
+  return count;
 }
 
-// Прив'язка кліку безпосередньо до елементів
 document.addEventListener("click", function(e) {
-    // Натискання на сундучок
-    if (e.target.closest("#treasuryWidget")) {
-        const amount = updateTreasuryUI();
-        const modal = document.getElementById("treasuryModal");
-        const modalAmount = document.getElementById("modalTreasuryAmount");
-        if (modalAmount) modalAmount.textContent = amount;
-        if (modal) {
-            modal.style.display = "flex";
-            setTimeout(() => modal.classList.add("active"), 10);
-        }
+  if (e.target.closest("#treasuryWidget")) {
+    const amount = updateTreasuryUI();
+    const modal = document.getElementById("treasuryModal");
+    const modalAmount = document.getElementById("modalTreasuryAmount");
+    if (modalAmount) modalAmount.textContent = amount;
+    if (modal) {
+      modal.style.display = "flex";
+      setTimeout(() => modal.classList.add("active"), 10);
     }
-    
-    // Натискання на кнопку "Забрати"
-    if (e.target.closest("#confirmTreasuryBtn")) {
-        const amount = updateTreasuryUI();
-        if (amount > 0) {
-            state.crystals += amount;
-            state.lastTreasuryClaim = Date.now();
-            updateUI(); 
-            showToast("Забрано " + amount + " 💎");
-        }
-        const modal = document.getElementById("treasuryModal");
-        if (modal) {
-            modal.classList.remove("active");
-            setTimeout(() => modal.style.display = "none", 300);
-        }
-    }
+  }
 
-    // Закриття модалки
-    if (e.target.closest("#closeTreasuryModal") || e.target.id === "treasuryModal") {
-        const modal = document.getElementById("treasuryModal");
-        if (modal) {
-            modal.classList.remove("active");
-            setTimeout(() => modal.style.display = "none", 300);
-        }
+  if (e.target.closest("#confirmTreasuryBtn")) {
+    const amount = updateTreasuryUI();
+    if (amount > 0) {
+      state.crystals += amount;
+      state.lastTreasuryClaim = Date.now();
+      updateUI();
+      showToast("Забрано " + amount + " 💎");
     }
+    const modal = document.getElementById("treasuryModal");
+    if (modal) {
+      modal.classList.remove("active");
+      setTimeout(() => modal.style.display = "none", 300);
+    }
+  }
+
+  if (e.target.closest("#closeTreasuryModal") || e.target.id === "treasuryModal") {
+    const modal = document.getElementById("treasuryModal");
+    if (modal) {
+      modal.classList.remove("active");
+      setTimeout(() => modal.style.display = "none", 300);
+    }
+  }
 });
 
-// Запуск таймера оновлення
+let gameActive = false;
+let gameScore = 0;
+let gameLives = 3;
+let gameXp = 0;
+let gameObjects = [];
+let gameSpeed = 3;
+let spawnRate = 0.04;
+let gameCanvas = null;
+let gameCtx = null;
+let gameCountdownInterval = null;
+let gameAnimationId = null;
+
+function resizeGameCanvas() {
+  if (!gameCanvas) return;
+  const screen = document.getElementById("gameScreen");
+  const rect = screen ? screen.getBoundingClientRect() : { width: window.innerWidth, height: window.innerHeight };
+  gameCanvas.width = Math.max(320, Math.floor(rect.width || window.innerWidth));
+  gameCanvas.height = Math.max(480, Math.floor(rect.height || window.innerHeight));
+}
+
+function startCountdown() {
+  const countdownEl = document.getElementById("gameCountdown");
+  gameCanvas = document.getElementById("gameCanvas");
+  gameActive = false;
+  gameObjects = [];
+
+  if (gameAnimationId) {
+    cancelAnimationFrame(gameAnimationId);
+    gameAnimationId = null;
+  }
+
+  if (gameCanvas) {
+    gameCtx = gameCanvas.getContext("2d");
+    resizeGameCanvas();
+    gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+  }
+
+  if (!countdownEl) {
+    initGameEngine();
+    return;
+  }
+
+  if (gameCountdownInterval) clearInterval(gameCountdownInterval);
+
+  let count = 3;
+  countdownEl.style.display = "flex";
+  countdownEl.textContent = count;
+
+  gameCountdownInterval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      countdownEl.textContent = count;
+    } else if (count === 0) {
+      countdownEl.textContent = "СТАРТ!";
+    } else {
+      clearInterval(gameCountdownInterval);
+      gameCountdownInterval = null;
+      countdownEl.style.display = "none";
+      initGameEngine();
+    }
+  }, 1000);
+}
+
+function initGameEngine() {
+  gameCanvas = document.getElementById("gameCanvas");
+  if (!gameCanvas) {
+    console.error("Не знайдено #gameCanvas");
+    return;
+  }
+
+  gameCtx = gameCanvas.getContext("2d");
+  resizeGameCanvas();
+
+  gameActive = true;
+  gameScore = 0;
+  gameLives = 3;
+  gameXp = 0;
+  gameSpeed = 3;
+  gameObjects = [];
+
+  const scoreEl = document.getElementById("gameScore");
+  const livesEl = document.getElementById("gameLives");
+  const xpEl = document.getElementById("gameXp");
+  const overEl = document.getElementById("gameOverScreen");
+  if (scoreEl) scoreEl.textContent = "0";
+  if (livesEl) livesEl.textContent = "3";
+  if (xpEl) xpEl.textContent = "0";
+  if (overEl) overEl.style.display = "none";
+
+  gameLoop();
+}
+
+function gameLoop() {
+    if (!gameActive || !gameCtx || !gameCanvas) return;
+
+    gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+const shouldSpawn = Math.random() < 0.04;
+
+if (shouldSpawn || gameObjects.length === 0) {
+    const roll = Math.random();
+
+    let objectType = "💎";
+    let objectValue = 1;
+    let objectSpeed = gameSpeed + Math.random() * 2;
+
+    if (roll < 0.18) {
+        objectType = "💣";
+    } else if (roll < 0.45) {
+        objectValue = Math.floor(40 + Math.random() * 90);
+        objectType = "+" + objectValue + " XP";
+        objectSpeed = gameSpeed + 1 + Math.random() * 2;
+    } else if (roll < 0.48) {
+        objectValue = 2000;
+        objectType = "+2000 XP";
+        objectSpeed = gameSpeed + 8 + Math.random() * 4;
+    }
+
+    gameObjects.push({
+        x: Math.random() * Math.max(1, gameCanvas.width - 90),
+        y: -45,
+        type: objectType,
+        value: objectValue,
+        speed: objectSpeed
+    });
+}
+
+    for (let i = gameObjects.length - 1; i >= 0; i--) {
+        const obj = gameObjects[i];
+        obj.y += obj.speed;
+
+       if (String(obj.type).includes("XP")) {
+
+    gameCtx.font = "bold 16px Arial";
+
+    const textWidth = gameCtx.measureText(obj.type).width;
+
+    const boxWidth = textWidth + 24;
+    const boxHeight = 32;
+
+    gameCtx.fillStyle = "rgba(120,70,255,0.30)";
+    gameCtx.strokeStyle = "rgba(255,255,255,0.15)";
+    gameCtx.lineWidth = 1;
+
+    roundRect(
+        gameCtx,
+        obj.x - 12,
+        obj.y - 4,
+        boxWidth,
+        boxHeight,
+        14
+    );
+
+    gameCtx.fill();
+    gameCtx.stroke();
+
+    gameCtx.fillStyle = "#ffffff";
+    gameCtx.fillText(
+        obj.type,
+        obj.x,
+        obj.y + 10
+    );
+
+} else {
+
+    gameCtx.font = "35px Arial";
+    gameCtx.textBaseline = "top";
+    gameCtx.fillStyle = "#ffffff";
+
+    gameCtx.fillText(obj.type, obj.x, obj.y);
+
+}
+
+        if (obj.y > gameCanvas.height + 50) {
+            gameObjects.splice(i, 1);
+        }
+    }
+
+    gameAnimationId = requestAnimationFrame(gameLoop);
+}
+function roundRect(ctx, x, y, width, height, radius) {
+
+    ctx.beginPath();
+
+    ctx.moveTo(x + radius, y);
+
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(
+        x + width,
+        y + height,
+        x + width - radius,
+        y + height
+    );
+
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+
+    ctx.closePath();
+}
+function handleGamePointer(clientX, clientY) {
+  if (!gameActive || !gameCanvas) return;
+  const rect = gameCanvas.getBoundingClientRect();
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+
+  for (let i = gameObjects.length - 1; i >= 0; i--) {
+    const obj = gameObjects[i];
+    if (x >= obj.x - 20 && x <= obj.x + 55 && y >= obj.y - 20 && y <= obj.y + 55) {
+     if (obj.type === "💎") {
+    gameScore++;
+    const scoreEl = document.getElementById("gameScore");
+    if (scoreEl) scoreEl.textContent = gameScore;
+} else if (String(obj.type).includes("XP")) {
+    gameXp += obj.value || 0;
+
+    const xpEl = document.getElementById("gameXp");
+    if (xpEl) xpEl.textContent = gameXp;
+} else {
+        gameLives--;
+        const livesEl = document.getElementById("gameLives");
+        if (livesEl) livesEl.textContent = gameLives;
+        if (gameLives <= 0) endGame();
+      }
+      gameObjects.splice(i, 1);
+      break;
+    }
+  }
+}
+
+document.addEventListener("mousedown", e => handleGamePointer(e.clientX, e.clientY));
+document.addEventListener("touchstart", e => {
+  const touch = e.touches[0];
+  if (touch) handleGamePointer(touch.clientX, touch.clientY);
+}, { passive: true });
+
+function endGame() {
+  gameActive = false;
+  if (gameAnimationId) {
+    cancelAnimationFrame(gameAnimationId);
+    gameAnimationId = null;
+  }
+  const finalScoreEl = document.getElementById("finalScore");
+  const finalXpEl = document.getElementById("finalXp");
+  const overEl = document.getElementById("gameOverScreen");
+  if (finalScoreEl) finalScoreEl.textContent = gameScore;
+  if (finalXpEl) finalXpEl.textContent = gameXp;
+  if (overEl) overEl.style.display = "flex";
+if (gameXp > 0) {
+    state.xp += gameXp;
+}
+  const reward = Math.floor(gameScore / 5);
+  if (reward > 0) {
+    state.crystals += reward;
+    updateUI();
+    showPush("Гру завершено", `Ви заробили ${reward} 💎`, "🎮");
+  }
+}
+
+function restartGame() {
+  startCountdown();
+}
+
+function exitGame() {
+  gameActive = false;
+  if (gameAnimationId) {
+    cancelAnimationFrame(gameAnimationId);
+    gameAnimationId = null;
+  }
+  if (gameCountdownInterval) {
+    clearInterval(gameCountdownInterval);
+    gameCountdownInterval = null;
+  }
+  const countdownEl = document.getElementById("gameCountdown");
+  if (countdownEl) countdownEl.style.display = "none";
+  openScreen("tasks");
+}
+
+window.addEventListener("resize", resizeGameCanvas);
+window.openScreen = openScreen;
+window.startCountdown = startCountdown;
+window.restartGame = restartGame;
+window.exitGame = exitGame;
+
+openScreen("home");
+if (navButtons[0]) navButtons[0].classList.add("active");
+updateUI();
+updateCardsView();
+updateDailyTimer();
+loadReferrals();
+loadIncomingCards();
+setInterval(updateDailyTimer, 1000);
 setInterval(updateTreasuryUI, 60000);
 updateTreasuryUI();
-checkDailyStreak(); // Перевірка щоденного входу
-function showPush(title, message, icon = "🎁") {
-    const push = document.getElementById("customPush");
-    const titleEl = document.getElementById("pushTitle");
-    const messageEl = document.getElementById("pushMessage");
-    const iconEl = document.querySelector(".push-icon");
-
-    if (!push || !titleEl || !messageEl) return;
-
-    titleEl.textContent = title;
-    messageEl.textContent = message;
-    if (iconEl) iconEl.textContent = icon;
-
-    push.classList.add("active");
-
-    setTimeout(() => {
-        push.classList.remove("active");
-    }, 3000);
-}
+})();
