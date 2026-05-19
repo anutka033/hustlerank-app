@@ -3610,7 +3610,7 @@ body {
 }
 
 .custom-push.active {
-    top: 20px; /* Випливає зверху */
+    top: 75px; /* Випливає зверху */
 }
 
 .push-content {
