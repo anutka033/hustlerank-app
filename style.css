@@ -2996,7 +2996,7 @@ button {
 .vip-badge {
   position: absolute;
   bottom: -10px;
-  left: 50%;
+  left: 55%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
