@@ -141,6 +141,17 @@
 
     
     <div id="dropsScreen" class="screen">
+      <div class="drops-balance-box">
+
+    <div class="drops-balance-item">
+        ⭐ <span id="dropStars">0</span>
+    </div>
+
+    <div class="drops-balance-item">
+        💎 <span id="dropCrystals">0</span>
+    </div>
+
+</div>
       <h1 class="page-title">Дропы</h1>
       <h2 class="drop-section-title">Void Drop</h2>
       <section class="drop-case compact-drop">
@@ -194,8 +205,14 @@
           <span>💎 +500</span>
         </div>
         <div class="ref-actions">
-          <button id="inviteFriendBtn">👥 Пригласить друга</button>
-          <button id="copyRefBtn">📋</button>
+          <button id="inviteFriendBtn" class="invite-friend-btn">
+    <span class="custom-icon user-plus-icon"></span>
+    <span>Запросити друга</span>
+</button>
+
+<button id="copyRefBtn" class="copy-ref-btn">
+    <span class="custom-icon copy-icon"></span>
+</button>
         </div>
       </section>
       <section class="friends-head">
@@ -312,6 +329,18 @@
           <img src="./images/solar-emperor.png" alt="Solar Emperor">
           <button class="unlock-btn gold-btn">⭐ 5000</button>
         </div>
+        <div class="rank-card legendary limited-card premium-card card-old" data-card-id="old">
+    <div class="rank-top">
+        <span class="card-level">∞</span>
+        <span class="rarity">LIMITED</span>
+    </div>
+
+    <img src="./images/old.png" alt="Old">
+
+    <button class="unlock-btn gold-btn">⭐ 250000</button>
+</div>
+
+</div>
       </div>
       <div class="status-box">
         <div>

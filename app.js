@@ -88,6 +88,7 @@ const cardsData = [
   { id: "legendary01", price: 950 },
   { id: "mythic01", price: 2500 },
   { id: "limited01", price: 9000 },
+  { id: "old", price: 250000 },
 ];
 
 const modalCards = [
@@ -112,6 +113,16 @@ const modalCards = [
   { id: "legendary01", name: "Legendary", rarity: "ЛЕГЕНДАРНАЯ", status: "Статус: Легенда", price: 950, quote: "Легендами становятся через испытания.", img: "images/legendary-01.png" },
   { id: "mythic01", name: "Mythic", rarity: "МИФИЧЕСКАЯ", status: "Статус: Абсолют", price: 2500, quote: "Мифы создают те, кто не сдаются.", img: "images/mythic-01.png" },
   { id: "limited01", name: "Limited", rarity: "LIMITED", status: "Статус: Эксклюзив", price: 9000, quote: "Редкость определяет ценность.", img: "images/limited-01.png", specialGlow: true },
+  {
+    id: "old",
+    name: "Genesis",
+    rarity: "LIMITED",
+    status: "Статус: Початок історії",
+    price: 250000,
+    quote: "Те, з чого народився шлях, неможливо стерти.",
+    series: "#001 / 1",
+    img: "./images/old.png"
+},
 ];
 
 const tasks = [
@@ -328,6 +339,20 @@ function updateUI() {
   if (xpFill) xpFill.style.width = percent + "%";
   if (coinsEl) coinsEl.textContent = state.crystals.toLocaleString("ru-RU");
   if (starsEl) starsEl.textContent = state.stars.toLocaleString("ru-RU");
+  const dropStarsEl = document.getElementById("dropStars");
+if (dropStarsEl) {
+    dropStarsEl.textContent = state.stars.toLocaleString("ru-RU");
+}
+
+const dropCrystalsEl = document.getElementById("dropCrystals");
+if (dropCrystalsEl) {
+    dropCrystalsEl.textContent = state.crystals.toLocaleString("ru-RU");
+}
+  const taskStarsEl = document.getElementById("taskStars");
+
+if (taskStarsEl) {
+    taskStarsEl.textContent = state.stars.toLocaleString("ru-RU");
+}
   if (ratingEl) ratingEl.textContent = state.level >= 2 ? "#" + (900 - state.level * 37) : "#---";
   if (incomePerHourEl) incomePerHourEl.textContent = "+0/час";
   if (earnText) earnText.textContent = "Перейти к заданиям";
@@ -485,6 +510,9 @@ function updateCardsView(){
     if(rarity.includes("леген")) card.classList.add("legendary");
     if(rarity.includes("миф")) card.classList.add("mythic");
     if(rarity.includes("limit")) card.classList.add("limited-card");
+    if(cardData.id === "old") {
+    card.classList.add("card-old");
+}
 
     card.innerHTML = `
       <div class="rank-top"><span class="rarity">${cardData.rarity}</span></div>
@@ -769,8 +797,11 @@ if (inviteFriendBtn) {
 if (copyRefBtn) {
   copyRefBtn.addEventListener("click", function () {
     navigator.clipboard.writeText(referralLink);
-    copyRefBtn.textContent = "✅";
-    setTimeout(() => copyRefBtn.textContent = "📋", 1500);
+    copyRefBtn.classList.add("copied");
+
+setTimeout(() => {
+    copyRefBtn.classList.remove("copied");
+}, 1200);
   });
 }
 
