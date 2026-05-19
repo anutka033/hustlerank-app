@@ -4117,3 +4117,9 @@ body {
 
     z-index:100 !important;
 }
+#homeScreen{
+    height:100dvh !important;
+    max-height:100dvh !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+}
