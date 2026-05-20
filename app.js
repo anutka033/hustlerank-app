@@ -55,7 +55,31 @@ const state = {
   dailyStreak: safeNumber(localStorage.getItem("dailyStreak"), 0),
   lastTreasuryClaim: safeNumber(localStorage.getItem("lastTreasuryClaim"), Date.now())
 };
+async function updateOnlineCollectors() {
+    if (!state.playerId) return;
 
+    await supabaseClient
+        .from("online_collectors")
+        .upsert({
+            id: String(state.playerId),
+            last_seen: new Date().toISOString()
+        });
+
+    const fiveMinutesAgo =
+        new Date(Date.now() - 5 * 60 * 1000).toISOString();
+
+    const { data, error } = await supabaseClient
+        .from("online_collectors")
+        .select("id")
+        .gt("last_seen", fiveMinutesAgo);
+
+    if (!error && data) {
+        document.querySelectorAll(".collectors-count").forEach(el => {
+            el.textContent =
+                data.length.toLocaleString("ru-RU");
+        });
+    }
+}
 if (state.vip && !state.vipUntil) {
   state.vipUntil = Date.now() + (30 * 24 * 60 * 60 * 1000);
 }
@@ -1568,7 +1592,11 @@ loadIncomingCards();
 setInterval(updateDailyTimer, 1000);
 setInterval(updateTreasuryUI, 60000);
 updateTreasuryUI();
+updateOnlineCollectors();
 
+setInterval(() => {
+    updateOnlineCollectors();
+}, 30000);
 function updateGiveawayModal() {
     const modal = document.getElementById("giveawayModal");
     const percentEl = document.getElementById("giveawayPercent");
