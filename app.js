@@ -1603,7 +1603,7 @@ updateOnlineCollectors();
 
 setInterval(() => {
     updateOnlineCollectors();
-}, 30000);
+}, 15000);
 function updateGiveawayModal() {
     const modal = document.getElementById("giveawayModal");
     const percentEl = document.getElementById("giveawayPercent");
