@@ -56,29 +56,36 @@ const state = {
   lastTreasuryClaim: safeNumber(localStorage.getItem("lastTreasuryClaim"), Date.now())
 };
 async function updateOnlineCollectors() {
-    if (!state.playerId) return;
+    const playerId = state.playerId;
 
     await supabaseClient
         .from("online_collectors")
         .upsert({
-            id: String(state.playerId),
+            id: playerId,
             last_seen: new Date().toISOString()
         });
 
-    const fiveMinutesAgo =
-        new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
 
     const { data, error } = await supabaseClient
         .from("online_collectors")
-        .select("id")
+        .select("*")
         .gt("last_seen", fiveMinutesAgo);
 
-    if (!error && data) {
-        document.querySelectorAll(".collectors-count").forEach(el => {
-            el.textContent =
-                data.length.toLocaleString("ru-RU");
-        });
+    if (error) {
+        console.log(error);
+        return;
     }
+
+    const onlineCount = data.length;
+
+    const el = document.getElementById("onlineCollectors");
+
+    if (el) {
+        el.textContent = onlineCount;
+    }
+
+    console.log("ONLINE:", onlineCount);
 }
 if (state.vip && !state.vipUntil) {
   state.vipUntil = Date.now() + (30 * 24 * 60 * 60 * 1000);
