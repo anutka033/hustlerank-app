@@ -92,6 +92,8 @@ async function authPlayerOnServer() {
 
   if (player.level !== undefined) state.level = Number(player.level) || 1;
   if (player.xp !== undefined) state.xp = Number(player.xp) || 0;
+  if (player.coins !== undefined) state.stars = Number(player.coins) || 0;
+if (player.gems !== undefined) state.crystals = Number(player.gems) || 0;
 
   save();
   updateUI();
@@ -107,10 +109,12 @@ async function savePlayerToServer() {
       },
       body: JSON.stringify({
         initData: tg.initData,
-        player: {
-          level: state.level,
-          xp: state.xp
-        }
+       player: {
+  level: state.level,
+  xp: state.xp,
+  coins: state.stars,
+  gems: state.crystals
+}
       })
     });
   } catch (error) {

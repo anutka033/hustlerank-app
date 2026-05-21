@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   try {
     const { initData } = req.body || {};
     if (!initData) return res.status(400).json({ error: "No initData" });
-
+const player = req.body?.player || null;
     const params = new URLSearchParams(initData);
     const userRaw = params.get("user");
     if (!userRaw) return res.status(400).json({ error: "No user" });
@@ -24,11 +24,13 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
           Prefer: "resolution=merge-duplicates,return=representation"
         },
-        body: JSON.stringify({
-          username: telegramId,
-          level: 1,
-          xp: 0
-        })
+       body: JSON.stringify({
+  username: telegramId,
+  level: player?.level ?? 1,
+  xp: player?.xp ?? 0,
+  coins: player?.coins ?? 0,
+  gems: player?.gems ?? 0
+})
       }
     );
 
