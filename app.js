@@ -219,7 +219,30 @@ function rankByLevel(level) {
   if (level >= 2) return "Rookie";
   return "Новичок";
 }
+function getFriendAvatar(level) {
 
+  if (level >= 25) {
+    return "images/avatar-voidking.png";
+  }
+
+  if (level >= 16) {
+    return "images/avatar-gold.png";
+  }
+
+  if (level >= 10) {
+    return "images/avatar-diamond.png";
+  }
+
+  if (level >= 7) {
+    return "images/avatar-red.png";
+  }
+
+  if (level >= 4) {
+    return "images/avatar-red.png";
+  }
+
+  return "images/avatar.png";
+}
 function isVipActive() {
   return state.vip && state.vipUntil > Date.now();
 }
@@ -863,7 +886,9 @@ function renderFriends() {
     friendsContainer.innerHTML += `
       <div class="friend-item">
         <div class="friend-left">
-          <div class="friend-avatar">${friend.name[0]}</div>
+          <div class="friend-avatar">
+  <img src="${getFriendAvatar(friend.level || 1)}" alt="">
+</div>
           <div>
            <div class="friend-top">
   <span class="friend-level">${friend.level || 1} lvl</span>
