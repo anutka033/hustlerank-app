@@ -1071,7 +1071,6 @@ if (taskStarsEl) {
     vipBtn.innerHTML = "<span>👑</span> <span>" + t("vip") + "</span>";
   }
   save();
-  savePlayerToServer();
 }
 
 function openScreen(name) {
