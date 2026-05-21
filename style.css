@@ -4649,11 +4649,11 @@ body {
 #friendsContainer {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 6px;
 }
 
 .friend-item {
-  margin-bottom: 14px;
+  margin-bottom: 0 !important;
 }
 
 .friend-top {
