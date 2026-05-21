@@ -688,7 +688,14 @@ if (openShopBtn) openShopBtn.addEventListener("click", openShop);
 if (shopBg) shopBg.addEventListener("click", closeShop);
 if (shopClose) shopClose.addEventListener("click", closeShop);
 
-const starPrices = { 150: 5, 500: 15, 1200: 30, 3500: 80, 12000: 250 };
+const starPrices = {
+  150: 5,
+  500: 15,
+  1200: 30,
+  3500: 80,
+  12000: 250,
+  40000: 450
+};
 
 document.querySelectorAll(".shop-pack").forEach((pack) => {
   pack.addEventListener("click", async () => {
