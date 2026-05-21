@@ -1621,6 +1621,44 @@ if (claimRefBtn) {
 }
 
 const openDropBtn = document.getElementById("openDropBtn");
+async function openDropOnServer() {
+  if (!tg?.initData) {
+    showToast("Помилка Telegram авторизації");
+    return null;
+  }
+
+  try {
+    const response = await fetch("/api/open-drop", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        initData: tg.initData
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      if (data.error === "Not enough coins") {
+        showToast("Недостатньо ⭐ для дропа");
+      } else {
+        showToast("Помилка відкриття дропа");
+      }
+
+      console.error("Open drop error:", data);
+      return null;
+    }
+
+    return data;
+
+  } catch (error) {
+    console.error("Open drop fetch error:", error);
+    showToast("Помилка сервера");
+    return null;
+  }
+}
 const dropModal = document.getElementById("dropModal");
 const closeDropModal = document.getElementById("closeDropModal");
 let lastDropCard = null;
@@ -1662,7 +1700,7 @@ if (closeDropModal) {
 }
 
 if (openDropBtn) {
-  openDropBtn.addEventListener("click", function () {
+  openDropBtn.addEventListener("click", async function () {
     if (isDropRolling) return;
     let freeVipDrop = false;
     if (isVipActive() && !vipFreeDropClaimed) {
@@ -1671,14 +1709,15 @@ if (openDropBtn) {
       localStorage.setItem("vipFreeDropClaimed", "true");
     }
 
-    if (!freeVipDrop) {
-      if (state.stars < 100) return showToast(t("notEnoughForDrop"));
-      state.stars -= 100;
-      save();
-      updateUI();
-    } else {
-      showToast(t("vipFreeDrop"));
-    }
+   const dropResult = await openDropOnServer();
+
+if (!dropResult) {
+  isDropRolling = false;
+  return;
+}
+
+state.stars = Number(dropResult.coins) || state.stars;
+updateUI();
 
     isDropRolling = true;
     lastDropCard = null;
@@ -1694,8 +1733,15 @@ if (openDropBtn) {
         const random = caseCards[Math.floor(Math.random() * caseCards.length)];
         rouletteTrack.innerHTML += `<div class="roulette-card rarity-${random.rarity}"><img src="${random.img}"></div>`;
       }
-      const winner = caseCards[Math.floor(Math.random() * caseCards.length)];
-      lastDropCard = winner;
+      const winner = caseCards.find(card => card.id === dropResult.cardId);
+
+if (!winner) {
+  showToast("Помилка карти");
+  isDropRolling = false;
+  return;
+}
+
+lastDropCard = winner;
       rouletteTrack.children[34].outerHTML = `<div class="roulette-card rarity-${winner.rarity}"><img src="${winner.img}"></div>`;
       rouletteTrack.style.transition = "none";
       rouletteTrack.style.transform = "translateX(0px)";
