@@ -4645,3 +4645,35 @@ body {
     inset 0 0 10px rgba(255,255,255,0.03),
     0 0 14px rgba(168,85,247,0.18);
 }
+.friendsContainer,
+#friendsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.friend-item {
+  margin-bottom: 14px;
+}
+
+.friend-top {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.friend-id-box {
+  max-width: 230px;
+  padding: 6px 12px;
+  border-radius: 14px;
+  font-size: 15px;
+  line-height: 1.1;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.friend-left {
+  align-items: center;
+}

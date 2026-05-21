@@ -869,7 +869,7 @@ function renderFriends() {
   <span class="friend-level">${friend.level || 1} lvl</span>
 
   <span class="friend-id-box">
-    ID: ${friend.name}
+    ${friend.name}
   </span>
 </div>
         </div>
