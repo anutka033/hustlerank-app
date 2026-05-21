@@ -24,13 +24,19 @@ const player = req.body?.player || null;
           "Content-Type": "application/json",
           Prefer: "resolution=merge-duplicates,return=representation"
         },
-       body: JSON.stringify({
-  username: telegramId,
-  level: player?.level ?? 1,
-  xp: player?.xp ?? 0,
-  coins: player?.coins ?? 0,
-  gems: player?.gems ?? 0
-})
+       body: JSON.stringify(
+  player
+    ? {
+        username: telegramId,
+        level: player.level,
+        xp: player.xp,
+        coins: player.coins,
+        gems: player.gems
+      }
+    : {
+        username: telegramId
+      }
+)
       }
     );
 
