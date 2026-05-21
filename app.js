@@ -786,7 +786,7 @@ document.addEventListener("click", async function (event) {
   }
 });
 
-const referralLink = `https://t.me/HustleRank033Bot?startapp=ref_${state.playerId}`;
+const referralLink = `https://t.me/HustleRank033Bot?start=ref_${state.playerId}`;
 const urlParams = new URLSearchParams(window.location.search);
 let referrerId = urlParams.get("ref");
 
@@ -886,7 +886,12 @@ async function loadReferrals() {
   let availableCrystals = 0;
 
   data.forEach(function(ref) {
-    invitedFriends.push({ name: "Игрок", level: ref.invited_level, income: 0, reward: ref.reward_claimed ? "✅" : "🎁" });
+    invitedFriends.push({
+    name: "ID: " + ref.invited_id,
+    level: ref.invited_level || 1,
+    income: 0,
+    reward: ref.reward_claimed ? "✅" : "🎁"
+});
     if (ref.invited_level >= 3 && !ref.reward_claimed) {
       availableStars += 25;
       availableCrystals += 500;
