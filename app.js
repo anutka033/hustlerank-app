@@ -865,12 +865,13 @@ function renderFriends() {
         <div class="friend-left">
           <div class="friend-avatar">${friend.name[0]}</div>
           <div>
-            <div class="friend-top">
-              <span class="friend-level">${friend.level || 1} lvl</span>
-              <span class="friend-name">${friend.name}</span>
-            </div>
-            <div class="friend-income">Доход в час: ${friend.income || 0}</div>
-          </div>
+           <div class="friend-top">
+  <span class="friend-level">${friend.level || 1} lvl</span>
+
+  <span class="friend-id-box">
+    ID: ${friend.name}
+  </span>
+</div>
         </div>
         <div class="friend-reward">${friend.reward || 0}</div>
       </div>
