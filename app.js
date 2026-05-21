@@ -94,11 +94,12 @@ async function authPlayerOnServer() {
   if (player.xp !== undefined) state.xp = Number(player.xp) || 0;
   if (player.coins !== undefined) state.stars = Number(player.coins) || 0;
 if (player.gems !== undefined) state.crystals = Number(player.gems) || 0;
-
+window.serverPlayerLoaded = true;
   save();
   updateUI();
 }
 async function savePlayerToServer() {
+    if (!window.serverPlayerLoaded) return;
   if (!tg?.initData) return;
 
   try {
