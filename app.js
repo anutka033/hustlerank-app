@@ -112,7 +112,10 @@ async function savePlayerToServer() {
         initData: tg.initData,
        player: {
   level: state.level,
-  xp: state.xp,
+  xp: Math.max(
+  Number(state.xp) || 0,
+  Number(localStorage.getItem("xp")) || 0
+),
   coins: state.stars,
   gems: state.crystals
 }
