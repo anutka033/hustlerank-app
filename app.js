@@ -36,10 +36,28 @@ function safeNumber(value, fallback = 0) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
 }
+function getTelegramPlayerId() {
+  const telegramId = tg?.initDataUnsafe?.user?.id;
 
+  if (telegramId) {
+    localStorage.setItem("playerId", String(telegramId));
+    return String(telegramId);
+  }
+
+  const localId = localStorage.getItem("playerId");
+
+  if (localId) {
+    return localId;
+  }
+
+  const guestId = Math.floor(100000000 + Math.random() * 900000000).toString();
+  localStorage.setItem("playerId", guestId);
+
+  return guestId;
+}
 const state = {
   xp: safeNumber(localStorage.getItem("xp"), 0),
-  playerId: localStorage.getItem("playerId") || Math.floor(100000000 + Math.random() * 900000000).toString(),
+  playerId: getTelegramPlayerId(),
   maxXp: Math.max(100, safeNumber(localStorage.getItem("maxXp"), 100)),
   level: Math.max(1, safeNumber(localStorage.getItem("level"), 1)),
   coins: safeNumber(localStorage.getItem("coins"), 0),
