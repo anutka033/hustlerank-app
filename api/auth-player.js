@@ -1,20 +1,69 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({
+      ok: true
+    });
   }
 
   try {
-    const { initData } = req.body || {};
-    if (!initData) return res.status(400).json({ error: "No initData" });
-const player = req.body?.player || null;
+    const { initData, player } = req.body || {};
+
+    if (!initData) {
+      return res.status(400).json({
+        error: "No initData"
+      });
+    }
+
     const params = new URLSearchParams(initData);
     const userRaw = params.get("user");
-    if (!userRaw) return res.status(400).json({ error: "No user" });
+
+    if (!userRaw) {
+      return res.status(400).json({
+        error: "No user"
+      });
+    }
 
     const user = JSON.parse(userRaw);
     const telegramId = String(user.id);
 
-    const response = await fetch(
+    const getPlayerRes = await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/players?username=eq.${telegramId}&select=*`,
+      {
+        method: "GET",
+        headers: {
+          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    );
+
+    const existingPlayers = await getPlayerRes.json();
+    const existingPlayer = existingPlayers[0] || null;
+
+    let payload;
+
+    if (existingPlayer) {
+      payload = {
+        username: telegramId
+      };
+
+      if (player) {
+        if (player.level !== undefined) payload.level = Number(player.level) || 1;
+        if (player.xp !== undefined) payload.xp = Number(player.xp) || 0;
+        if (player.coins !== undefined) payload.coins = Number(player.coins) || 0;
+        if (player.gems !== undefined) payload.gems = Number(player.gems) || 0;
+      }
+    } else {
+      payload = {
+        username: telegramId,
+        level: Number(player?.level) || 1,
+        xp: Number(player?.xp) || 0,
+        coins: Number(player?.coins) || 0,
+        gems: Number(player?.gems) || 0
+      };
+    }
+
+    const saveRes = await fetch(
       `${process.env.SUPABASE_URL}/rest/v1/players?on_conflict=username`,
       {
         method: "POST",
@@ -24,38 +73,28 @@ const player = req.body?.player || null;
           "Content-Type": "application/json",
           Prefer: "resolution=merge-duplicates,return=representation"
         },
-       body: JSON.stringify(
-  player
-    ? {
-        username: telegramId,
-        level: player.level,
-        xp: player.xp,
-        coins: player.coins,
-        gems: player.gems
-      }
-    : {
-        username: telegramId
-      }
-)
+        body: JSON.stringify(payload)
       }
     );
 
-    const text = await response.text();
+    const saveText = await saveRes.text();
 
-    if (!response.ok) {
+    if (!saveRes.ok) {
       return res.status(500).json({
-        error: text
+        error: saveText
       });
     }
 
+    const savedPlayer = saveText ? JSON.parse(saveText)[0] : null;
+
     return res.status(200).json({
       success: true,
-      player: text ? JSON.parse(text)[0] : null
+      player: savedPlayer || existingPlayer
     });
 
-  } catch (e) {
+  } catch (error) {
     return res.status(500).json({
-      error: String(e)
+      error: String(error)
     });
   }
 }
