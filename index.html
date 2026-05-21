@@ -16,6 +16,15 @@
 </head>
 
 <body>
+  <div id="languageModal" class="language-modal">
+  <div class="language-box">
+    <h2 data-i18n="chooseLanguage">Оберіть мову</h2>
+
+    <button data-lang="ua">🇺🇦 Українська</button>
+    <button data-lang="en">🇬🇧 English</button>
+    <button data-lang="fr">🇫🇷 Français</button>
+  </div>
+</div>
   <main class="app">
 
     
@@ -58,8 +67,8 @@
       <button class="earn-card" id="earnBtn">
         <span class="earn-icon">⚡️</span>
         <span>
-          <b>Заработать XP</b>
-          <small id="earnText">Перейти к заданиям</small>
+          <b data-i18n="earnXp">Заробити XP</b>
+          <small id="earnText" data-i18n="earnGoTasks">Перейти до завдань</small>
         </span>
         <span class="arrow">›</span>
       </button>
@@ -67,17 +76,17 @@
 <div id="treasuryWidget" class="treasury-widget">
     <div class="chest-icon">🎁</div>
     <div class="chest-info">
-        <span class="chest-title">Скарбниця</span>
+        <span class="chest-title" data-i18n="treasury">Скарбниця</span>
         <span id="treasuryAmount" class="chest-amount">0 💎</span>
     </div>
 </div>
       <div class="daily-drop" id="dailyDrop">
         <div class="drop-icon">🎁</div>
         <div class="drop-info">
-          <span class="drop-title">Daily Drop</span>
+          <span class="drop-title" data-i18n="dailyDrop">Щоденний дроп</span>
           <span class="drop-reward" id="dailyDropTimer"></span>
           </div>
-        <button class="daily-claim-btn" id="dailyClaimBtn">Забрать</button>
+        <button class="daily-claim-btn" id="dailyClaimBtn" data-i18n="claim">Забрати</button>
       </div>
     </div>
 
@@ -85,27 +94,27 @@
     <div class="side-menu" id="sideMenu">
       <button class="menu-toggle" id="menuToggle">❯</button>
       <button class="menu-btn" id="bonusBtn">
-        <span>🎁</span> Бонус
+        <span>🎁</span> <span data-i18n="bonus">Бонус</span>
       </button>
       <button class="menu-btn" id="vipBtn">
-        <span>👑</span> VIP
+        <span>👑</span> <span data-i18n="vip">VIP</span>
       </button>
      <button class="menu-btn" id="giveawayBtn">
-  <span>🎉</span> Розыгрыш
+  <span>🎉</span> <span data-i18n="giveaway">Розіграш</span>
 </button>
       <button class="menu-btn disabled">
-        <span>🛡</span> Клан <small>Скоро</small>
+        <span>🛡</span> <span data-i18n="clan">Клан</span> <small data-i18n="soon">Скоро</small>
       </button>
       <button class="menu-btn" id="langBtn">
-  <span>🌐</span> Language
+  <span>🌐</span> <span data-i18n="language">Мова</span>
 </button>
     </div>
 
 <div id="tasksScreen" class="screen">
     <div class="cards-header">
         <div>
-            <h1>Завдання</h1>
-            <p>Виконуй місії та отримуй цінні ресурси</p>
+            <h1 data-i18n="tasks">Завдання</h1>
+            <p data-i18n="tasksDescription">Виконуй місії та отримуй цінні ресурси</p>
         </div>
         <div class="stars-box">
             <span id="taskStars">0</span> ⭐
@@ -114,17 +123,17 @@
 
     <div class="tasks-list"></div>
 
-    <div class="tasks-category-title">Ігри</div>
+    <div class="tasks-category-title" data-i18n="games">Ігри</div>
     <div class="games-list">
         <div class="game-card-ios" onclick="openScreen('game')">
             <div class="game-icon-wrapper">
                 <img src="images/game-icon.png" alt="Game" class="game-icon-ios">
             </div>
             <div class="game-details">
-                <div class="game-name">Кристальна Лихоманка</div>
-                <div class="game-desc">Збирай кристали та отримуй нагороди</div>
+                <div class="game-name" data-i18n="crystalFever">Кристальна лихоманка</div>
+                <div class="game-desc" data-i18n="crystalFeverDesc">Збирай кристали та отримуй нагороди</div>
             </div>
-            <button class="game-play-btn">Грати</button>
+            <button class="game-play-btn" data-i18n="play">Грати</button>
         </div>
     </div>
     <div class="game-card-ios soon-game-card">
@@ -133,11 +142,11 @@
     </div>
 
     <div class="game-details">
-        <div class="game-name">Ферма Зірок</div>
-        <div class="game-desc">Будуй ферму та добувай зорі</div>
+        <div class="game-name" data-i18n="starFarm">Ферма зірок</div>
+        <div class="game-desc" data-i18n="starFarmDesc">Будуй ферму та добувай зірки</div>
     </div>
 
-    <button class="game-play-btn soon-game-btn" disabled>Скоро</button>
+    <button class="game-play-btn soon-game-btn" disabled data-i18n="soon">Скоро</button>
 </div>
 </div>
 
@@ -155,16 +164,16 @@
     </div>
 
 </div>
-      <h1 class="page-title" data-i18n="drops">Дропы</h1>
+      <h1 class="page-title" data-i18n="drops">Дропи</h1>
       <h2 class="drop-section-title">Void Drop</h2>
       <section class="drop-case compact-drop">
         <div class="drop-case-box">
           <img src="images/cards-drop.png" alt="Cards">
         </div>
         <div class="drop-case-info">
-          <p>Случайная карта в коллекцию</p>
+          <p data-i18n="randomCardDesc">Випадкова карта до колекції</p>
         </div>
-        <button class="open-drop-btn" id="openDropBtn">Открыть за ⭐ 100</button>
+        <button class="open-drop-btn" id="openDropBtn" data-i18n="openFor100">Відкрити за ⭐ 100</button>
       </section>
 
       <section class="drop-case compact-drop locked-drop">
@@ -174,7 +183,7 @@
         <div class="drop-case-info">
           <h3>Shadow Relic</h3>
         </div>
-        <button class="open-drop-btn locked-btn" disabled>Скоро</button>
+        <button class="open-drop-btn locked-btn" disabled data-i18n="soon">Скоро</button>
       </section>
 
       <section class="drop-case compact-drop locked-drop">
@@ -184,7 +193,7 @@
         <div class="drop-case-info">
           <h3>Celestial Vault</h3>
         </div>
-        <button class="open-drop-btn locked-btn" disabled>Скоро</button>
+        <button class="open-drop-btn locked-btn" disabled data-i18n="soon">Скоро</button>
       </section>
 
       <section class="drop-case compact-drop locked-drop limited-drop">
@@ -194,7 +203,7 @@
         <div class="drop-case-info">
           <h3>Limited Genesis</h3>
         </div>
-        <button class="open-drop-btn locked-btn" disabled>Скоро</button>
+        <button class="open-drop-btn locked-btn" disabled data-i18n="soon">Скоро</button>
       </section>
     </div>
 
@@ -202,7 +211,7 @@
     <div id="friendsScreen" class="screen">
       <h1 class="page-title" data-i18n="friends">Друзі</h1>
       <section class="ref-card">
-        <p class="ref-label">Бонус за друга, который достиг 3 уровня:</p>
+        <p class="ref-label" data-i18n="refBonusLabel">Бонус за друга, який досяг 3 рівня:</p>
         <div class="ref-rewards">
           <span>⭐ +25</span>
           <span>💎 +500</span>
@@ -210,7 +219,7 @@
         <div class="ref-actions">
           <button id="inviteFriendBtn" class="invite-friend-btn">
     <span class="custom-icon user-plus-icon"></span>
-    <span>Запросити друга</span>
+    <span data-i18n="inviteFriend">Запросити друга</span>
 </button>
 
 <button id="copyRefBtn" class="copy-ref-btn">
@@ -227,10 +236,10 @@
           <p data-i18n="claimTitle">Ти можеш забрати</p>
           <strong>⭐ <span id="claimStars">0</span> · 💎 <span id="claimCrystals">0</span></strong>
         </div>
-        <button id="claimRefBtn" data-i18n="claimBtn">Забрать</button>
+        <button id="claimRefBtn" data-i18n="claimBtn">Забрати</button>
       </section>
       <section class="friends-list">
-        <div class="friend-empty" id="friendEmpty" data-i18n="friendEmpty">Пока нет приглашённых друзей</div>
+        <div class="friend-empty" id="friendEmpty" data-i18n="friendEmpty">Поки немає запрошених друзів</div>
         <div id="friendsContainer"></div>
       </section>
     </div>
@@ -239,23 +248,23 @@
     <div id="cardsScreen" class="screen">
       <div class="cards-header">
         <div>
-          <h1 data-i18n="cards">Карточки</h1>
-          <p data-i18n="cardsDescription">Собирай, прокачивай и открывай статусы.</p>
+          <h1 data-i18n="cards">Картки</h1>
+          <p data-i18n="cardsDescription">Збирай, прокачуй і відкривай статуси.</p>
         </div>
         <div class="stars-box">
           ⭐ <span id="cardStars">0</span>
         </div>
       </div>
       <div class="cards-tabs">
-        <button class="tab-btn active" id="shopTab" data-cards-tab="shop">Магазин</button>
-        <button class="tab-btn" id="inventoryTab" data-cards-tab="inventory">Инвентарь</button>
-        <button class="tab-btn" id="marketTab" data-cards-tab="market">Рынок</button>
+        <button class="tab-btn active" id="shopTab" data-cards-tab="shop" data-i18n="shop">Магазин</button>
+        <button class="tab-btn" id="inventoryTab" data-cards-tab="inventory" data-i18n="inventory">Інвентар</button>
+        <button class="tab-btn" id="marketTab" data-cards-tab="market" data-i18n="market">Ринок</button>
       </div>
       <div id="marketScreen" class="market-screen" style="display: none;">
         <div class="market-soon">
-          <h2 data-i18n="marketSoon">Рынок скоро откроется</h2>
-          <p data-i18n="marketSoonDescription">Скоро здесь можно будет продавать свои карты за звёзды.</p>
-          <p data-i18n="marketSoonDescription2">А пока собирай коллекцию, покупай новые карты и открывай редкие статусы.</p>
+          <h2 data-i18n="marketSoon">Ринок скоро відкриється</h2>
+          <p data-i18n="marketSoonDescription">Скоро тут можна буде продавати свої карти за зірки.</p>
+          <p data-i18n="marketSoonDescription2">А поки збирай колекцію, купуй нові карти й відкривай рідкісні статуси.</p>
         </div>
       </div>
       <div class="new-cards-grid">
@@ -263,65 +272,65 @@
         <div class="rank-card epic" data-card-id="novice">
           <div class="rank-top">
             <span class="card-level">1</span>
-            <span class="rarity">ЭПИЧЕСКАЯ</span>
+            <span class="rarity" data-i18n="rarityEpic">ЕПІЧНА</span>
           </div>
-          <img src="./images/epic-smile.png" alt="Новичок">
+          <img src="./images/epic-smile.png" alt="Новачок" data-i18n-alt="card_novice_name">
           <button class="unlock-btn">⭐ 10</button>
         </div>
         <div class="rank-card rare" data-card-id="focus">
           <div class="rank-top">
             <span class="card-level">2</span>
-            <span class="rarity">РЕДКАЯ</span>
+            <span class="rarity" data-i18n="rarityRare">РІДКІСНА</span>
           </div>
-          <img src="./images/focus-mind.png" alt="Фокус">
+          <img src="./images/focus-mind.png" alt="Фокус" data-i18n-alt="card_focus_name">
           <button class="unlock-btn blue-btn">⭐ 25</button>
         </div>
         <div class="rank-card legendary" data-card-id="leader">
           <div class="rank-top">
             <span class="card-level">3</span>
-            <span class="rarity">ЛЕГЕНДАРНАЯ</span>
+            <span class="rarity" data-i18n="rarityLegendary">ЛЕГЕНДАРНА</span>
           </div>
-          <img src="./images/leader-core.png" alt="Лидер">
+          <img src="./images/leader-core.png" alt="Лідер" data-i18n-alt="card_leader_name">
           <button class="unlock-btn gold-btn">⭐ 75</button>
         </div>
         <div class="rank-card legendary" data-card-id="voidking">
           <div class="rank-top">
             <span class="card-level">4</span>
-            <span class="rarity">ЛЕГЕНДАРНАЯ</span>
+            <span class="rarity" data-i18n="rarityLegendary">ЛЕГЕНДАРНА</span>
           </div>
-          <img src="./images/void-king.png" alt="Void King">
+          <img src="./images/void-king.png" alt="Void King" data-i18n-alt="card_voidking_name">
           <button class="unlock-btn gold-btn">⭐ 150</button>
         </div>
         <div class="rank-card mythic" data-card-id="stormpaw">
           <div class="rank-top">
             <span class="card-level">5</span>
-            <span class="rarity">МИФИЧЕСКАЯ</span>
+            <span class="rarity" data-i18n="rarityMythic">МІФІЧНА</span>
           </div>
-          <img src="./images/mystic-stormpaw.png" alt="Stormpaw">
+          <img src="./images/mystic-stormpaw.png" alt="Storm Paw" data-i18n-alt="card_stormpaw_name">
           <button class="unlock-btn mythic-btn">⭐ 650</button>
         </div>
         <div class="rank-card mythic" data-card-id="voidmage">
           <div class="rank-top">
             <span class="card-level">6</span>
-            <span class="rarity">МИФИЧЕСКАЯ</span>
+            <span class="rarity" data-i18n="rarityMythic">МІФІЧНА</span>
           </div>
-          <img src="./images/voidmage.png" alt="Voidmage">
+          <img src="./images/voidmage.png" alt="Void Mage" data-i18n-alt="card_voidmage_name">
           <button class="unlock-btn mythic-btn">⭐ 955</button>
         </div>
         <div class="rank-card common" data-card-id="shadowkeeper">
-          <img src="./images/shadow-keeper.png" alt="Хранитель Тени">
+          <img src="./images/shadow-keeper.png" alt="Охоронець тіні" data-i18n-alt="card_shadowkeeper_name">
           <button class="unlock-btn common-btn">⭐ 30</button>
         </div>
         <div class="rank-card common" data-card-id="hopeseed">
-          <img src="./images/hope-seed.png" alt="Семя Надежды">
+          <img src="./images/hope-seed.png" alt="Насінина надії" data-i18n-alt="card_hopeseed_name">
           <button class="unlock-btn common-btn">⭐ 30</button>
         </div>
         <div class="rank-card common" data-card-id="willshard">
-          <img src="./images/will-shard.png" alt="Осколок Воли">
+          <img src="./images/will-shard.png" alt="Уламок волі" data-i18n-alt="card_willshard_name">
           <button class="unlock-btn common-btn">⭐ 30</button>
         </div>
         <div class="rank-card legendary" data-card-id="voidemperor">
-          <img src="./images/void-emperor.png" alt="Император Пустоты">
+          <img src="./images/void-emperor.png" alt="Імператор порожнечі" data-i18n-alt="card_voidemperor_name">
           <button class="unlock-btn gold-btn">⭐ 250</button>
         </div>
         <div class="rank-card legendary limited-card premium-card" data-card-id="solaremperor">
@@ -329,7 +338,7 @@
             <span class="card-level">∞</span>
             <span class="rarity">LIMITED</span>
           </div>
-          <img src="./images/solar-emperor.png" alt="Solar Emperor">
+          <img src="./images/solar-emperor.png" alt="Solar Emperor" data-i18n-alt="card_solaremperor_name">
           <button class="unlock-btn gold-btn">⭐ 5000</button>
         </div>
         <div class="rank-card legendary limited-card premium-card card-old" data-card-id="old">
@@ -338,14 +347,14 @@
         <span class="rarity">LIMITED</span>
     </div>
 
-    <img src="./images/old.png" alt="Old">
+    <img src="./images/old.png" alt="Genesis" data-i18n-alt="card_old_name">
 
     <button class="unlock-btn gold-btn">⭐ 250000</button>
 </div>
 
 </div>
      <div class="limited-banner">
-  🔥 Колекціонерів онлайн: <span id="onlineCollectors">1</span>
+  🔥 <span data-i18n="collectorsOnline">Колекціонерів онлайн</span>: <span id="onlineCollectors">1</span>
 </div>
     </div>
 
@@ -353,15 +362,15 @@
     <nav class="bottom-nav">
       <button class="active" data-screen="home">
         <i class="fa-solid fa-house"></i>
-        <span data-i18n="tasks">Завдання</span>
+        <span data-i18n="main">Головна</span>
       </button>
       <button data-screen="tasks">
         <i class="fa-solid fa-list-check"></i>
-        <span data-i18n="drops">Дропи</span>
+        <span data-i18n="tasks">Завдання</span>
       </button>
       <button data-screen="drops">
         <i class="fa-solid fa-briefcase"></i>
-        <span data-i18n="drops">Дропы</span>
+        <span data-i18n="drops">Дропи</span>
       </button>
       <button data-screen="friends">
         <i class="fa-solid fa-user-group"></i>
@@ -380,7 +389,7 @@
           <div class="roulette-line"></div>
           <div class="roulette-track" id="rouletteTrack"></div>
         </div>
-        <button id="closeDropModal" style="display:none;">Забрать</button>
+        <button id="closeDropModal" style="display:none;" data-i18n="claim">Забрати</button>
       </div>
     </div>
 
@@ -392,27 +401,27 @@
         <div class="flip-inner" id="flipInner">
           <div class="flip-front">
             <img id="modalCardImg" src="" alt="">
-            <h2 id="modalCardName">Карта</h2>
+            <h2 id="modalCardName" data-i18n="cardModalTitle">Карта</h2>
           </div>
           <div class="flip-back">
             <button class="modal-close" id="modalClose">×</button>
             <span id="modalRarity" class="modal-rarity">RARE</span>
-            <h2 id="modalName">Night Hustler</h2>
-            <p id="modalStatus">Статус: Ночной игрок</p>
+            <h2 id="modalName" data-i18n="defaultModalName">Night Hustler</h2>
+            <p id="modalStatus" data-i18n="defaultModalStatus">Статус: Нічний гравець</p>
             <div class="card-message">
               <p id="modalQuote"></p>
             </div>
             <div class="card-meta">
               <div class="meta-box">
-                <small>Стоимость</small>
+                <small data-i18n="cost">Вартість</small>
                 <strong>⭐ <span id="modalPrice">10</span></strong>
               </div>
               <div class="meta-box">
-                <small>Серия</small>
+                <small data-i18n="series">Серія</small>
                 <strong>#017 / 500</strong>
               </div>
             </div>
-            <button class="modal-action-btn" id="modalActionBtn">🛒 Купить карту</button>
+            <button class="modal-action-btn" id="modalActionBtn" data-i18n="buyCard">🛒 Купити карту</button>
           </div>
         </div>
       </div>
@@ -423,31 +432,31 @@
       <div class="shop-bg" id="shopBg"></div>
       <div class="shop-box">
         <button class="shop-close" id="shopClose">×</button>
-        <h2>Магазин звёзд</h2>
-        <p>Покупай звёзды и открывай эксклюзивные карты.</p>
+        <h2 data-i18n="starsShop">Магазин зірок</h2>
+        <p data-i18n="starsShopDesc">Купуй зірки та відкривай ексклюзивні карти.</p>
         <div class="shop-pack" data-stars="150">
           <span>⭐ 150</span>
-          <button>5 star</button>
+          <button data-i18n="price5Stars">5 зірок</button>
         </div>
         <div class="shop-pack" data-stars="500">
           <span>⭐ 500</span>
-          <button>15 star</button>
+          <button data-i18n="price15Stars">15 зірок</button>
         </div>
         <div class="shop-pack" data-stars="1200">
           <span>⭐ 1 200</span>
-          <button>30 star</button>
+          <button data-i18n="price30Stars">30 зірок</button>
         </div>
         <div class="shop-pack" data-stars="3500">
           <span>⭐ 3 500</span>
-          <button>80 star</button>
+          <button data-i18n="price80Stars">80 зірок</button>
         </div>
         <div class="shop-pack vip-pack" data-stars="12000">
           <span>👑 ⭐ 12 000</span>
-          <button>250 star</button>
+          <button data-i18n="price250Stars">250 зірок</button>
         </div>
       <div class="shop-pack vip-pack" data-stars="40000">
     <span>👑⭐ 40 000</span>
-    <button>450 star</button>
+    <button data-i18n="price450Stars">450 зірок</button>
 </div>
       </div>
     </div>
@@ -461,24 +470,24 @@
         <button class="daily-close" id="dailyCloseBtn">✕</button>
         <div class="daily-glow"></div>
         <div class="daily-big-icon">🎁</div>
-        <h2>Daily Drop</h2>
-        <p>Ты получил ежедневную награду</p>
+        <h2 data-i18n="dailyDrop">Щоденний дроп</h2>
+        <p data-i18n="dailyRewardReceived">Ти отримав щоденну нагороду</p>
         <div class="daily-reward">
           <span>⭐ +50</span>
           <span>⚡ +500 XP</span>
         </div>
-        <button id="claimDailyBtn">Забрать</button>
+        <button id="claimDailyBtn" data-i18n="claim">Забрати</button>
       </div>
     </div>
 
     
     <div class="buy-confirm-modal" id="buyConfirmModal">
       <div class="buy-confirm-box">
-        <h3>Подтвердить покупку</h3>
-        <p>Купить карту за <span id="buyConfirmPrice">0</span> ⭐?</p>
+        <h3 data-i18n="confirmPurchase">Підтвердити покупку</h3>
+        <p><span data-i18n="buyCardFor">Купити карту за</span> <span id="buyConfirmPrice">0</span> ⭐?</p>
         <div class="buy-confirm-actions">
-          <button id="confirmBuyBtn">Да</button>
-          <button id="cancelBuyBtn">Нет</button>
+          <button id="confirmBuyBtn" data-i18n="yes">Так</button>
+          <button id="cancelBuyBtn" data-i18n="no">Ні</button>
         </div>
       </div>
     </div>
@@ -486,12 +495,12 @@
     
     <div class="gift-modal" id="giftModal">
       <div class="gift-modal-box">
-        <h3>🎁 Подарить карту</h3>
-        <p>Введите ID получателя</p>
-        <input type="text" id="giftUserId" placeholder="Например: 48291">
+        <h3><span>🎁</span> <span data-i18n="giftCard">Подарувати карту</span></h3>
+        <p data-i18n="enterReceiverId">Введіть ID отримувача</p>
+        <input type="text" id="giftUserId" placeholder="Наприклад: 48291" data-i18n-placeholder="giftPlaceholder">
         <div class="gift-actions">
-          <button id="sendGiftBtn" class="send-btn">Отправить</button>
-          <button id="cancelGiftBtn" class="cancel-btn">Отмена</button>
+          <button id="sendGiftBtn" class="send-btn" data-i18n="send">Надіслати</button>
+          <button id="cancelGiftBtn" class="cancel-btn" data-i18n="cancel">Скасувати</button>
         </div>
       </div>
     </div>
@@ -501,36 +510,36 @@
       <div class="vip-modal-box">
         <button class="vip-close" id="vipCancelBtn">✕</button>
         <div class="vip-crown">👑</div>
-        <h2>VIP статус</h2>
-        <p class="vip-subtitle">Премиум-привилегии на 30 дней</p>
+        <h2 data-i18n="vipStatus">VIP-статус</h2>
+        <p class="vip-subtitle" data-i18n="vipSubtitle">Преміум-привілеї на 30 днів</p>
         <div class="vip-benefits">
-          <div>⭐ Ежедневный бонус x2</div>
-          <div>🎁 +1 бесплатный дроп каждый день</div>
-          <div>⚡ +25% XP за задания</div>
-          <div>💎 +100 кристаллов сразу</div>
-          <div>🃏 Повышенный шанс редких карт</div>
+          <div data-i18n="vipBenefit1">⭐ Щоденний бонус x2</div>
+          <div data-i18n="vipBenefit2">🎁 +1 безкоштовний дроп щодня</div>
+          <div data-i18n="vipBenefit3">⚡ +25% XP за завдання</div>
+          <div data-i18n="vipBenefit4">💎 +100 кристалів одразу</div>
+          <div data-i18n="vipBenefit5">🃏 Підвищений шанс рідкісних карт</div>
         </div>
-        <button class="vip-buy-btn" id="vipBuyBtn">Купить за 150 ⭐</button>
+        <button class="vip-buy-btn" id="vipBuyBtn" data-i18n="buyVip">Купити за 150 ⭐</button>
       </div>
     </div>
 <div class="giveaway-modal" id="giveawayModal">
     <div class="giveaway-box">
         <button class="giveaway-close" id="giveawayCloseBtn">✕</button>
 
-        <div class="giveaway-badge">🎉 Конкурс</div>
+        <div class="giveaway-badge" data-i18n="contestBadge">🎉 Конкурс</div>
 
-        <h2>АльоФон</h2>
+        <h2 data-i18n="giveawayTitle">АльоФон</h2>
 
         <div class="giveaway-phone">
         <img src="images/iphone.png" alt="iPhone">
         </div>
 
         <p class="giveaway-desc">
-            Досягни 50 рівня, щоб взяти участь у розіграші iPhone.
+            <span data-i18n="giveawayDesc">Досягни 50 рівня, щоб взяти участь у розіграші iPhone.</span>
         </p>
 
         <div class="giveaway-progress-info">
-            <span>Прогрес</span>
+            <span data-i18n="progress">Прогрес</span>
             <b id="giveawayPercent">0%</b>
         </div>
 
@@ -539,10 +548,10 @@
         </div>
 
         <div class="giveaway-level-text">
-            Твій рівень: <b id="giveawayLevel">1</b> / 50
+            <span data-i18n="yourLevel">Твій рівень</span>: <b id="giveawayLevel">1</b> / 50
         </div>
 
-        <button class="giveaway-main-btn" id="giveawayJoinBtn">
+        <button class="giveaway-main-btn" id="giveawayJoinBtn" data-i18n="unavailable">
             Недоступно
         </button>
     </div>
@@ -550,8 +559,6 @@
   </main>
 
   
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
  <!-- Оновлене модальне вікно Скарбниці -->
 <div id="treasuryModal" class="modal-overlay">
     <div class="modal-content treasury-modal-content">
@@ -562,23 +569,23 @@
         <div class="modal-body">
             <div class="reward-icon-anim">🎁</div>
 
-            <h2 class="reward-title">Ваша Скарбниця</h2>
+            <h2 class="reward-title" data-i18n="yourTreasury">Ваша скарбниця</h2>
 
             <p class="reward-desc">
-                Накопичено пасивного доходу:
+                <span data-i18n="passiveIncomeAccumulated">Накопичено пасивного доходу:</span>
             </p>
 
             <div class="reward-amount-box">
                 <span id="modalTreasuryAmount">0</span>
-                <small>Кристалів</small>
+                <small data-i18n="crystals">Кристалів</small>
             </div>
 
             <p class="reminder-text">
-                💡 Заходь у гру кожні 4 години, щоб скарбниця не переповнювалася!
+                <span data-i18n="treasuryReminder">💡 Заходь у гру кожні 4 години, щоб скарбниця не переповнювалася!</span>
             </p>
 
             <button class="modal-buy-btn" id="confirmTreasuryBtn">
-                Забрати нагороду
+                <span data-i18n="claimReward">Забрати нагороду</span>
             </button>
         </div>
     </div>
@@ -590,10 +597,10 @@
         <div class="push-icon">🎁</div>
 
         <div class="push-text">
-            <b id="pushTitle">Нова карта!</b>
+            <b id="pushTitle" data-i18n="newCard">Нова карта!</b>
 
             <p id="pushMessage">
-                Ви отримали рідкісну карту в колекцію.
+                <span data-i18n="newCardMessage">Ви отримали рідкісну карту в колекцію.</span>
             </p>
         </div>
     </div>
@@ -640,29 +647,31 @@
 
     <div class="game-over-card">
 
-        <h2>Гру завершено!</h2>
+        <h2 data-i18n="gameOver">Гру завершено!</h2>
 
         <div class="game-reward-row">
-            <span>💎 Кристали</span>
+            <span data-i18n="gameCrystals">💎 Кристали</span>
             <b id="finalScore">0</b>
         </div>
 
         <div class="game-reward-row">
-            <span>⚡ XP</span>
+            <span data-i18n="gameXpLabel">⚡ XP</span>
             <b id="finalXp">0</b>
         </div>
 
         <button onclick="restartGame()"
                 class="restart-btn">
-            Спробувати ще
+            <span data-i18n="tryAgain">Спробувати ще</span>
         </button>
 
         <button onclick="exitGame()"
                 class="exit-btn">
-            На головну
+            <span data-i18n="toMain">На головну</span>
         </button>
 
     </div>
+
+</div>
 
 </div>
 
@@ -671,15 +680,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<div id="languageModal" class="language-modal">
-  <div class="language-box">
-    <h2>Choose language</h2>
-
-    <button data-lang="ua">🇺🇦 Українська</button>
-    <button data-lang="en">🇬🇧 English</button>
-    <button data-lang="fr">🇫🇷 Français</button>
-  </div>
-</div>
 <script src="app.js"></script>
 
 </body>

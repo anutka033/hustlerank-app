@@ -57,46 +57,539 @@ const state = {
 };
 const translations = {
   ua: {
-    friends: "Друзі",
-    invited: "Запрошено",
-    claimTitle: "Ти можеш забрати",
-    claimBtn: "Забрати",
-    inviteFriend: "Запросити друга",
+    chooseLanguage: "Оберіть мову",
     main: "Головна",
     tasks: "Завдання",
+    tasksDescription: "Виконуй місії та отримуй цінні ресурси",
+    games: "Ігри",
     drops: "Дропи",
-    cards: "Картки"
+    friends: "Друзі",
+    cards: "Картки",
+    earnXp: "Заробити XP",
+    earnGoTasks: "Перейти до завдань",
+    treasury: "Скарбниця",
+    dailyDrop: "Щоденний дроп",
+    claim: "Забрати",
+    claimBtn: "Забрати",
+    bonus: "Бонус",
+    vip: "VIP",
+    giveaway: "Розіграш",
+    clan: "Клан",
+    soon: "Скоро",
+    language: "Мова",
+    crystalFever: "Кристальна лихоманка",
+    crystalFeverDesc: "Збирай кристали та отримуй нагороди",
+    starFarm: "Ферма зірок",
+    starFarmDesc: "Будуй ферму та добувай зірки",
+    play: "Грати",
+    randomCardDesc: "Випадкова карта до колекції",
+    openFor100: "Відкрити за ⭐ 100",
+    refBonusLabel: "Бонус за друга, який досяг 3 рівня:",
+    inviteFriend: "Запросити друга",
+    invited: "Запрошено",
+    claimTitle: "Ти можеш забрати",
+    friendEmpty: "Поки немає запрошених друзів",
+    cardsDescription: "Збирай, прокачуй і відкривай статуси.",
+    shop: "Магазин",
+    inventory: "Інвентар",
+    market: "Ринок",
+    marketSoon: "Ринок скоро відкриється",
+    marketSoonDescription: "Скоро тут можна буде продавати свої карти за зірки.",
+    marketSoonDescription2: "А поки збирай колекцію, купуй нові карти й відкривай рідкісні статуси.",
+    rarityCommon: "ЗВИЧАЙНА",
+    rarityRare: "РІДКІСНА",
+    rarityEpic: "ЕПІЧНА",
+    rarityLegendary: "ЛЕГЕНДАРНА",
+    rarityMythic: "МІФІЧНА",
+    rarityLimited: "LIMITED",
+    collectorsOnline: "Колекціонерів онлайн",
+    bought: "Куплена",
+    cost: "Вартість",
+    series: "Серія",
+    buyCard: "🛒 Купити карту",
+    giftCardButton: "🎁 Подарувати карту",
+    viewCard: "👁 Переглянути карту",
+    starsShop: "Магазин зірок",
+    starsShopDesc: "Купуй зірки та відкривай ексклюзивні карти.",
+    price5Stars: "5 зірок",
+    price15Stars: "15 зірок",
+    price30Stars: "30 зірок",
+    price80Stars: "80 зірок",
+    price250Stars: "250 зірок",
+    price450Stars: "450 зірок",
+    dailyRewardReceived: "Ти отримав щоденну нагороду",
+    confirmPurchase: "Підтвердити покупку",
+    buyCardFor: "Купити карту за",
+    yes: "Так",
+    no: "Ні",
+    giftCard: "Подарувати карту",
+    enterReceiverId: "Введіть ID отримувача",
+    giftPlaceholder: "Наприклад: 48291",
+    send: "Надіслати",
+    cancel: "Скасувати",
+    vipStatus: "VIP-статус",
+    vipSubtitle: "Преміум-привілеї на 30 днів",
+    vipBenefit1: "⭐ Щоденний бонус x2",
+    vipBenefit2: "🎁 +1 безкоштовний дроп щодня",
+    vipBenefit3: "⚡ +25% XP за завдання",
+    vipBenefit4: "💎 +100 кристалів одразу",
+    vipBenefit5: "🃏 Підвищений шанс рідкісних карт",
+    buyVip: "Купити за 150 ⭐",
+    contestBadge: "🎉 Конкурс",
+    giveawayTitle: "АльоФон",
+    giveawayDesc: "Досягни 50 рівня, щоб взяти участь у розіграші iPhone.",
+    progress: "Прогрес",
+    yourLevel: "Твій рівень",
+    unavailable: "Недоступно",
+    participate: "Участь",
+    need50Level: "Потрібен 50 LVL",
+    yourTreasury: "Ваша скарбниця",
+    passiveIncomeAccumulated: "Накопичено пасивного доходу:",
+    crystals: "Кристалів",
+    treasuryReminder: "💡 Заходь у гру кожні 4 години, щоб скарбниця не переповнювалася!",
+    claimReward: "Забрати нагороду",
+    newCard: "Нова карта!",
+    newCardMessage: "Ви отримали рідкісну карту в колекцію.",
+    gameOver: "Гру завершено!",
+    gameCrystals: "💎 Кристали",
+    gameXpLabel: "⚡ XP",
+    tryAgain: "Спробувати ще",
+    toMain: "На головну",
+    notification: "Сповіщення",
+    bonusAlreadyTaken: "Бонус уже забрано",
+    bonusComeLater: "Повертайся пізніше за новою нагородою.",
+    received: "Отримано",
+    dailyBonus: "Щоденний бонус",
+    dailyBonusDesc: "Забери 50 XP і 1 зірку щодня",
+    accessOpen: "✅ Доступ відкрито",
+    accessFromLevel: "🔒 Доступ з Level ",
+    incomePerHourZero: "+0/год",
+    notEnoughStars: "Недостатньо зірок",
+    cardBought: "Карту куплено",
+    purchaseSuccess: "Покупку успішно завершено!",
+    invoiceError: "Помилка invoice: ",
+    purchaseError: "Помилка покупки: ",
+    idNineDigits: "ID має містити рівно 9 цифр",
+    chooseCardFirst: "Спочатку вибери карту",
+    cannotGiftSelf: "Не можна надіслати карту самому собі",
+    sendError: "Помилка надсилання: ",
+    cardSentTo: "🎁 Карту надіслано гравцю ID: ",
+    referralRegistered: "🎉 Ви зареєстровані як запрошений друг!",
+    noRewards: "Немає нагород",
+    rewardReceived: "🎉 Нагороду отримано!",
+    cardAddedInventory: "Карту додано до інвентарю",
+    notEnoughForDrop: "Недостатньо ⭐ для дропу",
+    vipFreeDrop: "🎁 VIP безкоштовний дроп",
+    check: "Перевірити",
+    checked: "Перевірено",
+    done: "Виконано",
+    doTask: "Виконати",
+    alreadyClaimed: "Уже забрано",
+    and: "і",
+    incomingCard: "🎁 Вам надійшла нова карта!",
+    vipActive: "👑 VIP уже активний",
+    vipActivated: "👑 VIP активовано!",
+    vipError: "Помилка VIP",
+    conditionNotMet: "Умова ще не виконана!",
+    taskRewardReceived: "Нагороду отримано!",
+    claimedAmount: "Забрано ",
+    start: "СТАРТ!",
+    canvasMissing: "Не знайдено #gameCanvas",
+    gameFinishedTitle: "Гру завершено",
+    gameEarned: "Ви заробили {amount} 💎",
+    rankNovice: "Новачок",
+    task_tg_channel_title: "Підписка на канал",
+    task_tg_channel_desc: "Приєднуйся до нашої спільноти",
+    task_daily_checkin_title: "Щоденний бонус",
+    task_daily_checkin_desc: "Заходь у гру щодня",
+    task_card_collector_title: "Колекціонер",
+    task_card_collector_desc: "Збери 5 будь-яких карт",
+    task_invite_friends_title: "Запроси друга",
+    task_invite_friends_desc: "Грай разом із друзями",
+    cardModalTitle: "Карта",
+    defaultModalName: "Night Hustler",
+    defaultModalStatus: "Статус: Нічний гравець",
+    card_novice_name: "Новачок", card_novice_rarity: "ЕПІЧНА", card_novice_status: "Статус: Перший крок", card_novice_quote: "Кожен король колись був ніким. Важливо не те, де ти почав, а скільки разів не зупинився.",
+    card_focus_name: "Фокус", card_focus_rarity: "РІДКІСНА", card_focus_status: "Статус: Концентрація", card_focus_quote: "Шум забирає слабких. Тиша збирає тих, хто знає, навіщо йде.",
+    card_leader_name: "Лідер", card_leader_rarity: "ЛЕГЕНДАРНА", card_leader_status: "Статус: Контроль", card_leader_quote: "Лідер — це той, хто йде першим, навіть коли інші бояться зробити крок.",
+    card_voidking_name: "Void King", card_voidking_rarity: "ЛЕГЕНДАРНА", card_voidking_status: "Статус: Володар порожнечі", card_voidking_quote: "Поки інші шукали світло, він навчився бачити в темряві.",
+    card_stormpaw_name: "Storm Paw", card_stormpaw_rarity: "МІФІЧНА", card_stormpaw_status: "Статус: Володар бурі", card_stormpaw_quote: "Ті, хто керують блискавкою, спочатку навчилися керувати собою.",
+    card_voidmage_name: "Void Mage", card_voidmage_rarity: "МІФІЧНА", card_voidmage_status: "Статус: Архімаг порожнечі", card_voidmage_quote: "Справжня сила приходить тоді, коли страх перестає керувати тобою.",
+    card_shadowkeeper_name: "Охоронець тіні", card_shadowkeeper_rarity: "ЗВИЧАЙНА", card_shadowkeeper_status: "Статус: Тихий розум", card_shadowkeeper_quote: "Спокій сильніший за шум.",
+    card_hopeseed_name: "Насінина надії", card_hopeseed_rarity: "ЗВИЧАЙНА", card_hopeseed_status: "Статус: Перший ріст", card_hopeseed_quote: "Навіть слабке світло веде вперед.",
+    card_willshard_name: "Уламок волі", card_willshard_rarity: "ЗВИЧАЙНА", card_willshard_status: "Статус: Внутрішня сила", card_willshard_quote: "Сила народжується всередині.",
+    card_voidemperor_name: "Імператор порожнечі", card_voidemperor_rarity: "ЛЕГЕНДАРНА", card_voidemperor_status: "Статус: Влада тиші", card_voidemperor_quote: "Світ схиляється перед тим, хто володіє собою.",
+    card_solaremperor_name: "Solar Emperor", card_solaremperor_rarity: "LIMITED", card_solaremperor_status: "Статус: Абсолютне світло", card_solaremperor_quote: "Навіть зірки схиляються перед вічністю.",
+    card_common01_name: "Common One", card_common01_rarity: "ЗВИЧАЙНА", card_common01_status: "Статус: Базова карта", card_common01_quote: "Кожен шлях починається з першого кроку.",
+    card_common02_name: "Common Two", card_common02_rarity: "ЗВИЧАЙНА", card_common02_status: "Статус: Початок сили", card_common02_quote: "Слабкий сьогодні — сильний завтра.",
+    card_common03_name: "Common Three", card_common03_rarity: "ЗВИЧАЙНА", card_common03_status: "Статус: Перший досвід", card_common03_quote: "Досвід приходить через дії.",
+    card_rare01_name: "Rare One", card_rare01_rarity: "РІДКІСНА", card_rare01_status: "Статус: Рідкісна енергія", card_rare01_quote: "Рідкість народжує цінність.",
+    card_rare02_name: "Rare Two", card_rare02_rarity: "РІДКІСНА", card_rare02_status: "Статус: Контроль", card_rare02_quote: "Тиша сильніша за шум.",
+    card_rare03_name: "Rare Three", card_rare03_rarity: "РІДКІСНА", card_rare03_status: "Статус: Стабільність", card_rare03_quote: "Стабільність перемагає хаос.",
+    card_epic02_name: "Epic Two", card_epic02_rarity: "ЕПІЧНА", card_epic02_status: "Статус: Високий рівень", card_epic02_quote: "Справжня сила розкривається з часом.",
+    card_legendary01_name: "Legendary", card_legendary01_rarity: "ЛЕГЕНДАРНА", card_legendary01_status: "Статус: Легенда", card_legendary01_quote: "Легендами стають через випробування.",
+    card_mythic01_name: "Mythic", card_mythic01_rarity: "МІФІЧНА", card_mythic01_status: "Статус: Абсолют", card_mythic01_quote: "Міфи створюють ті, хто не здається.",
+    card_limited01_name: "Limited", card_limited01_rarity: "LIMITED", card_limited01_status: "Статус: Ексклюзив", card_limited01_quote: "Рідкість визначає цінність.",
+    card_old_name: "Genesis", card_old_rarity: "LIMITED", card_old_status: "Статус: Початок історії", card_old_quote: "Те, з чого народився шлях, неможливо стерти."
   },
-
   en: {
-    friends: "Friends",
-    invited: "Invited",
-    claimTitle: "You can claim",
-    claimBtn: "Claim",
-    inviteFriend: "Invite friend",
+    chooseLanguage: "Choose language",
     main: "Home",
     tasks: "Tasks",
+    tasksDescription: "Complete missions and earn valuable resources",
+    games: "Games",
     drops: "Drops",
-    cards: "Cards"
+    friends: "Friends",
+    cards: "Cards",
+    earnXp: "Earn XP",
+    earnGoTasks: "Go to tasks",
+    treasury: "Treasury",
+    dailyDrop: "Daily Drop",
+    claim: "Claim",
+    claimBtn: "Claim",
+    bonus: "Bonus",
+    vip: "VIP",
+    giveaway: "Giveaway",
+    clan: "Clan",
+    soon: "Soon",
+    language: "Language",
+    crystalFever: "Crystal Fever",
+    crystalFeverDesc: "Collect crystals and earn rewards",
+    starFarm: "Star Farm",
+    starFarmDesc: "Build a farm and harvest stars",
+    play: "Play",
+    randomCardDesc: "A random card for your collection",
+    openFor100: "Open for ⭐ 100",
+    refBonusLabel: "Bonus for a friend who reaches level 3:",
+    inviteFriend: "Invite friend",
+    invited: "Invited",
+    claimTitle: "You can claim",
+    friendEmpty: "No invited friends yet",
+    cardsDescription: "Collect, upgrade, and unlock statuses.",
+    shop: "Shop",
+    inventory: "Inventory",
+    market: "Market",
+    marketSoon: "The market will open soon",
+    marketSoonDescription: "Soon you will be able to sell your cards here for stars.",
+    marketSoonDescription2: "For now, collect cards, buy new ones, and unlock rare statuses.",
+    rarityCommon: "COMMON",
+    rarityRare: "RARE",
+    rarityEpic: "EPIC",
+    rarityLegendary: "LEGENDARY",
+    rarityMythic: "MYTHIC",
+    rarityLimited: "LIMITED",
+    collectorsOnline: "Collectors online",
+    bought: "Owned",
+    cost: "Cost",
+    series: "Series",
+    buyCard: "🛒 Buy card",
+    giftCardButton: "🎁 Gift card",
+    viewCard: "👁 View card",
+    starsShop: "Stars Shop",
+    starsShopDesc: "Buy stars and unlock exclusive cards.",
+    price5Stars: "5 stars",
+    price15Stars: "15 stars",
+    price30Stars: "30 stars",
+    price80Stars: "80 stars",
+    price250Stars: "250 stars",
+    price450Stars: "450 stars",
+    dailyRewardReceived: "You received your daily reward",
+    confirmPurchase: "Confirm purchase",
+    buyCardFor: "Buy card for",
+    yes: "Yes",
+    no: "No",
+    giftCard: "Gift card",
+    enterReceiverId: "Enter receiver ID",
+    giftPlaceholder: "Example: 48291",
+    send: "Send",
+    cancel: "Cancel",
+    vipStatus: "VIP Status",
+    vipSubtitle: "Premium benefits for 30 days",
+    vipBenefit1: "⭐ Daily bonus x2",
+    vipBenefit2: "🎁 +1 free drop every day",
+    vipBenefit3: "⚡ +25% XP for tasks",
+    vipBenefit4: "💎 +100 crystals instantly",
+    vipBenefit5: "🃏 Higher chance for rare cards",
+    buyVip: "Buy for 150 ⭐",
+    contestBadge: "🎉 Contest",
+    giveawayTitle: "AloPhone",
+    giveawayDesc: "Reach level 50 to take part in the iPhone giveaway.",
+    progress: "Progress",
+    yourLevel: "Your level",
+    unavailable: "Unavailable",
+    participate: "Participate",
+    need50Level: "Need 50 LVL",
+    yourTreasury: "Your Treasury",
+    passiveIncomeAccumulated: "Passive income accumulated:",
+    crystals: "Crystals",
+    treasuryReminder: "💡 Open the game every 4 hours so your treasury does not overflow!",
+    claimReward: "Claim reward",
+    newCard: "New card!",
+    newCardMessage: "You received a rare card for your collection.",
+    gameOver: "Game over!",
+    gameCrystals: "💎 Crystals",
+    gameXpLabel: "⚡ XP",
+    tryAgain: "Try again",
+    toMain: "To home",
+    notification: "Notification",
+    bonusAlreadyTaken: "Bonus already claimed",
+    bonusComeLater: "Come back later for a new reward.",
+    received: "Received",
+    dailyBonus: "Daily bonus",
+    dailyBonusDesc: "Claim 50 XP and 1 star every day",
+    accessOpen: "✅ Access unlocked",
+    accessFromLevel: "🔒 Access from Level ",
+    incomePerHourZero: "+0/hour",
+    notEnoughStars: "Not enough stars",
+    cardBought: "Card purchased",
+    purchaseSuccess: "Purchase completed successfully!",
+    invoiceError: "Invoice error: ",
+    purchaseError: "Purchase error: ",
+    idNineDigits: "ID must be exactly 9 digits",
+    chooseCardFirst: "Choose a card first",
+    cannotGiftSelf: "You cannot send a card to yourself",
+    sendError: "Send error: ",
+    cardSentTo: "🎁 Card sent to player ID: ",
+    referralRegistered: "🎉 You have been registered as an invited friend!",
+    noRewards: "No rewards",
+    rewardReceived: "🎉 Reward received!",
+    cardAddedInventory: "Card added to inventory",
+    notEnoughForDrop: "Not enough ⭐ for the drop",
+    vipFreeDrop: "🎁 VIP free drop",
+    check: "Check",
+    checked: "Checked",
+    done: "Done",
+    doTask: "Start",
+    alreadyClaimed: "Already claimed",
+    and: "and",
+    incomingCard: "🎁 You received a new card!",
+    vipActive: "👑 VIP is already active",
+    vipActivated: "👑 VIP activated!",
+    vipError: "VIP error",
+    conditionNotMet: "Condition is not completed yet!",
+    taskRewardReceived: "Reward received!",
+    claimedAmount: "Claimed ",
+    start: "START!",
+    canvasMissing: "#gameCanvas not found",
+    gameFinishedTitle: "Game over",
+    gameEarned: "You earned {amount} 💎",
+    rankNovice: "Novice",
+    task_tg_channel_title: "Subscribe to the channel",
+    task_tg_channel_desc: "Join our community",
+    task_daily_checkin_title: "Daily bonus",
+    task_daily_checkin_desc: "Open the game every day",
+    task_card_collector_title: "Collector",
+    task_card_collector_desc: "Collect any 5 cards",
+    task_invite_friends_title: "Invite a friend",
+    task_invite_friends_desc: "Play together with friends",
+    cardModalTitle: "Card",
+    defaultModalName: "Night Hustler",
+    defaultModalStatus: "Status: Night player",
+    card_novice_name: "Novice", card_novice_rarity: "EPIC", card_novice_status: "Status: First step", card_novice_quote: "Every king was once nobody. What matters is not where you started, but how many times you did not stop.",
+    card_focus_name: "Focus", card_focus_rarity: "RARE", card_focus_status: "Status: Concentration", card_focus_quote: "Noise takes the weak. Silence gathers those who know why they move forward.",
+    card_leader_name: "Leader", card_leader_rarity: "LEGENDARY", card_leader_status: "Status: Control", card_leader_quote: "A leader is the one who goes first, even when others are afraid to take a step.",
+    card_voidking_name: "Void King", card_voidking_rarity: "LEGENDARY", card_voidking_status: "Status: Lord of the Void", card_voidking_quote: "While others searched for light, he learned to see in the dark.",
+    card_stormpaw_name: "Storm Paw", card_stormpaw_rarity: "MYTHIC", card_stormpaw_status: "Status: Lord of the Storm", card_stormpaw_quote: "Those who command lightning first learned to command themselves.",
+    card_voidmage_name: "Void Mage", card_voidmage_rarity: "MYTHIC", card_voidmage_status: "Status: Archmage of the Void", card_voidmage_quote: "True power comes when fear no longer controls you.",
+    card_shadowkeeper_name: "Shadow Keeper", card_shadowkeeper_rarity: "COMMON", card_shadowkeeper_status: "Status: Quiet Mind", card_shadowkeeper_quote: "Calm is stronger than noise.",
+    card_hopeseed_name: "Hope Seed", card_hopeseed_rarity: "COMMON", card_hopeseed_status: "Status: First Growth", card_hopeseed_quote: "Even a weak light leads forward.",
+    card_willshard_name: "Will Shard", card_willshard_rarity: "COMMON", card_willshard_status: "Status: Inner Strength", card_willshard_quote: "Strength is born within.",
+    card_voidemperor_name: "Void Emperor", card_voidemperor_rarity: "LEGENDARY", card_voidemperor_status: "Status: Power of Silence", card_voidemperor_quote: "The world bows to the one who masters himself.",
+    card_solaremperor_name: "Solar Emperor", card_solaremperor_rarity: "LIMITED", card_solaremperor_status: "Status: Absolute Light", card_solaremperor_quote: "Even the stars bow before eternity.",
+    card_common01_name: "Common One", card_common01_rarity: "COMMON", card_common01_status: "Status: Basic Card", card_common01_quote: "Every path begins with the first step.",
+    card_common02_name: "Common Two", card_common02_rarity: "COMMON", card_common02_status: "Status: Beginning of Power", card_common02_quote: "Weak today means strong tomorrow.",
+    card_common03_name: "Common Three", card_common03_rarity: "COMMON", card_common03_status: "Status: First Experience", card_common03_quote: "Experience comes through action.",
+    card_rare01_name: "Rare One", card_rare01_rarity: "RARE", card_rare01_status: "Status: Rare Energy", card_rare01_quote: "Rarity creates value.",
+    card_rare02_name: "Rare Two", card_rare02_rarity: "RARE", card_rare02_status: "Status: Control", card_rare02_quote: "Silence is stronger than noise.",
+    card_rare03_name: "Rare Three", card_rare03_rarity: "RARE", card_rare03_status: "Status: Stability", card_rare03_quote: "Stability defeats chaos.",
+    card_epic02_name: "Epic Two", card_epic02_rarity: "EPIC", card_epic02_status: "Status: High Level", card_epic02_quote: "True power reveals itself over time.",
+    card_legendary01_name: "Legendary", card_legendary01_rarity: "LEGENDARY", card_legendary01_status: "Status: Legend", card_legendary01_quote: "Legends are forged through trials.",
+    card_mythic01_name: "Mythic", card_mythic01_rarity: "MYTHIC", card_mythic01_status: "Status: Absolute", card_mythic01_quote: "Myths are created by those who do not give up.",
+    card_limited01_name: "Limited", card_limited01_rarity: "LIMITED", card_limited01_status: "Status: Exclusive", card_limited01_quote: "Rarity defines value.",
+    card_old_name: "Genesis", card_old_rarity: "LIMITED", card_old_status: "Status: Beginning of History", card_old_quote: "What gave birth to the path cannot be erased."
   },
-
   fr: {
+    chooseLanguage: "Choisir la langue",
+    main: "Accueil",
+    tasks: "Missions",
+    tasksDescription: "Accomplis des missions et gagne des ressources précieuses",
+    games: "Jeux",
+    drops: "Drops",
     friends: "Amis",
+    cards: "Cartes",
+    earnXp: "Gagner de l'XP",
+    earnGoTasks: "Aller aux missions",
+    treasury: "Trésor",
+    dailyDrop: "Drop quotidien",
+    claim: "Récupérer",
+    claimBtn: "Récupérer",
+    bonus: "Bonus",
+    vip: "VIP",
+    giveaway: "Tirage",
+    clan: "Clan",
+    soon: "Bientôt",
+    language: "Langue",
+    crystalFever: "Fièvre de cristal",
+    crystalFeverDesc: "Collecte des cristaux et gagne des récompenses",
+    starFarm: "Ferme d'étoiles",
+    starFarmDesc: "Construis une ferme et récolte des étoiles",
+    play: "Jouer",
+    randomCardDesc: "Une carte aléatoire pour ta collection",
+    openFor100: "Ouvrir pour ⭐ 100",
+    refBonusLabel: "Bonus pour un ami qui atteint le niveau 3 :",
+    inviteFriend: "Inviter un ami",
     invited: "Invités",
     claimTitle: "Tu peux récupérer",
-    claimBtn: "Récupérer",
-    inviteFriend: "Inviter un ami",
-    main: "Accueil",
-    tasks: "Tâches",
-    drops: "Drops",
-    cards: "Cartes"
+    friendEmpty: "Aucun ami invité pour le moment",
+    cardsDescription: "Collectionne, améliore et débloque des statuts.",
+    shop: "Boutique",
+    inventory: "Inventaire",
+    market: "Marché",
+    marketSoon: "Le marché ouvrira bientôt",
+    marketSoonDescription: "Bientôt, tu pourras vendre tes cartes ici contre des étoiles.",
+    marketSoonDescription2: "Pour l'instant, complète ta collection, achète de nouvelles cartes et débloque des statuts rares.",
+    rarityCommon: "COMMUNE",
+    rarityRare: "RARE",
+    rarityEpic: "ÉPIQUE",
+    rarityLegendary: "LÉGENDAIRE",
+    rarityMythic: "MYTHIQUE",
+    rarityLimited: "LIMITED",
+    collectorsOnline: "Collectionneurs en ligne",
+    bought: "Possédée",
+    cost: "Coût",
+    series: "Série",
+    buyCard: "🛒 Acheter la carte",
+    giftCardButton: "🎁 Offrir la carte",
+    viewCard: "👁 Voir la carte",
+    starsShop: "Boutique d'étoiles",
+    starsShopDesc: "Achète des étoiles et débloque des cartes exclusives.",
+    price5Stars: "5 étoiles",
+    price15Stars: "15 étoiles",
+    price30Stars: "30 étoiles",
+    price80Stars: "80 étoiles",
+    price250Stars: "250 étoiles",
+    price450Stars: "450 étoiles",
+    dailyRewardReceived: "Tu as reçu ta récompense quotidienne",
+    confirmPurchase: "Confirmer l'achat",
+    buyCardFor: "Acheter la carte pour",
+    yes: "Oui",
+    no: "Non",
+    giftCard: "Offrir une carte",
+    enterReceiverId: "Entre l'ID du destinataire",
+    giftPlaceholder: "Exemple : 48291",
+    send: "Envoyer",
+    cancel: "Annuler",
+    vipStatus: "Statut VIP",
+    vipSubtitle: "Avantages premium pendant 30 jours",
+    vipBenefit1: "⭐ Bonus quotidien x2",
+    vipBenefit2: "🎁 +1 drop gratuit chaque jour",
+    vipBenefit3: "⚡ +25 % d'XP pour les missions",
+    vipBenefit4: "💎 +100 cristaux instantanément",
+    vipBenefit5: "🃏 Meilleure chance d'obtenir des cartes rares",
+    buyVip: "Acheter pour 150 ⭐",
+    contestBadge: "🎉 Concours",
+    giveawayTitle: "AllôPhone",
+    giveawayDesc: "Atteins le niveau 50 pour participer au tirage de l'iPhone.",
+    progress: "Progression",
+    yourLevel: "Ton niveau",
+    unavailable: "Indisponible",
+    participate: "Participer",
+    need50Level: "Niveau 50 requis",
+    yourTreasury: "Ton trésor",
+    passiveIncomeAccumulated: "Revenu passif accumulé :",
+    crystals: "Cristaux",
+    treasuryReminder: "💡 Ouvre le jeu toutes les 4 heures pour éviter que ton trésor déborde !",
+    claimReward: "Récupérer la récompense",
+    newCard: "Nouvelle carte !",
+    newCardMessage: "Tu as reçu une carte rare pour ta collection.",
+    gameOver: "Partie terminée !",
+    gameCrystals: "💎 Cristaux",
+    gameXpLabel: "⚡ XP",
+    tryAgain: "Réessayer",
+    toMain: "Accueil",
+    notification: "Notification",
+    bonusAlreadyTaken: "Bonus déjà récupéré",
+    bonusComeLater: "Reviens plus tard pour une nouvelle récompense.",
+    received: "Reçu",
+    dailyBonus: "Bonus quotidien",
+    dailyBonusDesc: "Récupère 50 XP et 1 étoile chaque jour",
+    accessOpen: "✅ Accès débloqué",
+    accessFromLevel: "🔒 Accès à partir du Level ",
+    incomePerHourZero: "+0/heure",
+    notEnoughStars: "Pas assez d'étoiles",
+    cardBought: "Carte achetée",
+    purchaseSuccess: "Achat terminé avec succès !",
+    invoiceError: "Erreur invoice : ",
+    purchaseError: "Erreur d'achat : ",
+    idNineDigits: "L'ID doit contenir exactement 9 chiffres",
+    chooseCardFirst: "Choisis d'abord une carte",
+    cannotGiftSelf: "Tu ne peux pas t'envoyer une carte à toi-même",
+    sendError: "Erreur d'envoi : ",
+    cardSentTo: "🎁 Carte envoyée au joueur ID : ",
+    referralRegistered: "🎉 Tu as été enregistré comme ami invité !",
+    noRewards: "Aucune récompense",
+    rewardReceived: "🎉 Récompense reçue !",
+    cardAddedInventory: "Carte ajoutée à l'inventaire",
+    notEnoughForDrop: "Pas assez de ⭐ pour le drop",
+    vipFreeDrop: "🎁 Drop VIP gratuit",
+    check: "Vérifier",
+    checked: "Vérifié",
+    done: "Terminé",
+    doTask: "Commencer",
+    alreadyClaimed: "Déjà récupéré",
+    and: "et",
+    incomingCard: "🎁 Tu as reçu une nouvelle carte !",
+    vipActive: "👑 Le VIP est déjà actif",
+    vipActivated: "👑 VIP activé !",
+    vipError: "Erreur VIP",
+    conditionNotMet: "La condition n'est pas encore remplie !",
+    taskRewardReceived: "Récompense reçue !",
+    claimedAmount: "Récupéré ",
+    start: "DÉPART !",
+    canvasMissing: "#gameCanvas introuvable",
+    gameFinishedTitle: "Partie terminée",
+    gameEarned: "Tu as gagné {amount} 💎",
+    rankNovice: "Débutant",
+    task_tg_channel_title: "S'abonner à la chaîne",
+    task_tg_channel_desc: "Rejoins notre communauté",
+    task_daily_checkin_title: "Bonus quotidien",
+    task_daily_checkin_desc: "Ouvre le jeu chaque jour",
+    task_card_collector_title: "Collectionneur",
+    task_card_collector_desc: "Collectionne 5 cartes au choix",
+    task_invite_friends_title: "Invite un ami",
+    task_invite_friends_desc: "Joue avec tes amis",
+    cardModalTitle: "Carte",
+    defaultModalName: "Night Hustler",
+    defaultModalStatus: "Statut : Joueur nocturne",
+    card_novice_name: "Débutant", card_novice_rarity: "ÉPIQUE", card_novice_status: "Statut : Premier pas", card_novice_quote: "Chaque roi a un jour été personne. L’important n’est pas où tu as commencé, mais combien de fois tu ne t’es pas arrêté.",
+    card_focus_name: "Focus", card_focus_rarity: "RARE", card_focus_status: "Statut : Concentration", card_focus_quote: "Le bruit emporte les faibles. Le silence rassemble ceux qui savent pourquoi ils avancent.",
+    card_leader_name: "Leader", card_leader_rarity: "LÉGENDAIRE", card_leader_status: "Statut : Contrôle", card_leader_quote: "Un leader est celui qui avance le premier, même quand les autres ont peur de faire un pas.",
+    card_voidking_name: "Void King", card_voidking_rarity: "LÉGENDAIRE", card_voidking_status: "Statut : Maître du vide", card_voidking_quote: "Pendant que les autres cherchaient la lumière, il a appris à voir dans l’obscurité.",
+    card_stormpaw_name: "Storm Paw", card_stormpaw_rarity: "MYTHIQUE", card_stormpaw_status: "Statut : Maître de la tempête", card_stormpaw_quote: "Ceux qui maîtrisent la foudre ont d’abord appris à se maîtriser eux-mêmes.",
+    card_voidmage_name: "Void Mage", card_voidmage_rarity: "MYTHIQUE", card_voidmage_status: "Statut : Archimage du vide", card_voidmage_quote: "La vraie force arrive lorsque la peur cesse de te contrôler.",
+    card_shadowkeeper_name: "Gardien de l’ombre", card_shadowkeeper_rarity: "COMMUNE", card_shadowkeeper_status: "Statut : Esprit calme", card_shadowkeeper_quote: "Le calme est plus fort que le bruit.",
+    card_hopeseed_name: "Graine d’espoir", card_hopeseed_rarity: "COMMUNE", card_hopeseed_status: "Statut : Première pousse", card_hopeseed_quote: "Même une faible lumière guide vers l’avant.",
+    card_willshard_name: "Éclat de volonté", card_willshard_rarity: "COMMUNE", card_willshard_status: "Statut : Force intérieure", card_willshard_quote: "La force naît à l’intérieur.",
+    card_voidemperor_name: "Empereur du vide", card_voidemperor_rarity: "LÉGENDAIRE", card_voidemperor_status: "Statut : Pouvoir du silence", card_voidemperor_quote: "Le monde s’incline devant celui qui se maîtrise.",
+    card_solaremperor_name: "Solar Emperor", card_solaremperor_rarity: "LIMITED", card_solaremperor_status: "Statut : Lumière absolue", card_solaremperor_quote: "Même les étoiles s’inclinent devant l’éternité.",
+    card_common01_name: "Common One", card_common01_rarity: "COMMUNE", card_common01_status: "Statut : Carte de base", card_common01_quote: "Chaque chemin commence par un premier pas.",
+    card_common02_name: "Common Two", card_common02_rarity: "COMMUNE", card_common02_status: "Statut : Début de la force", card_common02_quote: "Faible aujourd’hui, fort demain.",
+    card_common03_name: "Common Three", card_common03_rarity: "COMMUNE", card_common03_status: "Statut : Première expérience", card_common03_quote: "L’expérience vient par l’action.",
+    card_rare01_name: "Rare One", card_rare01_rarity: "RARE", card_rare01_status: "Statut : Énergie rare", card_rare01_quote: "La rareté crée la valeur.",
+    card_rare02_name: "Rare Two", card_rare02_rarity: "RARE", card_rare02_status: "Statut : Contrôle", card_rare02_quote: "Le silence est plus fort que le bruit.",
+    card_rare03_name: "Rare Three", card_rare03_rarity: "RARE", card_rare03_status: "Statut : Stabilité", card_rare03_quote: "La stabilité vainc le chaos.",
+    card_epic02_name: "Epic Two", card_epic02_rarity: "ÉPIQUE", card_epic02_status: "Statut : Haut niveau", card_epic02_quote: "La vraie force se révèle avec le temps.",
+    card_legendary01_name: "Legendary", card_legendary01_rarity: "LÉGENDAIRE", card_legendary01_status: "Statut : Légende", card_legendary01_quote: "Les légendes naissent à travers les épreuves.",
+    card_mythic01_name: "Mythic", card_mythic01_rarity: "MYTHIQUE", card_mythic01_status: "Statut : Absolu", card_mythic01_quote: "Les mythes sont créés par ceux qui n’abandonnent pas.",
+    card_limited01_name: "Limited", card_limited01_rarity: "LIMITED", card_limited01_status: "Statut : Exclusif", card_limited01_quote: "La rareté définit la valeur.",
+    card_old_name: "Genesis", card_old_rarity: "LIMITED", card_old_status: "Statut : Début de l’histoire", card_old_quote: "Ce qui a donné naissance au chemin ne peut pas être effacé."
   }
 };
 
 let currentLang = localStorage.getItem("lang") || "";
 
-function t(key) {
-  return translations[currentLang]?.[key] || translations.ua[key] || key;
+function t(key, fallback = key) {
+  return translations[currentLang]?.[key] || translations.ua?.[key] || fallback;
 }
 
 function setLanguage(lang) {
@@ -106,10 +599,23 @@ function setLanguage(lang) {
 }
 
 function applyLanguage() {
+  document.documentElement.lang = currentLang === "ua" ? "uk" : currentLang;
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.dataset.i18n;
-    el.textContent = t(key);
+    el.textContent = t(key, el.textContent);
   });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    el.setAttribute("placeholder", t(key, el.getAttribute("placeholder") || ""));
+  });
+  document.querySelectorAll("[data-i18n-alt]").forEach(el => {
+    const key = el.dataset.i18nAlt;
+    el.setAttribute("alt", t(key, el.getAttribute("alt") || ""));
+  });
+  if (typeof renderTasks === "function" && screens.tasks?.classList.contains("active-screen")) renderTasks();
+  if (typeof updateCards === "function") updateCards();
+  if (typeof updateCardsView === "function") updateCardsView();
+  if (typeof updateDailyTimer === "function") updateDailyTimer();
 }
 async function updateOnlineCollectors() {
     const playerId = state.playerId;
@@ -273,7 +779,7 @@ function rankByLevel(level) {
   if (level >= 7) return "Pro Hustler";
   if (level >= 4) return "Hustler";
   if (level >= 2) return "Rookie";
-  return "Новичок";
+  return t("rankNovice", "Новачок");
 }
 function getFriendAvatar(level) {
 
@@ -328,7 +834,7 @@ function showPush(title, message, icon = "🎁") {
 }
 
 function showToast(text) {
-  showPush("Сповіщення", text, "✨");
+  showPush(t("notification"), text, "✨");
 }
 
 function checkLevelUp() {
@@ -378,14 +884,14 @@ function updateAvatar() {
 function updateBonus() {
   if (!bonusBtn || !bonusTitle || !bonusText) return;
   if (state.bonusTaken) {
-    bonusTitle.textContent = "Бонус уже забран";
-    bonusText.textContent = "Возвращайся позже за новой наградой.";
-    bonusBtn.textContent = "Получено";
+    bonusTitle.textContent = t("bonusAlreadyTaken");
+    bonusText.textContent = t("bonusComeLater");
+    bonusBtn.textContent = t("received");
     bonusBtn.disabled = true;
   } else {
-    bonusTitle.textContent = "Ежедневный бонус";
-    bonusText.textContent = "Забери 50 XP и 1 Gem каждый день";
-    bonusBtn.textContent = "Забрать";
+    bonusTitle.textContent = t("dailyBonus");
+    bonusText.textContent = t("dailyBonusDesc");
+    bonusBtn.textContent = t("claim");
     bonusBtn.disabled = false;
   }
 }
@@ -397,10 +903,10 @@ function updateDrops() {
     if (!lock) return;
     if (state.level >= need) {
       drop.classList.add("open");
-      lock.textContent = "✅ Доступ открыт";
+      lock.textContent = t("accessOpen");
     } else {
       drop.classList.remove("open");
-      lock.textContent = "🔒 Доступ с Level " + need;
+      lock.textContent = t("accessFromLevel") + need;
     }
   });
 }
@@ -425,7 +931,7 @@ function updateCards() {
     card.classList.toggle("not-enough", !unlocked && !enoughStars);
 
     if (unlocked) {
-      button.textContent = "Куплена";
+      button.textContent = t("bought");
       button.disabled = true;
     } else {
       button.textContent = "⭐ " + data.price;
@@ -464,8 +970,8 @@ if (taskStarsEl) {
     taskStarsEl.textContent = state.stars.toLocaleString("ru-RU");
 }
   if (ratingEl) ratingEl.textContent = state.level >= 2 ? "#" + (900 - state.level * 37) : "#---";
-  if (incomePerHourEl) incomePerHourEl.textContent = "+0/час";
-  if (earnText) earnText.textContent = "Перейти к заданиям";
+  if (incomePerHourEl) incomePerHourEl.textContent = t("incomePerHourZero");
+  if (earnText) earnText.textContent = t("earnGoTasks");
 
   updateAvatar();
   updateBonus();
@@ -478,7 +984,7 @@ if (taskStarsEl) {
   const vipBtn = document.getElementById("vipBtn");
   if (vipBtn) {
     vipBtn.classList.toggle("disabled", isVipActive());
-    vipBtn.innerHTML = "<span>👑</span> VIP";
+    vipBtn.innerHTML = "<span>👑</span> <span>" + t("vip") + "</span>";
   }
   save();
 }
@@ -541,7 +1047,7 @@ if (bonusBtn) {
     state.stars += 1;
     state.bonusTaken = true;
     updateUI();
-    showToast("+50 XP и +1 Gem");
+    showToast("+50 XP " + t("and") + " +1 ⭐");
   });
 }
 
@@ -625,9 +1131,9 @@ function updateCardsView(){
 }
 
     card.innerHTML = `
-      <div class="rank-top"><span class="rarity">${cardData.rarity}</span></div>
-      <img src="${cardData.img}" alt="${cardData.name}">
-      <button class="unlock-btn" disabled>🏆 В коллекции</button>
+      <div class="rank-top"><span class="rarity">${t("card_" + cardData.id + "_rarity", cardData.rarity)}</span></div>
+      <img src="${cardData.img}" alt="${t("card_" + cardData.id + "_name", cardData.name)}">
+      <button class="unlock-btn" disabled>🏆 ${t("inventory")}</button>
     `;
 
     card.addEventListener("click", function(){
@@ -649,17 +1155,21 @@ function openCardModal(data, canBuy) {
   const modalQuote = document.getElementById("modalQuote");
   const actionBtn = document.getElementById("modalActionBtn");
 
+  const localizedName = t("card_" + data.id + "_name", data.name);
+  const localizedRarity = t("card_" + data.id + "_rarity", data.rarity);
+  const localizedStatus = t("card_" + data.id + "_status", data.status);
+  const localizedQuote = t("card_" + data.id + "_quote", data.quote);
   if (modalCardImg) modalCardImg.src = data.img;
-  if (modalCardName) modalCardName.textContent = data.name;
-  if (modalName) modalName.textContent = data.name;
-  if (modalRarity) modalRarity.textContent = data.rarity;
-  if (modalStatus) modalStatus.textContent = data.status;
+  if (modalCardName) modalCardName.textContent = localizedName;
+  if (modalName) modalName.textContent = localizedName;
+  if (modalRarity) modalRarity.textContent = localizedRarity;
+  if (modalStatus) modalStatus.textContent = localizedStatus;
   if (modalPrice) modalPrice.textContent = data.price;
-  if (modalQuote) modalQuote.textContent = data.quote;
+  if (modalQuote) modalQuote.textContent = localizedQuote;
 
   if (actionBtn) {
     if (canBuy) {
-      actionBtn.innerHTML = "🛒 Купить карту";
+      actionBtn.innerHTML = t("buyCard");
       actionBtn.onclick = function () {
         selectedCard = data;
         const buyConfirmPrice = document.getElementById("buyConfirmPrice");
@@ -668,7 +1178,7 @@ function openCardModal(data, canBuy) {
         if (buyConfirmModal) buyConfirmModal.classList.add("show");
       };
     } else {
-      actionBtn.innerHTML = "🎁 Подарить карту";
+      actionBtn.innerHTML = t("giftCardButton");
       actionBtn.onclick = function () {
         selectedGiftCard = data;
         document.getElementById("giftModal")?.classList.add("show");
@@ -682,7 +1192,7 @@ function openCardModal(data, canBuy) {
     cardModal.classList.remove("view-front");
   }
   const viewCardBtn = document.getElementById("viewCardBtn");
-  if (viewCardBtn) viewCardBtn.textContent = "👁 Смотреть карту";
+  if (viewCardBtn) viewCardBtn.textContent = t("viewCard");
   document.querySelector(".bottom-nav")?.classList.add("hide-nav");
 }
 
@@ -690,11 +1200,25 @@ document.querySelectorAll(".rank-card").forEach(function(card){
   card.addEventListener("click", function(event){
     if (event.target.closest("button")) return;
     const isInventoryOpen = document.querySelector('[data-cards-tab="inventory"]')?.classList.contains("active");
-    const isBuyButton = !isInventoryOpen && card.closest("#cardsScreen") && card.querySelector(".unlock-btn");
     const cardId = card.dataset.cardId;
     const data = modalCards.find(c => c.id === cardId);
     if (!data) return;
+    const isOwned = Boolean(state.cards[data.id] && state.cards[data.id].unlocked);
+    const isBuyButton = !isInventoryOpen && card.closest("#cardsScreen") && card.querySelector(".unlock-btn") && !isOwned;
     openCardModal(data, isBuyButton);
+  });
+});
+
+document.querySelectorAll("#cardsScreen .rank-card .unlock-btn").forEach(function(button){
+  button.addEventListener("click", function(event){
+    event.stopPropagation();
+    if (button.disabled) return;
+    const card = button.closest(".rank-card");
+    if (!card) return;
+    const data = modalCards.find(c => c.id === card.dataset.cardId);
+    if (!data) return;
+    const isOwned = Boolean(state.cards[data.id] && state.cards[data.id].unlocked);
+    openCardModal(data, !isOwned);
   });
 });
 
@@ -728,7 +1252,7 @@ if (confirmBuyBtn) {
   confirmBuyBtn.addEventListener("click", function () {
     if (!selectedCard) return;
     if (state.stars < selectedCard.price) {
-      showToast("Недостаточно звёзд");
+      showToast(t("notEnoughStars"));
       if (buyConfirmModal) buyConfirmModal.classList.remove("show");
       return;
     }
@@ -743,7 +1267,7 @@ if (confirmBuyBtn) {
     updateUI();
     updateCardsView();
     if (buyConfirmModal) buyConfirmModal.classList.remove("show");
-    showToast("Карта куплена");
+    showToast(t("cardBought"));
   });
 }
 
@@ -793,15 +1317,15 @@ document.querySelectorAll(".shop-pack").forEach((pack) => {
             state.stars += starsAmount;
             save();
             updateUI();
-            showToast("Покупка успешно завершена!");
+            showToast(t("purchaseSuccess"));
           }
         });
       } else {
-        alert("Ошибка invoice: " + JSON.stringify(data));
+        alert(t("invoiceError") + JSON.stringify(data));
       }
     } catch (err) {
       console.log(err);
-      alert("Ошибка покупки: " + err.message);
+      alert(t("purchaseError") + err.message);
     }
   });
 });
@@ -842,9 +1366,9 @@ document.addEventListener("click", async function (event) {
     const giftUserIdEl = document.getElementById("giftUserId");
     const receiverId = giftUserIdEl ? giftUserIdEl.value.trim() : "";
 
-    if (receiverId.length !== 9) return alert("ID должен быть ровно 9 цифр");
-    if (!selectedGiftCard) return alert("Сначала выбери карту");
-    if (receiverId === state.playerId) return alert("Нельзя отправить карту самому себе");
+    if (receiverId.length !== 9) return alert(t("idNineDigits"));
+    if (!selectedGiftCard) return alert(t("chooseCardFirst"));
+    if (receiverId === state.playerId) return alert(t("cannotGiftSelf"));
 
     const { error } = await supabaseClient.from("trades").insert({
       sender_id: state.playerId,
@@ -853,7 +1377,7 @@ document.addEventListener("click", async function (event) {
       status: "sent"
     });
 
-    if (error) return alert("Ошибка отправки: " + error.message);
+    if (error) return alert(t("sendError") + error.message);
 
     state.boughtCards = state.boughtCards.filter(card => card.id !== selectedGiftCard.id);
     if (state.cards[selectedGiftCard.id]) state.cards[selectedGiftCard.id].unlocked = false;
@@ -861,7 +1385,7 @@ document.addEventListener("click", async function (event) {
     updateCardsView();
     selectedGiftCard = null;
     document.getElementById("giftModal")?.classList.remove("show");
-    alert("🎁 Карта отправлена игроку ID: " + receiverId);
+    alert(t("cardSentTo") + receiverId);
   }
 });
 
@@ -886,7 +1410,7 @@ async function registerReferral() {
     reward_claimed: false
   });
   localStorage.setItem("referralRegistered", "true");
-  showToast("🎉 Вы зарегистрированы как приглашённый друг!");
+  showToast(t("referralRegistered"));
 }
 
 registerReferral();
@@ -1001,12 +1525,12 @@ if (claimRefBtn) {
         await supabaseClient.from("referrals").update({ reward_claimed: true }).eq("id", ref.id);
       }
     }
-    if (rewardCount <= 0) return alert("Нет наград");
+    if (rewardCount <= 0) return alert(t("noRewards"));
     state.stars += rewardCount * 25;
     state.crystals += rewardCount * 500;
     save();
     updateUI();
-    alert("🎉 Награда получена!");
+    alert(t("rewardReceived"));
     loadReferrals();
   });
 }
@@ -1045,7 +1569,7 @@ if (closeDropModal) {
     save();
     updateUI();
     updateCardsView();
-    showToast("Карта добавлена в инвентарь");
+    showToast(t("cardAddedInventory"));
     lastDropCard = null;
     if (dropModal) dropModal.classList.remove("show");
     closeDropModal.style.display = "none";
@@ -1063,12 +1587,12 @@ if (openDropBtn) {
     }
 
     if (!freeVipDrop) {
-      if (state.stars < 100) return showToast("Недостаточно ⭐ для дропа");
+      if (state.stars < 100) return showToast(t("notEnoughForDrop"));
       state.stars -= 100;
       save();
       updateUI();
     } else {
-      showToast("🎁 VIP бесплатный дроп");
+      showToast(t("vipFreeDrop"));
     }
 
     isDropRolling = true;
@@ -1113,12 +1637,12 @@ if (telegramTaskBtn) {
     if (telegramTaskClaimed) return;
     if (!telegramTaskOpened) {
       telegramTaskOpened = true;
-      telegramTaskBtn.textContent = "Проверить";
+      telegramTaskBtn.textContent = t("check");
       window.open("https://t.me/hustlerank", "_blank");
       return;
     }
     if (claimTelegramTaskBtn) claimTelegramTaskBtn.classList.remove("hidden");
-    telegramTaskBtn.textContent = "Проверено";
+    telegramTaskBtn.textContent = t("checked");
     telegramTaskBtn.disabled = true;
   });
 }
@@ -1133,7 +1657,7 @@ if (claimTelegramTaskBtn) {
     const gainedXp = addXp(1500);
     telegramTaskClaimed = true;
     claimTelegramTaskBtn.classList.add("hidden");
-    telegramTaskBtn.textContent = "Выполнено";
+    telegramTaskBtn.textContent = t("done");
     telegramTaskBtn.disabled = true;
     if (telegramTaskCard) telegramTaskCard.classList.add("completed");
     updateUI();
@@ -1157,10 +1681,10 @@ function updateDailyTimer() {
     dailyClaimBtn.style.pointerEvents = "auto";
     dailyClaimBtn.style.opacity = "1";
     dailyDropTimer.textContent = "";
-    dailyClaimBtn.textContent = "Забрать";
+    dailyClaimBtn.textContent = t("claim");
     if (claimDailyBtn) {
       claimDailyBtn.disabled = false;
-      claimDailyBtn.textContent = "Забрать";
+      claimDailyBtn.textContent = t("claim");
       claimDailyBtn.style.background = "";
       claimDailyBtn.style.color = "";
       claimDailyBtn.style.cursor = "pointer";
@@ -1173,7 +1697,7 @@ function updateDailyTimer() {
   dailyClaimBtn.disabled = true;
   if (claimDailyBtn) {
     claimDailyBtn.disabled = true;
-    claimDailyBtn.textContent = "Уже забрано";
+    claimDailyBtn.textContent = t("alreadyClaimed");
     claimDailyBtn.style.background = "#5f6475";
     claimDailyBtn.style.color = "#cfd3df";
     claimDailyBtn.style.cursor = "not-allowed";
@@ -1198,7 +1722,7 @@ if (dailyClaimBtn) {
     dailyDropEndTime = Date.now() + 24 * 60 * 60 * 1000;
     localStorage.setItem("dailyDropEndTime", dailyDropEndTime);
     updateDailyTimer();
-    showToast("+" + gainedStars + " ⭐ и +" + gainedXp + " XP");
+    showToast("+" + gainedStars + " ⭐ " + t("and") + " +" + gainedXp + " XP");
   });
 }
 
@@ -1219,7 +1743,7 @@ async function loadIncomingCards() {
   if (received) {
     save();
     updateCardsView();
-    alert("🎁 Вам пришла новая карта!");
+    alert(t("incomingCard"));
   }
 }
 
@@ -1241,13 +1765,13 @@ const vipBuyBtn = document.getElementById("vipBuyBtn");
 
 if (vipMenuBtn && vipModal && vipCancelBtn && vipBuyBtn) {
   vipMenuBtn.addEventListener("click", () => {
-    if (isVipActive()) return showToast("👑 VIP уже активен");
+    if (isVipActive()) return showToast(t("vipActive"));
     vipModal.classList.add("show");
   });
   vipCancelBtn.addEventListener("click", () => vipModal.classList.remove("show"));
   vipBuyBtn.addEventListener("click", async () => {
     if (isVipActive()) {
-      showToast("👑 VIP уже активен");
+      showToast(t("vipActive"));
       vipModal.classList.remove("show");
       return;
     }
@@ -1267,14 +1791,14 @@ if (vipMenuBtn && vipModal && vipCancelBtn && vipBuyBtn) {
             localStorage.setItem("vipFreeDropClaimed", "false");
             save();
             vipModal.classList.remove("show");
-            showToast("👑 VIP активирован!");
+            showToast(t("vipActivated"));
             updateUI();
           }
         });
       }
     } catch (err) {
       console.log(err);
-      alert("Ошибка VIP");
+      alert(t("vipError"));
     }
   });
 }
@@ -1292,8 +1816,8 @@ function renderTasks() {
       <div class="task-left">
         <div class="task-icon">${task.icon}</div>
         <div class="task-info">
-          <h3>${task.title}</h3>
-          <p>${task.desc}</p>
+          <h3>${t("task_" + task.id + "_title", task.title)}</h3>
+          <p>${t("task_" + task.id + "_desc", task.desc)}</p>
           <div class="task-rewards">
             ${task.reward.xp ? `<span>+${task.reward.xp} XP</span>` : ""}
             ${task.reward.crystals ? `<span>+${task.reward.crystals} 💎</span>` : ""}
@@ -1302,7 +1826,7 @@ function renderTasks() {
         </div>
       </div>
       <div class="task-actions">
-        <button class="task-btn" id="btn_${task.id}" ${isCompleted ? "disabled" : ""}>${isCompleted ? "Виконано" : "Виконати"}</button>
+        <button class="task-btn" id="btn_${task.id}" ${isCompleted ? "disabled" : ""}>${isCompleted ? t("done") : t("doTask")}</button>
       </div>
     `;
     taskCard.querySelector(`#btn_${task.id}`)?.addEventListener("click", () => handleTaskAction(task));
@@ -1317,14 +1841,14 @@ function handleTaskAction(task) {
     window.open(task.link, "_blank");
     const btn = document.getElementById(`btn_${task.id}`);
     if (btn) {
-      btn.textContent = "Перевірити";
+      btn.textContent = t("check");
       btn.onclick = (e) => {
         e.stopPropagation();
         completeTask(task);
       };
     }
   } else if (task.check) {
-    task.check() ? completeTask(task) : showToast("Умова ще не виконана!");
+    task.check() ? completeTask(task) : showToast(t("conditionNotMet"));
   } else {
     completeTask(task);
   }
@@ -1335,7 +1859,7 @@ function completeTask(task) {
   state.crystals += task.reward.crystals || 0;
   state.stars += task.reward.stars || 0;
   localStorage.setItem(`task_${task.id}_completed`, "true");
-  showToast("Нагорода отримана!");
+  showToast(t("taskRewardReceived"));
   updateUI();
   renderTasks();
 }
@@ -1371,7 +1895,7 @@ document.addEventListener("click", function(e) {
       state.crystals += amount;
       state.lastTreasuryClaim = Date.now();
       updateUI();
-      showToast("Забрано " + amount + " 💎");
+      showToast(t("claimedAmount") + amount + " 💎");
     }
     const modal = document.getElementById("treasuryModal");
     if (modal) {
@@ -1442,7 +1966,7 @@ function startCountdown() {
     if (count > 0) {
       countdownEl.textContent = count;
     } else if (count === 0) {
-      countdownEl.textContent = "СТАРТ!";
+      countdownEl.textContent = t("start");
     } else {
       clearInterval(gameCountdownInterval);
       gameCountdownInterval = null;
@@ -1455,7 +1979,7 @@ function startCountdown() {
 function initGameEngine() {
   gameCanvas = document.getElementById("gameCanvas");
   if (!gameCanvas) {
-    console.error("Не знайдено #gameCanvas");
+    console.error(t("canvasMissing"));
     return;
   }
 
@@ -1641,15 +2165,18 @@ function endGame() {
   if (finalScoreEl) finalScoreEl.textContent = gameScore;
   if (finalXpEl) finalXpEl.textContent = gameXp;
   if (overEl) overEl.style.display = "flex";
-if (gameXp > 0) {
+  let hasGameReward = false;
+  if (gameXp > 0) {
     state.xp += gameXp;
-}
+    hasGameReward = true;
+  }
   const reward = Math.floor(gameScore / 5);
   if (reward > 0) {
     state.crystals += reward;
-    updateUI();
-    showPush("Гру завершено", `Ви заробили ${reward} 💎`, "🎮");
+    hasGameReward = true;
+    showPush(t("gameFinishedTitle"), t("gameEarned").replace("{amount}", reward), "🎮");
   }
+  if (hasGameReward) updateUI();
 }
 
 function restartGame() {
@@ -1714,10 +2241,10 @@ function updateGiveawayModal() {
 
     if (joinBtn) {
         if (currentLevel >= 50) {
-            joinBtn.textContent = "Участвовать";
+            joinBtn.textContent = t("participate");
             joinBtn.disabled = false;
         } else {
-            joinBtn.textContent = "Нужно 50 LVL";
+            joinBtn.textContent = t("need50Level");
             joinBtn.disabled = true;
         }
     }
@@ -1772,4 +2299,3 @@ initLanguageModal();
 applyLanguage();
 
 })();
-
