@@ -55,6 +55,31 @@ function getTelegramPlayerId() {
 
   return guestId;
 }
+async function authPlayerOnServer() {
+  if (!tg?.initData) {
+    console.warn("Telegram initData отсутствует. Серверная авторизация пропущена.");
+    return null;
+  }
+
+  const response = await fetch("/api/auth-player", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      initData: tg.initData
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error("Auth error:", data);
+    return null;
+  }
+
+  return data.player;
+}
 const state = {
   xp: safeNumber(localStorage.getItem("xp"), 0),
   playerId: getTelegramPlayerId(),
@@ -2227,7 +2252,11 @@ window.openScreen = openScreen;
 window.startCountdown = startCountdown;
 window.restartGame = restartGame;
 window.exitGame = exitGame;
+authPlayerOnServer().then((serverPlayer) => {
+  if (!serverPlayer) return;
 
+  console.log("SERVER PLAYER:", serverPlayer);
+});
 openScreen("home");
 if (navButtons[0]) navButtons[0].classList.add("active");
 updateUI();
