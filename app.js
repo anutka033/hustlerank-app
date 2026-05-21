@@ -57,28 +57,65 @@ function getTelegramPlayerId() {
 }
 async function authPlayerOnServer() {
   if (!tg?.initData) {
-    console.warn("Telegram initData отсутствует. Серверная авторизация пропущена.");
+    console.warn("Telegram initData отсутствует.");
     return null;
   }
 
-  const response = await fetch("/api/auth-player", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      initData: tg.initData
-    })
-  });
+  try {
+    const response = await fetch("/api/auth-player", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        initData: tg.initData
+      })
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (!response.ok) {
-    console.error("Auth error:", data);
+    if (!response.ok) {
+      console.error("Auth error:", data);
+      return null;
+    }
+
+    return data.player || null;
+
+  } catch (error) {
+    console.error("Auth fetch error:", error);
     return null;
   }
+}
 
-  return data.player;
+ function applyServerPlayer(player) {
+  if (!player) return;
+
+  if (player.level !== undefined) state.level = Number(player.level) || 1;
+  if (player.xp !== undefined) state.xp = Number(player.xp) || 0;
+
+  save();
+  updateUI();
+}
+async function savePlayerToServer() {
+  if (!tg?.initData) return;
+
+  try {
+    await fetch("/api/auth-player", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        initData: tg.initData,
+        player: {
+          level: state.level,
+          xp: state.xp
+        }
+      })
+    });
+  } catch (error) {
+    console.error("Save player error:", error);
+  }
 }
 const state = {
   xp: safeNumber(localStorage.getItem("xp"), 0),
@@ -1030,6 +1067,7 @@ if (taskStarsEl) {
     vipBtn.innerHTML = "<span>👑</span> <span>" + t("vip") + "</span>";
   }
   save();
+  savePlayerToServer();
 }
 
 function openScreen(name) {
@@ -2256,6 +2294,7 @@ authPlayerOnServer().then((serverPlayer) => {
   if (!serverPlayer) return;
 
   console.log("SERVER PLAYER:", serverPlayer);
+  applyServerPlayer(serverPlayer);
 });
 openScreen("home");
 if (navButtons[0]) navButtons[0].classList.add("active");
