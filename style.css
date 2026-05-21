@@ -4615,3 +4615,7 @@ body {
         0 0 25px rgba(180, 80, 255, 0.18),
         inset 0 0 18px rgba(255,255,255,0.03);
 }
+.vip-pack {
+    border: 2px solid rgba(255, 215, 0, 0.45);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.18);
+}

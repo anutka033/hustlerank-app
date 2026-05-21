@@ -1062,7 +1062,7 @@ function updateDailyTimer() {
     dailyClaimBtn.disabled = false;
     dailyClaimBtn.style.pointerEvents = "auto";
     dailyClaimBtn.style.opacity = "1";
-    dailyDropTimer.textContent = "Готово";
+    dailyDropTimer.textContent = "";
     dailyClaimBtn.textContent = "Забрать";
     if (claimDailyBtn) {
       claimDailyBtn.disabled = false;
