@@ -55,6 +55,62 @@ const state = {
   dailyStreak: safeNumber(localStorage.getItem("dailyStreak"), 0),
   lastTreasuryClaim: safeNumber(localStorage.getItem("lastTreasuryClaim"), Date.now())
 };
+const translations = {
+  ua: {
+    friends: "Друзі",
+    invited: "Запрошено",
+    claimTitle: "Ти можеш забрати",
+    claimBtn: "Забрати",
+    inviteFriend: "Запросити друга",
+    main: "Головна",
+    tasks: "Завдання",
+    drops: "Дропи",
+    cards: "Картки"
+  },
+
+  en: {
+    friends: "Friends",
+    invited: "Invited",
+    claimTitle: "You can claim",
+    claimBtn: "Claim",
+    inviteFriend: "Invite friend",
+    main: "Home",
+    tasks: "Tasks",
+    drops: "Drops",
+    cards: "Cards"
+  },
+
+  fr: {
+    friends: "Amis",
+    invited: "Invités",
+    claimTitle: "Tu peux récupérer",
+    claimBtn: "Récupérer",
+    inviteFriend: "Inviter un ami",
+    main: "Accueil",
+    tasks: "Tâches",
+    drops: "Drops",
+    cards: "Cartes"
+  }
+};
+
+let currentLang = localStorage.getItem("lang") || "";
+
+function t(key) {
+  return translations[currentLang]?.[key] || translations.ua[key] || key;
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  applyLanguage();
+}
+
+function applyLanguage() {
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    el.textContent = t(key);
+  });
+}
 async function updateOnlineCollectors() {
     const playerId = state.playerId;
 
@@ -1683,5 +1739,37 @@ if (giveawayCloseBtn && giveawayModal) {
         giveawayModal.style.display = "none";
     });
 }
+if (!currentLang) {
+  currentLang = "ua";
+}
+
+function initLanguageModal() {
+  const modal = document.getElementById("languageModal");
+
+  if (!modal) return;
+
+  if (!localStorage.getItem("lang")) {
+    modal.classList.add("show");
+  }
+
+  modal.querySelectorAll("[data-lang]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      setLanguage(btn.dataset.lang);
+      modal.classList.remove("show");
+    });
+  });
+
+  const langBtn = document.getElementById("langBtn");
+
+  if (langBtn) {
+    langBtn.addEventListener("click", () => {
+      modal.classList.add("show");
+    });
+  }
+}
+
+initLanguageModal();
+applyLanguage();
+
 })();
 

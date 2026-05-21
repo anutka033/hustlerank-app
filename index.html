@@ -96,6 +96,9 @@
       <button class="menu-btn disabled">
         <span>🛡</span> Клан <small>Скоро</small>
       </button>
+      <button class="menu-btn" id="langBtn">
+  <span>🌐</span> Language
+</button>
     </div>
 
 <div id="tasksScreen" class="screen">
@@ -152,7 +155,7 @@
     </div>
 
 </div>
-      <h1 class="page-title">Дропы</h1>
+      <h1 class="page-title" data-i18n="drops">Дропы</h1>
       <h2 class="drop-section-title">Void Drop</h2>
       <section class="drop-case compact-drop">
         <div class="drop-case-box">
@@ -197,7 +200,7 @@
 
     
     <div id="friendsScreen" class="screen">
-      <h1 class="page-title">Друзья</h1>
+      <h1 class="page-title" data-i18n="friends">Друзі</h1>
       <section class="ref-card">
         <p class="ref-label">Бонус за друга, который достиг 3 уровня:</p>
         <div class="ref-rewards">
@@ -216,18 +219,18 @@
         </div>
       </section>
       <section class="friends-head">
-        <h2>Друзья</h2>
-        <span>Приглашено: <b id="friendsCount">0</b></span>
+        <h2 data-i18n="friends">Друзі</h2>
+        <span><span data-i18n="invited">Запрошено</span>: <b id="friendsCount">0</b></span>
       </section>
       <section class="claim-box">
         <div>
-          <p>Ты можешь забрать</p>
+          <p data-i18n="claimTitle">Ти можеш забрати</p>
           <strong>⭐ <span id="claimStars">0</span> · 💎 <span id="claimCrystals">0</span></strong>
         </div>
-        <button id="claimRefBtn">Забрать</button>
+        <button id="claimRefBtn" data-i18n="claimBtn">Забрать</button>
       </section>
       <section class="friends-list">
-        <div class="friend-empty" id="friendEmpty">Пока нет приглашённых друзей</div>
+        <div class="friend-empty" id="friendEmpty" data-i18n="friendEmpty">Пока нет приглашённых друзей</div>
         <div id="friendsContainer"></div>
       </section>
     </div>
@@ -236,8 +239,8 @@
     <div id="cardsScreen" class="screen">
       <div class="cards-header">
         <div>
-          <h1>Карточки</h1>
-          <p>Собирай, прокачивай и открывай статусы.</p>
+          <h1 data-i18n="cards">Карточки</h1>
+          <p data-i18n="cardsDescription">Собирай, прокачивай и открывай статусы.</p>
         </div>
         <div class="stars-box">
           ⭐ <span id="cardStars">0</span>
@@ -250,9 +253,9 @@
       </div>
       <div id="marketScreen" class="market-screen" style="display: none;">
         <div class="market-soon">
-          <h2>Рынок скоро откроется</h2>
-          <p>Скоро здесь можно будет продавать свои карты за звёзды.</p>
-          <p>А пока собирай коллекцию, покупай новые карты и открывай редкие статусы.</p>
+          <h2 data-i18n="marketSoon">Рынок скоро откроется</h2>
+          <p data-i18n="marketSoonDescription">Скоро здесь можно будет продавать свои карты за звёзды.</p>
+          <p data-i18n="marketSoonDescription2">А пока собирай коллекцию, покупай новые карты и открывай редкие статусы.</p>
         </div>
       </div>
       <div class="new-cards-grid">
@@ -350,23 +353,23 @@
     <nav class="bottom-nav">
       <button class="active" data-screen="home">
         <i class="fa-solid fa-house"></i>
-        <span>Главная</span>
+        <span data-i18n="tasks">Завдання</span>
       </button>
       <button data-screen="tasks">
         <i class="fa-solid fa-list-check"></i>
-        <span>Задания</span>
+        <span data-i18n="drops">Дропи</span>
       </button>
       <button data-screen="drops">
         <i class="fa-solid fa-briefcase"></i>
-        <span>Дропы</span>
+        <span data-i18n="drops">Дропы</span>
       </button>
       <button data-screen="friends">
         <i class="fa-solid fa-user-group"></i>
-        <span>Друзья</span>
+       <span data-i18n="friends">Друзі</span>
       </button>
       <button data-screen="cards">
         <i class="fa-solid fa-layer-group"></i>
-        <span>Карточки</span>
+        <span data-i18n="cards">Картки</span>
       </button>
     </nav>
 
@@ -668,7 +671,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<div id="languageModal" class="language-modal">
+  <div class="language-box">
+    <h2>Choose language</h2>
 
+    <button data-lang="ua">🇺🇦 Українська</button>
+    <button data-lang="en">🇬🇧 English</button>
+    <button data-lang="fr">🇫🇷 Français</button>
+  </div>
+</div>
 <script src="app.js"></script>
 
 </body>

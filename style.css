@@ -4689,3 +4689,121 @@ body {
 .friend-left {
   align-items: center;
 }
+.language-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0,0,0,0.72);
+
+  backdrop-filter: blur(12px);
+
+  z-index: 999999;
+}
+
+.language-modal.show {
+  display: flex;
+}
+
+.language-box {
+  width: calc(100% - 40px);
+  max-width: 340px;
+
+  padding: 24px;
+
+  border-radius: 28px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(33,22,59,.96),
+    rgba(18,12,38,.98)
+  );
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  box-shadow:
+    0 0 40px rgba(236,72,153,.22),
+    inset 0 0 30px rgba(255,255,255,.03);
+}
+
+.language-box h2 {
+  margin-bottom: 18px;
+
+  text-align: center;
+
+  color: white;
+
+  font-size: 24px;
+
+  font-weight: 800;
+}
+
+.language-box button {
+  width: 100%;
+
+  margin-top: 12px;
+
+  padding: 16px;
+
+  border: none;
+
+  border-radius: 18px;
+
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+
+  color: white;
+
+  font-size: 17px;
+
+  font-weight: 800;
+}
+#languageModal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+
+  width: 100vw !important;
+  height: 100vh !important;
+
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: rgba(0, 0, 0, 0.85) !important;
+  z-index: 99999999 !important;
+}
+
+#languageModal.show {
+  display: flex !important;
+}
+
+#languageModal .language-box {
+  width: 320px !important;
+  padding: 24px !important;
+  border-radius: 24px !important;
+  background: #1b1230 !important;
+  color: #fff !important;
+  text-align: center !important;
+}
+
+#languageModal .language-box button {
+  display: block !important;
+  width: 100% !important;
+  margin-top: 12px !important;
+  padding: 14px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  color: #fff !important;
+  background: linear-gradient(135deg, #7c3aed, #ec4899) !important;
+  font-weight: 800 !important;
+}
