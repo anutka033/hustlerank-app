@@ -1950,7 +1950,7 @@ if (claimTelegramTaskBtn) {
   });
 }
 
-const dailyClaimBtn = document.getElementById("dailyClaimBtn");
+const dailyClaimBtn = document.getElementById("dailyClaimBtn") || document.getElementById("dailyDropClaimBtn");
 const dailyDropTimer = document.getElementById("dailyDropTimer");
 let dailyDropEndTime = Number(localStorage.getItem("dailyDropEndTime")) || 0;
 
