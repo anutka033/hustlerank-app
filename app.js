@@ -2375,14 +2375,28 @@ function handleTaskAction(task) {
   }
 }
 
-function completeTask(task) {
-  state.xp += task.reward.xp || 0;
-  state.crystals += task.reward.crystals || 0;
-  state.stars += task.reward.stars || 0;
-  localStorage.setItem(`task_${task.id}_completed`, "true");
-  showToast(t("taskRewardReceived"));
-  updateUI();
-  renderTasks();
+async function completeTask(task) {
+  const btn = document.getElementById(`btn_${task.id}`);
+  if (btn) btn.disabled = true;
+
+  try {
+    const data = await claimServerReward("/api/tasks/claim", { taskId: task.id });
+    localStorage.setItem(`task_${task.id}_completed`, "true");
+    const reward = data.reward || task.reward || {};
+    showToast(`+${reward.xp || 0} XP +${reward.crystals || 0} 💎 +${reward.stars || 0} ⭐`);
+    updateUI();
+    renderTasks();
+  } catch (error) {
+    if (error?.data?.error === "TASK_ALREADY_CLAIMED") {
+      localStorage.setItem(`task_${task.id}_completed`, "true");
+      showToast(t("alreadyClaimed"));
+      renderTasks();
+      return;
+    }
+
+    if (btn) btn.disabled = false;
+    showToast(formatClaimError(error));
+  }
 }
 
 const TREASURY_CONFIG = { perHour: 60, max: 100 };
