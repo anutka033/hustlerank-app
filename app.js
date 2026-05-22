@@ -1734,6 +1734,56 @@ const caseCards = [
   { id: "limited01", name: "Limited", img: "images/limited-01.png", rarity: "limited" }
 ];
 
+const DROP_WINNER_INDEX = 34;
+
+function getDropRarityClass(card) {
+  const rarity = String(card?.rarity || "").toLowerCase();
+
+  if (rarity.includes("common") || rarity.includes("обыч") || rarity.includes("звич") || rarity.includes("commune")) return "common";
+  if (rarity.includes("rare") || rarity.includes("ред") || rarity.includes("рід") || rarity.includes("rareté")) return "rare";
+  if (rarity.includes("epic") || rarity.includes("эпич") || rarity.includes("епіч") || rarity.includes("épique")) return "epic";
+  if (rarity.includes("legend") || rarity.includes("леген")) return "legendary";
+  if (rarity.includes("myth") || rarity.includes("миф") || rarity.includes("міф")) return "mythic";
+  if (rarity.includes("limited")) return "limited";
+
+  return "common";
+}
+
+function getDropCardById(cardId) {
+  const normalizedCardId = String(cardId || "");
+  if (!normalizedCardId) return null;
+
+  const caseCard = caseCards.find(card => card.id === normalizedCardId);
+  if (caseCard) return caseCard;
+
+  const modalCard = modalCards.find(card => card.id === normalizedCardId);
+  if (!modalCard) return null;
+
+  return {
+    id: modalCard.id,
+    name: modalCard.name,
+    img: modalCard.img,
+    rarity: getDropRarityClass(modalCard)
+  };
+}
+
+function renderRouletteCard(card) {
+  return `<div class="roulette-card rarity-${getDropRarityClass(card)}"><img src="${card.img}"></div>`;
+}
+
+function getRouletteTargetOffset(roulette, rouletteTrack, winnerIndex) {
+  const winnerElement = rouletteTrack?.children?.[winnerIndex];
+
+  if (!roulette || !winnerElement) {
+    return Math.max(0, (winnerIndex * 134) - 1300);
+  }
+
+  const winnerCenter = winnerElement.offsetLeft + (winnerElement.offsetWidth / 2);
+  const rouletteCenter = roulette.clientWidth / 2;
+
+  return Math.max(0, Math.round(winnerCenter - rouletteCenter));
+}
+
 if (closeDropModal) {
   closeDropModal.addEventListener("click", function () {
     if (!lastDropCard) return;
@@ -1788,9 +1838,9 @@ updateUI();
       rouletteTrack.innerHTML = "";
       for(let i = 0; i < 40; i++){
         const random = caseCards[Math.floor(Math.random() * caseCards.length)];
-        rouletteTrack.innerHTML += `<div class="roulette-card rarity-${random.rarity}"><img src="${random.img}"></div>`;
+        rouletteTrack.innerHTML += renderRouletteCard(random);
       }
-      const winner = caseCards.find(card => card.id === dropResult.cardId);
+      const winner = getDropCardById(dropResult.cardId || dropResult.card?.id);
 
 if (!winner) {
   showToast("Помилка карти");
@@ -1801,12 +1851,13 @@ if (!winner) {
 lastDropCard = winner;
 lastDropDuplicate = !!dropResult.duplicate;
 lastDropCompensation = Number(dropResult.compensation || 0);
-      rouletteTrack.children[34].outerHTML = `<div class="roulette-card rarity-${winner.rarity}"><img src="${winner.img}"></div>`;
+      rouletteTrack.children[DROP_WINNER_INDEX].outerHTML = renderRouletteCard(winner);
       rouletteTrack.style.transition = "none";
       rouletteTrack.style.transform = "translateX(0px)";
       setTimeout(() => {
         rouletteTrack.style.transition = "transform 5s cubic-bezier(.08,.6,0,1)";
-        rouletteTrack.style.transform = `translateX(-${(34 * 134) - 1300}px)`;
+        const targetOffset = getRouletteTargetOffset(roulette, rouletteTrack, DROP_WINNER_INDEX);
+        rouletteTrack.style.transform = `translateX(-${targetOffset}px)`;
       }, 100);
       setTimeout(() => {
   isDropRolling = false;
