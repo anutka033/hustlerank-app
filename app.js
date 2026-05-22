@@ -1718,6 +1718,8 @@ const dropModal = document.getElementById("dropModal");
 const closeDropModal = document.getElementById("closeDropModal");
 let lastDropCard = null;
 let isDropRolling = false;
+let lastDropDuplicate = false;
+let lastDropCompensation = 0;
 
 const caseCards = [
   { id: "common01", name: "Common One", img: "images/common-01.png", rarity: "common" },
@@ -1797,6 +1799,8 @@ if (!winner) {
 }
 
 lastDropCard = winner;
+lastDropDuplicate = !!dropResult.duplicate;
+lastDropCompensation = Number(dropResult.compensation || 0);
       rouletteTrack.children[34].outerHTML = `<div class="roulette-card rarity-${winner.rarity}"><img src="${winner.img}"></div>`;
       rouletteTrack.style.transition = "none";
       rouletteTrack.style.transform = "translateX(0px)";
@@ -1805,9 +1809,41 @@ lastDropCard = winner;
         rouletteTrack.style.transform = `translateX(-${(34 * 134) - 1300}px)`;
       }, 100);
       setTimeout(() => {
-        isDropRolling = false;
-        if (closeDropModal) closeDropModal.style.display = "block";
-      }, 5200);
+    isDropRolling = false;
+
+    if (closeDropModal) {
+        closeDropModal.style.display = "block";
+
+        if (lastDropDuplicate) {
+            closeDropModal.innerHTML = `
+                <div class="duplicate-drop">
+                    <div class="duplicate-title">
+                        Повторная карта
+                    </div>
+
+                    <img src="${lastDropCard.image}" class="duplicate-image">
+
+                    <div class="duplicate-compensation">
+                        Компенсация: +${lastDropCompensation} ⭐
+                    </div>
+
+                    <button class="duplicate-btn">
+                        Забрать
+                    </button>
+                </div>
+            `;
+
+            const btn = closeDropModal.querySelector(".duplicate-btn");
+
+            if (btn) {
+                btn.onclick = () => {
+                    closeDropModal.style.display = "none";
+                };
+            }
+        }
+    }
+
+}, 5200);
     }
   });
 }
