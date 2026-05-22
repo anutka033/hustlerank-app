@@ -4918,3 +4918,60 @@ body {
 .drop-result-btn.secondary {
   background: rgba(20, 10, 45, .35);
 }
+.drop-reward {
+  margin-top: 2px;
+  color: #b66aff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.08);
+  width: fit-content;
+}
+/* Daily Drop button + timer fix */
+.daily-drop-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.drop-claim-btn,
+.daily-drop-timer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7c3cff 0%, #b63cff 48%, #ff3fd4 100%);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(188, 69, 255, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.drop-claim-btn:active {
+  transform: scale(0.97);
+}
+
+.daily-drop-timer {
+  cursor: default;
+  background: linear-gradient(135deg, rgba(124, 60, 255, 0.34), rgba(255, 63, 212, 0.22));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #eee7ff;
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.04), 0 0 14px rgba(124, 60, 255, 0.25);
+}
+
+.drop-claim-btn:disabled {
+  opacity: 1;
+}
+

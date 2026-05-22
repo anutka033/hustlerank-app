@@ -1961,12 +1961,15 @@ function updateDailyTimer() {
   const claimDailyBtn = document.getElementById("claimDailyBtn");
 
   if (left <= 0) {
-    dailyClaimBtn.style.display = "block";
+    dailyDropTimer.textContent = "";
+    dailyDropTimer.style.display = "none";
+
+    dailyClaimBtn.style.display = "inline-flex";
     dailyClaimBtn.disabled = false;
     dailyClaimBtn.style.pointerEvents = "auto";
     dailyClaimBtn.style.opacity = "1";
-    dailyDropTimer.textContent = "";
     dailyClaimBtn.textContent = t("claim");
+
     if (claimDailyBtn) {
       claimDailyBtn.disabled = false;
       claimDailyBtn.textContent = t("claim");
@@ -1978,8 +1981,20 @@ function updateDailyTimer() {
     return;
   }
 
-  dailyClaimBtn.style.display = "block";
+  const totalSeconds = Math.floor(left / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const timeText = String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+
+  dailyDropTimer.textContent = timeText;
+  dailyDropTimer.style.display = "inline-flex";
+
+  dailyClaimBtn.style.display = "none";
   dailyClaimBtn.disabled = true;
+  dailyClaimBtn.style.pointerEvents = "none";
+  dailyClaimBtn.style.opacity = "1";
+
   if (claimDailyBtn) {
     claimDailyBtn.disabled = true;
     claimDailyBtn.textContent = t("alreadyClaimed");
@@ -1988,13 +2003,6 @@ function updateDailyTimer() {
     claimDailyBtn.style.cursor = "not-allowed";
     claimDailyBtn.style.boxShadow = "none";
   }
-  const totalSeconds = Math.floor(left / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  dailyClaimBtn.textContent = String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
-  dailyClaimBtn.style.pointerEvents = "none";
-  dailyClaimBtn.style.opacity = "0.7";
 }
 
 if (dailyClaimBtn) {
