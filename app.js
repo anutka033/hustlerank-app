@@ -87,42 +87,93 @@ async function authPlayerOnServer() {
   }
 }
 
- function applyServerPlayer(player) {
+let isApplyingServerPlayer = false;
+let serverSaveTimer = null;
+
+function getPlayerNumber(player, keys, fallback) {
+  for (const key of keys) {
+    if (player[key] !== undefined && player[key] !== null) {
+      const value = Number(player[key]);
+      return Number.isFinite(value) ? value : fallback;
+    }
+  }
+  return fallback;
+}
+
+function applyServerPlayer(player) {
   if (!player) return;
 
-  if (player.level !== undefined) state.level = Number(player.level) || 1;
-  if (player.xp !== undefined) state.xp = Number(player.xp) || 0;
-  if (player.coins !== undefined) state.stars = Number(player.coins) || 0;
-if (player.gems !== undefined) state.crystals = Number(player.gems) || 0;
-window.serverPlayerLoaded = true;
-  save();
-  updateUI();
-}
-async function savePlayerToServer() {
-    if (!window.serverPlayerLoaded) return;
-  if (!tg?.initData) return;
+  isApplyingServerPlayer = true;
 
   try {
-    await fetch("/api/auth-player", {
+    state.level = Math.max(1, getPlayerNumber(player, ["level"], state.level || 1));
+    state.xp = Math.max(0, getPlayerNumber(player, ["xp"], state.xp || 0));
+    state.maxXp = Math.max(100, getPlayerNumber(player, ["max_xp", "maxXp"], state.maxXp || 100));
+    state.stars = Math.max(0, getPlayerNumber(player, ["stars", "coins"], state.stars || 0));
+    state.crystals = Math.max(0, getPlayerNumber(player, ["crystals", "gems"], state.crystals || 0));
+
+    if (player.vip !== undefined && player.vip !== null) {
+      state.vip = player.vip === true || player.vip === "true";
+    }
+
+    state.vipUntil = Math.max(0, getPlayerNumber(player, ["vip_until", "vipUntil"], state.vipUntil || 0));
+
+    window.serverPlayerLoaded = true;
+    save();
+    updateUI();
+  } finally {
+    isApplyingServerPlayer = false;
+  }
+}
+
+function schedulePlayerSaveToServer() {
+  if (!window.serverPlayerLoaded) return;
+  if (isApplyingServerPlayer) return;
+  if (!tg?.initData) return;
+
+  clearTimeout(serverSaveTimer);
+  serverSaveTimer = setTimeout(() => {
+    savePlayerToServer();
+  }, 500);
+}
+
+async function savePlayerToServer() {
+  if (!window.serverPlayerLoaded) return;
+  if (isApplyingServerPlayer) return;
+  if (!tg?.initData) return;
+
+  const playerPayload = {
+    level: Math.max(1, Number(state.level) || 1),
+    xp: Math.max(0, Number(state.xp) || 0),
+    max_xp: Math.max(100, Number(state.maxXp) || 100),
+    maxXp: Math.max(100, Number(state.maxXp) || 100),
+    stars: Math.max(0, Number(state.stars) || 0),
+    crystals: Math.max(0, Number(state.crystals) || 0),
+    coins: Math.max(0, Number(state.stars) || 0),
+    gems: Math.max(0, Number(state.crystals) || 0),
+    vip: Boolean(state.vip),
+    vip_until: Math.max(0, Number(state.vipUntil) || 0),
+    vipUntil: Math.max(0, Number(state.vipUntil) || 0)
+  };
+
+  try {
+    const response = await fetch("/api/auth-player", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         initData: tg.initData,
-       player: {
-  level: state.level,
-  xp: Math.max(
-  Number(state.xp) || 0,
-  Number(localStorage.getItem("xp")) || 0
-),
-  coins: state.stars,
-  gems: state.crystals
-}
+        player: playerPayload
       })
     });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      console.error("Save player error:", data);
+    }
   } catch (error) {
-    console.error("Save player error:", error);
+    console.error("Save player fetch error:", error);
   }
 }
 const state = {
@@ -858,6 +909,7 @@ function save() {
   localStorage.setItem("lastLoginDate", state.lastLoginDate);
   localStorage.setItem("dailyStreak", state.dailyStreak);
   localStorage.setItem("lastTreasuryClaim", state.lastTreasuryClaim);
+  schedulePlayerSaveToServer();
 }
 
 function rankByLevel(level) {
