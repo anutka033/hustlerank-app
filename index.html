@@ -212,23 +212,32 @@
     
     <div id="friendsScreen" class="screen">
       <h1 class="page-title" data-i18n="friends">Друзі</h1>
-      <section class="ref-card">
-        <p class="ref-label" data-i18n="refBonusLabel">Бонус за друга, який досяг 3 рівня:</p>
-        <div class="ref-rewards">
-          <span>⭐ +25</span>
-          <span>💎 +500</span>
-        </div>
-        <div class="ref-actions">
-          <button id="inviteFriendBtn" class="invite-friend-btn">
-    <span class="custom-icon user-plus-icon"></span>
-    <span data-i18n="inviteFriend">Запросити друга</span>
-</button>
 
-<button id="copyRefBtn" class="copy-ref-btn">
-    <span class="custom-icon copy-icon"></span>
-</button>
+      <section class="ref-preview-card">
+        <div class="ref-preview-image-wrap">
+          <img src="./images/ref-preview.png" alt="Запроси друга в HustleRank" class="ref-preview-image" data-i18n-alt="refPreviewAlt">
+          <div class="ref-preview-glow"></div>
+        </div>
+        <div class="ref-preview-content">
+          <span class="ref-preview-badge" data-i18n="refPreviewBadge">Командний бонус</span>
+          <h2 data-i18n="refPreviewTitle">Запрошуй друзів у HustleRank</h2>
+          <p data-i18n="refPreviewText">Друг досягає 3 рівня — ти забираєш нагороду для швидшого прогресу.</p>
+          <div class="ref-rewards ref-preview-rewards">
+            <span>⭐ +25</span>
+            <span>💎 +500</span>
+          </div>
+          <div class="ref-actions ref-preview-actions">
+            <button id="inviteFriendBtn" class="invite-friend-btn">
+              <span class="custom-icon user-plus-icon"></span>
+              <span data-i18n="inviteFriend">Запросити друга</span>
+            </button>
+            <button id="copyRefBtn" class="copy-ref-btn" aria-label="Копіювати реферальне посилання" data-i18n-aria-label="copyRefLink">
+              <span class="custom-icon copy-icon"></span>
+            </button>
+          </div>
         </div>
       </section>
+
       <section class="friends-head">
         <h2 data-i18n="friends">Друзі</h2>
         <span><span data-i18n="invited">Запрошено</span>: <b id="friendsCount">0</b></span>

@@ -171,7 +171,10 @@ async function savePlayerToServer() {
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
       console.error("Save player error:", data);
+      return;
     }
+
+    scheduleOwnReferralLevelSync();
   } catch (error) {
     console.error("Save player fetch error:", error);
   }
@@ -228,6 +231,11 @@ const translations = {
     invited: "Запрошено",
     claimTitle: "Ти можеш забрати",
     friendEmpty: "Поки немає запрошених друзів",
+    refPreviewBadge: "Командний бонус",
+    refPreviewTitle: "Запрошуй друзів у HustleRank",
+    refPreviewText: "Друг досягає 3 рівня — ти забираєш нагороду для швидшого прогресу.",
+    refPreviewAlt: "Запроси друга в HustleRank",
+    copyRefLink: "Копіювати реферальне посилання",
     cardsDescription: "Збирай, прокачуй і відкривай статуси.",
     shop: "Магазин",
     inventory: "Інвентар",
@@ -404,6 +412,11 @@ const translations = {
     invited: "Invited",
     claimTitle: "You can claim",
     friendEmpty: "No invited friends yet",
+    refPreviewBadge: "Team bonus",
+    refPreviewTitle: "Invite friends to HustleRank",
+    refPreviewText: "When a friend reaches level 3, you claim a reward for faster progress.",
+    refPreviewAlt: "Invite a friend to HustleRank",
+    copyRefLink: "Copy referral link",
     cardsDescription: "Collect, upgrade, and unlock statuses.",
     shop: "Shop",
     inventory: "Inventory",
@@ -580,6 +593,11 @@ const translations = {
     invited: "Invités",
     claimTitle: "Tu peux récupérer",
     friendEmpty: "Aucun ami invité pour le moment",
+    refPreviewBadge: "Bonus d'équipe",
+    refPreviewTitle: "Invite tes amis sur HustleRank",
+    refPreviewText: "Quand un ami atteint le niveau 3, tu récupères une récompense pour progresser plus vite.",
+    refPreviewAlt: "Invite un ami sur HustleRank",
+    copyRefLink: "Copier le lien de parrainage",
     cardsDescription: "Collectionne, améliore et débloque des statuts.",
     shop: "Boutique",
     inventory: "Inventaire",
@@ -750,6 +768,10 @@ function applyLanguage() {
   document.querySelectorAll("[data-i18n-alt]").forEach(el => {
     const key = el.dataset.i18nAlt;
     el.setAttribute("alt", t(key, el.getAttribute("alt") || ""));
+  });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach(el => {
+    const key = el.dataset.i18nAriaLabel;
+    el.setAttribute("aria-label", t(key, el.getAttribute("aria-label") || ""));
   });
   if (typeof renderTasks === "function" && screens.tasks?.classList.contains("active-screen")) renderTasks();
   if (typeof updateCards === "function") updateCards();
@@ -1532,21 +1554,58 @@ document.addEventListener("click", async function (event) {
 const referralLink = `https://t.me/HustleRank033Bot?start=ref_${state.playerId}`;
 const urlParams = new URLSearchParams(window.location.search);
 let referrerId = urlParams.get("ref");
+let ownReferralLevelSyncTimer = null;
 
 if (tg) {
   const startParam = tg.initDataUnsafe?.start_param;
   if (startParam && startParam.startsWith("ref_")) referrerId = startParam.replace("ref_", "");
 }
 
+function normalizedLevel(value) {
+  return Math.max(1, Number(value) || 1);
+}
+
+async function syncOwnReferralLevel() {
+  if (!state.playerId) return;
+  const currentLevel = normalizedLevel(state.level);
+  const { error } = await supabaseClient
+    .from("referrals")
+    .update({ invited_level: currentLevel })
+    .eq("invited_id", state.playerId)
+    .lt("invited_level", currentLevel);
+
+  if (error) console.warn("Referral level sync error:", error.message || error);
+}
+
+function scheduleOwnReferralLevelSync() {
+  clearTimeout(ownReferralLevelSyncTimer);
+  ownReferralLevelSyncTimer = setTimeout(() => {
+    syncOwnReferralLevel();
+  }, 700);
+}
+
 async function registerReferral() {
-  if (!referrerId || referrerId === state.playerId || localStorage.getItem("referralRegistered")) return;
-  const { data: existingReferral } = await supabaseClient.from("referrals").select("*").eq("invited_id", state.playerId).maybeSingle();
-  if (existingReferral) return;
+  if (!referrerId || referrerId === state.playerId) {
+    syncOwnReferralLevel();
+    return;
+  }
+
+  const { data: existingReferral } = await supabaseClient
+    .from("referrals")
+    .select("id, invited_level")
+    .eq("invited_id", state.playerId)
+    .maybeSingle();
+
+  if (existingReferral) {
+    localStorage.setItem("referralRegistered", "true");
+    await syncOwnReferralLevel();
+    return;
+  }
 
   await supabaseClient.from("referrals").insert({
     referrer_id: referrerId,
     invited_id: state.playerId,
-    invited_level: state.level || 1,
+    invited_level: normalizedLevel(state.level),
     reward_claimed: false
   });
   localStorage.setItem("referralRegistered", "true");
@@ -1576,13 +1635,17 @@ if (inviteFriendBtn) {
 }
 
 if (copyRefBtn) {
-  copyRefBtn.addEventListener("click", function () {
-    navigator.clipboard.writeText(referralLink);
-    copyRefBtn.classList.add("copied");
+  copyRefBtn.addEventListener("click", async function () {
+    try {
+      await navigator.clipboard.writeText(referralLink);
+    } catch (error) {
+      console.warn("Referral link copy error:", error?.message || error);
+    }
 
-setTimeout(() => {
-    copyRefBtn.classList.remove("copied");
-}, 1200);
+    copyRefBtn.classList.add("copied");
+    setTimeout(() => {
+      copyRefBtn.classList.remove("copied");
+    }, 1200);
   });
 }
 
@@ -1603,20 +1666,19 @@ function renderFriends() {
   if (friendEmpty) friendEmpty.style.display = "none";
 
   invitedFriends.forEach(function(friend) {
+    const friendLevel = normalizedLevel(friend.level);
     friendsContainer.innerHTML += `
       <div class="friend-item">
         <div class="friend-left">
           <div class="friend-avatar">
-  <img src="${getFriendAvatar(friend.level || 1)}" alt="">
-</div>
+            <img src="${getFriendAvatar(friendLevel)}" alt="">
+          </div>
           <div>
-           <div class="friend-top">
-  <span class="friend-level">${friend.level || 1} lvl</span>
-
-  <span class="friend-id-box">
-    ${friend.name}
-  </span>
-</div>
+            <div class="friend-top">
+              <span class="friend-level">${friendLevel} lvl</span>
+              <span class="friend-id-box">${friend.name}</span>
+            </div>
+          </div>
         </div>
         <div class="friend-reward">${friend.reward || 0}</div>
       </div>
@@ -1624,32 +1686,47 @@ function renderFriends() {
   });
 }
 
-async function loadReferrals() {
-  const { data, error } = await supabaseClient.from("referrals").select("*").eq("referrer_id", state.playerId);
-  if (error) return console.log(error);
-  invitedFriends.length = 0;
-  let availableStars = 0;
-  let availableCrystals = 0;
-
-  data.forEach(function(ref) {
-    invitedFriends.push({
-    name: "ID: " + ref.invited_id,
-    level: ref.invited_level || 1,
-    income: 0,
-    reward: ref.reward_claimed ? "✅" : "🎁"
-});
-    if (ref.invited_level >= 3 && !ref.reward_claimed) {
-      availableStars += 25;
-      availableCrystals += 500;
+function calculateReferralRewards(referrals) {
+  return referrals.reduce((totals, ref) => {
+    const level = normalizedLevel(ref.invited_level);
+    if (level >= 3 && !ref.reward_claimed) {
+      totals.stars += 25;
+      totals.crystals += 500;
     }
+    return totals;
+  }, { stars: 0, crystals: 0 });
+}
+
+async function loadReferrals() {
+  await syncOwnReferralLevel();
+  const { data, error } = await supabaseClient
+    .from("referrals")
+    .select("*")
+    .eq("referrer_id", state.playerId)
+    .order("created_at", { ascending: false });
+
+  if (error) return console.log(error);
+
+  invitedFriends.length = 0;
+  const referrals = data || [];
+  const rewards = calculateReferralRewards(referrals);
+
+  referrals.forEach(function(ref) {
+    const friendLevel = normalizedLevel(ref.invited_level);
+    invitedFriends.push({
+      name: "ID: " + ref.invited_id,
+      level: friendLevel,
+      income: 0,
+      reward: ref.reward_claimed ? "✅" : (friendLevel >= 3 ? "🎁" : "⏳")
+    });
   });
 
   const friendsCountEl = document.getElementById("friendsCount");
-  if (friendsCountEl) friendsCountEl.textContent = data.length;
+  if (friendsCountEl) friendsCountEl.textContent = referrals.length;
   const claimStarsEl = document.getElementById("claimStars");
-  if (claimStarsEl) claimStarsEl.textContent = availableStars;
+  if (claimStarsEl) claimStarsEl.textContent = rewards.stars;
   const claimCrystalsEl = document.getElementById("claimCrystals");
-  if (claimCrystalsEl) claimCrystalsEl.textContent = availableCrystals;
+  if (claimCrystalsEl) claimCrystalsEl.textContent = rewards.crystals;
 
   renderFriends();
 }
@@ -1657,10 +1734,20 @@ async function loadReferrals() {
 const claimRefBtn = document.getElementById("claimRefBtn");
 if (claimRefBtn) {
   claimRefBtn.addEventListener("click", async function () {
-    const { data } = await supabaseClient.from("referrals").select("*").eq("referrer_id", state.playerId);
+    await syncOwnReferralLevel();
+    const { data, error } = await supabaseClient
+      .from("referrals")
+      .select("*")
+      .eq("referrer_id", state.playerId);
+
+    if (error) {
+      console.log(error);
+      return alert(t("noRewards"));
+    }
+
     let rewardCount = 0;
-    for (const ref of data) {
-      if (ref.invited_level >= 3 && !ref.reward_claimed) {
+    for (const ref of data || []) {
+      if (normalizedLevel(ref.invited_level) >= 3 && !ref.reward_claimed) {
         rewardCount++;
         await supabaseClient.from("referrals").update({ reward_claimed: true }).eq("id", ref.id);
       }
