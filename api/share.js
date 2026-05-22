@@ -10,18 +10,19 @@ export default async function handler(req, res) {
 
     const BOT_TOKEN = process.env.BOT_TOKEN;
     const BOT_USERNAME = "HustleRank033Bot";
+    const APP_URL = "https://hustlerank-app.vercel.app";
 
     const referralLink = `https://t.me/${BOT_USERNAME}?startapp=ref_${userId}`;
 
     const text =
-`🔥 Hustle Rank
+`🔥 HustleRank — заходь у гру разом зі мною!
 
-Играй вместе со мной,
-открывай карточки,
-выполняй задания
-и забирай награды!
+Відкривай картки, виконуй завдання, прокачуй рівень і забирай бонуси.
+Запрошуй друзів, збирай нагороди та піднімайся вище у рейтингу.
 
-👇 Жми кнопку ниже`;
+👇 Натискай нижче та стартуй зі мною`;
+
+    const imageUrl = `${APP_URL}/images/friends-banner.png`;
 
     const response = await fetch(
       `https://api.telegram.org/bot${BOT_TOKEN}/savePreparedInlineMessage`,
@@ -31,21 +32,20 @@ export default async function handler(req, res) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          user_id: userId,
+          user_id: Number(userId ),
           result: {
-            type: "article",
-            id: `ref_${userId}`,
-            title: "Hustle Rank",
-            description: "Играй, выполняй задания и забирай награды!",
-            thumbnail_url: "https://hustlerank-app.vercel.app/images/ref-preview.png",
-            input_message_content: {
-              message_text: text
-            },
+            type: "photo",
+            id: `ref_${userId}_${Date.now()}`,
+            photo_url: imageUrl,
+            thumbnail_url: imageUrl,
+            title: "HustleRank",
+            description: "Відкривай картки, виконуй завдання та забирай бонуси разом із друзями!",
+            caption: text,
             reply_markup: {
               inline_keyboard: [
                 [
                   {
-                    text: "🚀 Запустить",
+                    text: "🚀 Відкрити HustleRank",
                     url: referralLink
                   }
                 ]
@@ -67,14 +67,16 @@ export default async function handler(req, res) {
         error: result.description,
         fallback: true,
         text,
-        referralLink
+        referralLink,
+        imageUrl
       });
     }
 
     return res.status(200).json({
       preparedMessageId: result.result.id,
       text,
-      referralLink
+      referralLink,
+      imageUrl
     });
 
   } catch (error) {
