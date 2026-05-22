@@ -4910,3 +4910,11 @@ body {
   font-weight: 900;
   background: rgba(20, 10, 45, .35);
 }
+.drop-result-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.drop-result-btn.secondary {
+  background: rgba(20, 10, 45, .35);
+}

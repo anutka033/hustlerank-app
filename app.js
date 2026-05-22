@@ -1870,7 +1870,8 @@ lastDropCompensation = Number(dropResult.compensation || 0);
   const resultTitle = document.getElementById("dropResultTitle");
   const resultImage = document.getElementById("dropResultImage");
   const resultText = document.getElementById("dropResultText");
-  const resultBtn = document.getElementById("dropResultClaimBtn");
+  const resultBtn = document.getElementById("dropResultAgainBtn");
+  const cancelBtn = document.getElementById("dropResultCancelBtn");
 
   if (resultModal && resultTitle && resultImage && resultText && resultBtn && lastDropCard) {
     resultModal.classList.add("show");
@@ -1885,9 +1886,25 @@ lastDropCompensation = Number(dropResult.compensation || 0);
       resultText.textContent = "Карта додана до вашого інвентарю!";
     }
 
-    resultBtn.onclick = () => {
-      resultModal.classList.remove("show");
-    };
+    cancelBtn.onclick = () => {
+  resultModal.classList.remove("show");
+};
+
+resultBtn.onclick = async () => {
+  if (state.stars < 100) {
+    showToast("Недостаточно звёзд");
+    return;
+  }
+
+  state.stars -= 100;
+  save();
+
+  resultModal.classList.remove("show");
+
+  setTimeout(() => {
+    openDropBtn.click();
+  }, 250);
+};
   }
 }, 5200);
     }
