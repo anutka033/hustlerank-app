@@ -88,7 +88,7 @@ button {
   color: #9aa0ad;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .hero {
@@ -2801,7 +2801,9 @@ button {
   align-items: center;
   gap: 14px;
   padding: 0 20px;
-  transition: transform 5s cubic-bezier(.08, .6, 0, 1);
+  transition: transform 2.8s cubic-bezier(.08, .6, 0, 1);
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
 .roulette-card {
@@ -2813,12 +2815,15 @@ button {
   background: #111;
   border: 2px solid rgba(255, 255, 255, .08);
   position: relative;
+  contain: layout paint;
+  backface-visibility: hidden;
 }
 
 .roulette-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .roulette-line {
@@ -4941,14 +4946,14 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 88px;
-  height: 34px;
-  padding: 0 14px;
+  min-width: 78px;
+  height: 30px;
+  padding: 0 11px;
   border: 0;
-  border-radius: 14px;
+  border-radius: 13px;
   background: linear-gradient(135deg, #7c3cff 0%, #b63cff 48%, #ff3fd4 100%);
   color: #ffffff;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1;
   white-space: nowrap;

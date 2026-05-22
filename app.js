@@ -1492,17 +1492,34 @@ document.querySelectorAll(".shop-pack").forEach((pack) => {
   });
 });
 
-document.querySelectorAll(".rank-card").forEach(card => {
-  card.addEventListener("mousemove", (e) => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const rotateY = ((x / rect.width) - 0.5) * 12;
-    const rotateX = ((y / rect.height) - 0.5) * -12;
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+if (window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  document.querySelectorAll(".rank-card").forEach(card => {
+    let hoverFrame = 0;
+    let lastEvent = null;
+
+    card.addEventListener("mousemove", (e) => {
+      lastEvent = e;
+      if (hoverFrame) return;
+      hoverFrame = requestAnimationFrame(() => {
+        hoverFrame = 0;
+        if (!lastEvent) return;
+        const rect = card.getBoundingClientRect();
+        const x = lastEvent.clientX - rect.left;
+        const y = lastEvent.clientY - rect.top;
+        const rotateY = ((x / rect.width) - 0.5) * 10;
+        const rotateX = ((y / rect.height) - 0.5) * -10;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.025)`;
+      });
+    }, { passive: true });
+
+    card.addEventListener("mouseleave", () => {
+      if (hoverFrame) cancelAnimationFrame(hoverFrame);
+      hoverFrame = 0;
+      lastEvent = null;
+      card.style.transform = "";
+    });
   });
-  card.addEventListener("mouseleave", () => card.style.transform = "");
-});
+}
 
 document.addEventListener("input", function (event) {
   if (event.target.id === "giftUserId") {
@@ -1821,7 +1838,10 @@ const caseCards = [
   { id: "limited01", name: "Limited", img: "images/limited-01.png", rarity: "limited" }
 ];
 
-const DROP_WINNER_INDEX = 34;
+const DROP_WINNER_INDEX = 28;
+const DROP_ROULETTE_CARD_COUNT = 34;
+const DROP_ROULETTE_DURATION = 2800;
+const DROP_RESULT_DELAY = 3050;
 
 function getDropRarityClass(card) {
   const rarity = String(card?.rarity || "").toLowerCase();
@@ -1855,7 +1875,29 @@ function getDropCardById(cardId) {
 }
 
 function renderRouletteCard(card) {
-  return `<div class="roulette-card rarity-${getDropRarityClass(card)}"><img src="${card.img}"></div>`;
+  return `<div class="roulette-card rarity-${getDropRarityClass(card)}"><img src="${card.img}" loading="eager" decoding="async"></div>`;
+}
+
+function preloadDropImages() {
+  const urls = new Set();
+  caseCards.forEach(card => card?.img && urls.add(card.img));
+  modalCards.forEach(card => card?.img && urls.add(card.img));
+  urls.forEach((url) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.src = url;
+  });
+}
+
+preloadDropImages();
+
+function fillRouletteTrack(rouletteTrack, winner = null) {
+  if (!rouletteTrack) return;
+  const cards = Array.from({ length: DROP_ROULETTE_CARD_COUNT }, (_, index) => {
+    if (winner && index === DROP_WINNER_INDEX) return winner;
+    return caseCards[Math.floor(Math.random() * caseCards.length)];
+  });
+  rouletteTrack.innerHTML = cards.map(renderRouletteCard).join("");
 }
 
 function getRouletteTargetOffset(roulette, rouletteTrack, winnerIndex) {
@@ -1896,6 +1938,9 @@ if (closeDropModal) {
 if (openDropBtn) {
   openDropBtn.addEventListener("click", async function () {
     if (isDropRolling) return;
+    isDropRolling = true;
+    openDropBtn.disabled = true;
+
     let freeVipDrop = false;
     if (isVipActive() && !vipFreeDropClaimed) {
       freeVipDrop = true;
@@ -1903,17 +1948,6 @@ if (openDropBtn) {
       localStorage.setItem("vipFreeDropClaimed", "true");
     }
 
-   const dropResult = await openDropOnServer();
-
-if (!dropResult) {
-  isDropRolling = false;
-  return;
-}
-
-state.stars = Number(dropResult.stars ?? dropResult.coins) || state.stars;
-updateUI();
-
-    isDropRolling = true;
     lastDropCard = null;
     if (closeDropModal) closeDropModal.style.display = "none";
     if (dropModal) dropModal.classList.add("show");
@@ -1922,79 +1956,91 @@ updateUI();
     const rouletteTrack = document.getElementById("rouletteTrack");
     if (roulette) roulette.style.display = "flex";
     if (rouletteTrack) {
-      rouletteTrack.innerHTML = "";
-      for(let i = 0; i < 40; i++){
-        const random = caseCards[Math.floor(Math.random() * caseCards.length)];
-        rouletteTrack.innerHTML += renderRouletteCard(random);
-      }
-      const winner = getDropCardById(dropResult.cardId || dropResult.card?.id);
-
-if (!winner) {
-  showToast("Помилка карти");
-  isDropRolling = false;
-  return;
-}
-
-lastDropCard = winner;
-lastDropDuplicate = !!dropResult.duplicate;
-lastDropCompensation = Number(dropResult.compensation || 0);
-      rouletteTrack.children[DROP_WINNER_INDEX].outerHTML = renderRouletteCard(winner);
       rouletteTrack.style.transition = "none";
-      rouletteTrack.style.transform = "translateX(0px)";
-      setTimeout(() => {
-        rouletteTrack.style.transition = "transform 5s cubic-bezier(.08,.6,0,1)";
+      rouletteTrack.style.transform = "translate3d(0,0,0)";
+      fillRouletteTrack(rouletteTrack);
+    }
+
+    const dropResult = await openDropOnServer();
+
+    if (!dropResult) {
+      isDropRolling = false;
+      openDropBtn.disabled = false;
+      if (freeVipDrop) {
+        vipFreeDropClaimed = false;
+        localStorage.setItem("vipFreeDropClaimed", "false");
+      }
+      if (dropModal) dropModal.classList.remove("show");
+      return;
+    }
+
+    state.stars = Number(dropResult.stars ?? dropResult.coins) || state.stars;
+    updateUI();
+
+    const winner = getDropCardById(dropResult.cardId || dropResult.card?.id);
+    if (!winner || !rouletteTrack) {
+      showToast("Помилка карти");
+      isDropRolling = false;
+      openDropBtn.disabled = false;
+      return;
+    }
+
+    lastDropCard = winner;
+    lastDropDuplicate = !!dropResult.duplicate;
+    lastDropCompensation = Number(dropResult.compensation || 0);
+
+    fillRouletteTrack(rouletteTrack, winner);
+    rouletteTrack.style.transition = "none";
+    rouletteTrack.style.transform = "translate3d(0,0,0)";
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        rouletteTrack.style.transition = `transform ${DROP_ROULETTE_DURATION}ms cubic-bezier(.08,.6,0,1)`;
         const targetOffset = getRouletteTargetOffset(roulette, rouletteTrack, DROP_WINNER_INDEX);
-        rouletteTrack.style.transform = `translateX(-${targetOffset}px)`;
-      }, 100);
-      setTimeout(() => {
-  isDropRolling = false;
+        rouletteTrack.style.transform = `translate3d(-${targetOffset}px,0,0)`;
+      });
+    });
 
-  if (closeDropModal) {
-    closeDropModal.style.display = "block";
-  }
+    setTimeout(() => {
+      isDropRolling = false;
+      openDropBtn.disabled = false;
 
-  const resultModal = document.getElementById("dropResultModal");
-  const resultTitle = document.getElementById("dropResultTitle");
-  const resultImage = document.getElementById("dropResultImage");
-  const resultText = document.getElementById("dropResultText");
-  const resultBtn = document.getElementById("dropResultAgainBtn");
-  const cancelBtn = document.getElementById("dropResultCancelBtn");
+      if (closeDropModal) closeDropModal.style.display = "block";
 
-  if (resultModal && resultTitle && resultImage && resultText && resultBtn && lastDropCard) {
-    resultModal.classList.add("show");
+      const resultModal = document.getElementById("dropResultModal");
+      const resultTitle = document.getElementById("dropResultTitle");
+      const resultImage = document.getElementById("dropResultImage");
+      const resultText = document.getElementById("dropResultText");
+      const resultBtn = document.getElementById("dropResultAgainBtn");
+      const cancelBtn = document.getElementById("dropResultCancelBtn");
 
-    resultImage.src = lastDropCard.img || lastDropCard.image;
+      if (resultModal && resultTitle && resultImage && resultText && resultBtn && lastDropCard) {
+        resultModal.classList.add("show");
+        resultImage.src = lastDropCard.img || lastDropCard.image;
 
-    if (lastDropDuplicate) {
-      resultTitle.textContent = "Повторна карта";
-      resultText.textContent = `Компенсація: +${lastDropCompensation} ⭐`;
-    } else {
-      resultTitle.textContent = "Нова карта";
-      resultText.textContent = "Карта додана до вашого інвентарю!";
-    }
+        if (lastDropDuplicate) {
+          resultTitle.textContent = "Повторна карта";
+          resultText.textContent = `Компенсація: +${lastDropCompensation} ⭐`;
+        } else {
+          resultTitle.textContent = "Нова карта";
+          resultText.textContent = "Карта додана до вашого інвентарю!";
+        }
 
-    cancelBtn.onclick = () => {
-  resultModal.classList.remove("show");
-};
+        cancelBtn.onclick = () => {
+          resultModal.classList.remove("show");
+        };
 
-resultBtn.onclick = async () => {
-  if (state.stars < 100) {
-    showToast("Недостаточно звёзд");
-    return;
-  }
+        resultBtn.onclick = async () => {
+          if (state.stars < 100) {
+            showToast("Недостатньо зірок");
+            return;
+          }
 
-  state.stars -= 100;
-  save();
-
-  resultModal.classList.remove("show");
-
-  setTimeout(() => {
-    openDropBtn.click();
-  }, 250);
-};
-  }
-}, 5200);
-    }
+          resultModal.classList.remove("show");
+          setTimeout(() => openDropBtn.click(), 120);
+        };
+      }
+    }, DROP_RESULT_DELAY);
   });
 }
 
