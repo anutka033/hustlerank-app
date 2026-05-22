@@ -1752,7 +1752,7 @@ if (closeDropModal) {
     showToast(t("cardAddedInventory"));
     lastDropCard = null;
     if (dropModal) dropModal.classList.remove("show");
-    closeDropModal.style.display = "none";
+    if (closeDropModal) closeDropModal.style.display = "none";
   });
 }
 
@@ -1773,7 +1773,7 @@ if (!dropResult) {
   return;
 }
 
-state.stars = Number(dropResult.coins) || state.stars;
+state.stars = Number(dropResult.stars ?? dropResult.coins) || state.stars;
 updateUI();
 
     isDropRolling = true;
@@ -1809,40 +1809,35 @@ lastDropCompensation = Number(dropResult.compensation || 0);
         rouletteTrack.style.transform = `translateX(-${(34 * 134) - 1300}px)`;
       }, 100);
       setTimeout(() => {
-    isDropRolling = false;
+  isDropRolling = false;
 
-    if (closeDropModal) {
-        closeDropModal.style.display = "block";
+  if (closeDropModal) {
+    closeDropModal.style.display = "block";
+  }
 
-        if (lastDropDuplicate) {
-            closeDropModal.innerHTML = `
-                <div class="duplicate-drop">
-                    <div class="duplicate-title">
-                        Повторная карта
-                    </div>
+  const resultModal = document.getElementById("dropResultModal");
+  const resultTitle = document.getElementById("dropResultTitle");
+  const resultImage = document.getElementById("dropResultImage");
+  const resultText = document.getElementById("dropResultText");
+  const resultBtn = document.getElementById("dropResultClaimBtn");
 
-                    <img src="${lastDropCard.image}" class="duplicate-image">
+  if (resultModal && resultTitle && resultImage && resultText && resultBtn && lastDropCard) {
+    resultModal.classList.add("show");
 
-                    <div class="duplicate-compensation">
-                        Компенсация: +${lastDropCompensation} ⭐
-                    </div>
+    resultImage.src = lastDropCard.img || lastDropCard.image;
 
-                    <button class="duplicate-btn">
-                        Забрать
-                    </button>
-                </div>
-            `;
-
-            const btn = closeDropModal.querySelector(".duplicate-btn");
-
-            if (btn) {
-                btn.onclick = () => {
-                    closeDropModal.style.display = "none";
-                };
-            }
-        }
+    if (lastDropDuplicate) {
+      resultTitle.textContent = "Повторна карта";
+      resultText.textContent = `Компенсація: +${lastDropCompensation} ⭐`;
+    } else {
+      resultTitle.textContent = "Нова карта";
+      resultText.textContent = "Карта додана до вашого інвентарю!";
     }
 
+    resultBtn.onclick = () => {
+      resultModal.classList.remove("show");
+    };
+  }
 }, 5200);
     }
   });
