@@ -179,6 +179,75 @@ async function savePlayerToServer() {
     console.error("Save player fetch error:", error);
   }
 }
+
+async function claimServerReward(endpoint, payload = {}) {
+  if (!tg?.initData) {
+    throw new Error("Telegram initData відсутній. Відкрий гру через Telegram Mini App.");
+  }
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      initData: tg.initData,
+      userId: state.playerId,
+      ...payload
+    })
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok || data.ok === false) {
+    const error = new Error(data.message || data.error || "CLAIM_FAILED");
+    error.data = data;
+    error.status = response.status;
+    throw error;
+  }
+
+  if (data.player) applyServerPlayer(data.player);
+  return data;
+}
+
+function setDailyDropCooldown(nextClaimAt) {
+  const nextTime = new Date(nextClaimAt).getTime();
+  if (!Number.isFinite(nextTime)) return;
+
+  dailyDropEndTime = nextTime;
+  localStorage.setItem("dailyDropEndTime", dailyDropEndTime);
+  updateDailyTimer();
+}
+
+function setBonusCooldown(nextClaimAt) {
+  const nextTime = new Date(nextClaimAt).getTime();
+  if (!Number.isFinite(nextTime)) return;
+
+  localStorage.setItem("bonusClaimEndTime", String(nextTime));
+  state.bonusTaken = nextTime > Date.now();
+  save();
+  updateBonus();
+}
+
+function refreshBonusCooldown() {
+  const nextTime = safeNumber(localStorage.getItem("bonusClaimEndTime"), 0);
+  if (nextTime && nextTime <= Date.now()) {
+    localStorage.removeItem("bonusClaimEndTime");
+    state.bonusTaken = false;
+    save();
+    updateBonus();
+  }
+}
+
+function formatClaimError(error) {
+  const code = error?.data?.error || error?.message || "";
+
+  if (code.includes("ALREADY_CLAIMED")) return t("alreadyClaimed");
+  if (code.includes("PLAYER_NOT_FOUND")) return "Спершу перезапусти гру через Telegram.";
+  if (code.includes("initData") || code.includes("Telegram")) return "Відкрий гру через Telegram Mini App.";
+
+  return t("sendError") + (error?.message ? " " + error.message : "");
+}
 const state = {
   xp: safeNumber(localStorage.getItem("xp"), 0),
   playerId: getTelegramPlayerId(),
@@ -189,7 +258,7 @@ const state = {
   crystals: safeNumber(localStorage.getItem("crystals"), 0),
   vip: localStorage.getItem("vip") === "true",
   vipUntil: Number(localStorage.getItem("vipUntil")) || 0,
-  bonusTaken: localStorage.getItem("bonusTaken") === "true",
+  bonusTaken: localStorage.getItem("bonusTaken") === "true" && safeNumber(localStorage.getItem("bonusClaimEndTime"), 0) > Date.now(),
   inventory: JSON.parse(localStorage.getItem("inventory") || "[]"),
   boughtCards: JSON.parse(localStorage.getItem("boughtCards") || "[]"),
   cards: JSON.parse(localStorage.getItem("cards") || "{}"),
@@ -1203,13 +1272,30 @@ document.querySelectorAll("[data-open]").forEach(function (button) {
 if (earnBtn) earnBtn.addEventListener("click", () => document.querySelector('[data-screen="tasks"]')?.click());
 
 if (bonusBtn) {
-  bonusBtn.addEventListener("click", function () {
-    if (state.bonusTaken) return;
-    state.xp += 50;
-    state.stars += 1;
-    state.bonusTaken = true;
-    updateUI();
-    showToast("+50 XP " + t("and") + " +1 ⭐");
+  bonusBtn.addEventListener("click", async function () {
+    if (state.bonusTaken || bonusBtn.disabled) return;
+
+    bonusBtn.disabled = true;
+
+    try {
+      const data = await claimServerReward("/api/bonus/claim");
+      const reward = data.reward || { xp: 50, stars: 1 };
+      if (data.nextClaimAt) {
+        setBonusCooldown(data.nextClaimAt);
+      } else {
+        state.bonusTaken = true;
+        save();
+        updateUI();
+      }
+      showToast("+" + reward.xp + " XP " + t("and") + " +" + reward.stars + " ⭐");
+    } catch (error) {
+      if (error?.data?.nextClaimAt) {
+        setBonusCooldown(error.data.nextClaimAt);
+      } else {
+        bonusBtn.disabled = false;
+      }
+      showToast(formatClaimError(error));
+    }
   });
 }
 
@@ -2139,16 +2225,25 @@ function updateDailyTimer() {
 }
 
 if (dailyClaimBtn) {
-  dailyClaimBtn.addEventListener("click", function () {
-    if (dailyDropEndTime > Date.now()) return;
-    const gainedStars = isVipActive() ? 100 : 50;
-    state.stars += gainedStars;
-    const gainedXp = addXp(500);
-    updateUI();
-    dailyDropEndTime = Date.now() + 24 * 60 * 60 * 1000;
-    localStorage.setItem("dailyDropEndTime", dailyDropEndTime);
-    updateDailyTimer();
-    showToast("+" + gainedStars + " ⭐ " + t("and") + " +" + gainedXp + " XP");
+  dailyClaimBtn.addEventListener("click", async function () {
+    if (dailyDropEndTime > Date.now() || dailyClaimBtn.disabled) return;
+
+    dailyClaimBtn.disabled = true;
+
+    try {
+      const data = await claimServerReward("/api/daily/claim");
+      const reward = data.reward || { stars: 50, xp: 500 };
+      if (data.nextClaimAt) setDailyDropCooldown(data.nextClaimAt);
+      updateUI();
+      showToast("+" + reward.stars + " ⭐ " + t("and") + " +" + reward.xp + " XP");
+    } catch (error) {
+      if (error?.data?.nextClaimAt) {
+        setDailyDropCooldown(error.data.nextClaimAt);
+      } else {
+        dailyClaimBtn.disabled = false;
+      }
+      showToast(formatClaimError(error));
+    }
   });
 }
 
@@ -2646,9 +2741,11 @@ if (navButtons[0]) navButtons[0].classList.add("active");
 updateUI();
 updateCardsView();
 updateDailyTimer();
+refreshBonusCooldown();
 loadReferrals();
 loadIncomingCards();
 setInterval(updateDailyTimer, 1000);
+setInterval(refreshBonusCooldown, 60000);
 setInterval(updateTreasuryUI, 60000);
 updateTreasuryUI();
 updateOnlineCollectors();
