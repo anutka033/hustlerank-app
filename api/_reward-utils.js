@@ -234,4 +234,3 @@ export function secondsUntil(date) {
   if (!Number.isFinite(target)) return 0;
   return Math.max(0, Math.ceil((target - Date.now()) / 1000));
 }
-
