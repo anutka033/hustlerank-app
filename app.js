@@ -307,6 +307,7 @@ const state = {
   inventory: JSON.parse(localStorage.getItem("inventory") || "[]"),
   boughtCards: JSON.parse(localStorage.getItem("boughtCards") || "[]"),
   cards: JSON.parse(localStorage.getItem("cards") || "{}"),
+  favoriteCardId: localStorage.getItem("favoriteCardId") || "",
   lastLoginDate: localStorage.getItem("lastLoginDate") || "",
   dailyStreak: safeNumber(localStorage.getItem("dailyStreak"), 0),
   lastTreasuryClaim: safeNumber(localStorage.getItem("lastTreasuryClaim"), Date.now())
@@ -1048,6 +1049,13 @@ const screens = {
 };
 
 const navButtons = document.querySelectorAll(".bottom-nav button");
+const favoriteCardWidget = document.getElementById("favoriteCardWidget");
+const favoriteCardImage = document.getElementById("favoriteCardImage");
+const favoriteCardEmpty = document.getElementById("favoriteCardEmpty");
+const favoriteCardPickerModal = document.getElementById("favoriteCardPickerModal");
+const favoriteCardPickerGrid = document.getElementById("favoriteCardPickerGrid");
+const favoriteCardPickerClose = document.getElementById("favoriteCardPickerClose");
+let favoriteCardAnimationTimers = [];
 
 function save() {
   localStorage.setItem("xp", state.xp);
@@ -1062,10 +1070,160 @@ function save() {
   localStorage.setItem("cards", JSON.stringify(state.cards));
   localStorage.setItem("inventory", JSON.stringify(state.inventory || []));
   localStorage.setItem("boughtCards", JSON.stringify(state.boughtCards || []));
+  localStorage.setItem("favoriteCardId", state.favoriteCardId || "");
   localStorage.setItem("lastLoginDate", state.lastLoginDate);
   localStorage.setItem("dailyStreak", state.dailyStreak);
   localStorage.setItem("lastTreasuryClaim", state.lastTreasuryClaim);
   schedulePlayerSaveToServer();
+}
+
+function getCardIdFromStorageItem(item) {
+  if (!item) return "";
+  if (typeof item === "string") return item;
+  return item.id || item.cardId || item.card_id || "";
+}
+
+function isCardOwned(cardId) {
+  if (!cardId) return false;
+  if (state.cards && state.cards[cardId] && state.cards[cardId].unlocked) return true;
+  if ((state.boughtCards || []).some(item => getCardIdFromStorageItem(item) === cardId)) return true;
+  if ((state.inventory || []).some(item => getCardIdFromStorageItem(item) === cardId)) return true;
+  return false;
+}
+
+function getOwnedFavoriteCards() {
+  const ownedIds = new Set();
+
+  Object.keys(state.cards || {}).forEach(function(cardId) {
+    if (state.cards[cardId] && state.cards[cardId].unlocked) ownedIds.add(cardId);
+  });
+
+  (state.boughtCards || []).forEach(function(item) {
+    const cardId = getCardIdFromStorageItem(item);
+    if (cardId) ownedIds.add(cardId);
+  });
+
+  (state.inventory || []).forEach(function(item) {
+    const cardId = getCardIdFromStorageItem(item);
+    if (cardId) ownedIds.add(cardId);
+  });
+
+  return modalCards.filter(card => ownedIds.has(card.id));
+}
+
+function getFavoriteCardData() {
+  if (!state.favoriteCardId) return null;
+  const card = modalCards.find(item => item.id === state.favoriteCardId);
+  if (!card || !isCardOwned(card.id)) return null;
+  return card;
+}
+
+function clearFavoriteCardAnimation() {
+  favoriteCardAnimationTimers.forEach(timer => clearTimeout(timer));
+  favoriteCardAnimationTimers = [];
+  if (favoriteCardWidget) {
+    favoriteCardWidget.classList.remove("is-cleaning", "is-spotted", "is-shining");
+  }
+}
+
+function playFavoriteCardScene() {
+  if (!favoriteCardWidget || !getFavoriteCardData()) return;
+
+  clearFavoriteCardAnimation();
+  favoriteCardWidget.classList.remove("is-cleaning", "is-spotted", "is-shining");
+  void favoriteCardWidget.offsetWidth;
+  favoriteCardWidget.classList.add("is-cleaning");
+
+  favoriteCardAnimationTimers.push(setTimeout(function() {
+    favoriteCardWidget.classList.add("is-spotted");
+  }, 3000));
+
+  favoriteCardAnimationTimers.push(setTimeout(function() {
+    favoriteCardWidget.classList.add("is-shining");
+  }, 3600));
+
+  favoriteCardAnimationTimers.push(setTimeout(function() {
+    favoriteCardWidget.classList.remove("is-cleaning", "is-spotted", "is-shining");
+  }, 6100));
+}
+
+function renderFavoriteCard() {
+  if (!favoriteCardWidget || !favoriteCardImage || !favoriteCardEmpty) return;
+
+  const card = getFavoriteCardData();
+
+  if (!card) {
+    if (state.favoriteCardId && !isCardOwned(state.favoriteCardId)) {
+      state.favoriteCardId = "";
+      localStorage.removeItem("favoriteCardId");
+    }
+    favoriteCardImage.src = "";
+    favoriteCardImage.classList.add("hidden");
+    favoriteCardEmpty.classList.remove("hidden");
+    favoriteCardWidget.classList.remove("has-card");
+    favoriteCardWidget.title = "Обрати улюблену карту";
+    clearFavoriteCardAnimation();
+    return;
+  }
+
+  const localizedName = t("card_" + card.id + "_name", card.name);
+  favoriteCardImage.src = card.img;
+  favoriteCardImage.alt = localizedName;
+  favoriteCardImage.classList.remove("hidden");
+  favoriteCardEmpty.classList.add("hidden");
+  favoriteCardWidget.classList.add("has-card");
+  favoriteCardWidget.title = localizedName + " — улюблена карта";
+}
+
+function renderFavoriteCardPicker() {
+  if (!favoriteCardPickerGrid) return;
+
+  const ownedCards = getOwnedFavoriteCards();
+  favoriteCardPickerGrid.innerHTML = "";
+
+  if (!ownedCards.length) {
+    favoriteCardPickerGrid.innerHTML = '<div class="favorite-card-picker-empty">У тебе ще немає відкритих карт. Спочатку отримай карту в дропі або купи її в магазині.</div>';
+    return;
+  }
+
+  ownedCards.forEach(function(card) {
+    const item = document.createElement("button");
+    const localizedName = t("card_" + card.id + "_name", card.name);
+    const localizedRarity = t("card_" + card.id + "_rarity", card.rarity);
+
+    item.type = "button";
+    item.className = "favorite-card-picker-item";
+    if (card.id === state.favoriteCardId) item.classList.add("selected");
+    item.innerHTML = `
+      <img src="${card.img}" alt="${localizedName}">
+      <span>${localizedName}</span>
+      <small>${localizedRarity}</small>
+    `;
+
+    item.addEventListener("click", function() {
+      state.favoriteCardId = card.id;
+      localStorage.setItem("favoriteCardId", card.id);
+      renderFavoriteCard();
+      if (favoriteCardPickerModal) favoriteCardPickerModal.classList.remove("show");
+      document.querySelector(".bottom-nav")?.classList.remove("hide-nav");
+      showToast("Улюблену карту обрано");
+      save();
+      playFavoriteCardScene();
+    });
+
+    favoriteCardPickerGrid.appendChild(item);
+  });
+}
+
+function openFavoriteCardPicker() {
+  renderFavoriteCardPicker();
+  if (favoriteCardPickerModal) favoriteCardPickerModal.classList.add("show");
+  document.querySelector(".bottom-nav")?.classList.add("hide-nav");
+}
+
+function closeFavoriteCardPicker() {
+  if (favoriteCardPickerModal) favoriteCardPickerModal.classList.remove("show");
+  document.querySelector(".bottom-nav")?.classList.remove("hide-nav");
 }
 
 function rankByLevel(level) {
@@ -1273,6 +1431,7 @@ if (taskStarsEl) {
   updateBonus();
   updateDrops();
   updateCards();
+  renderFavoriteCard();
 
   const vipBadge = document.getElementById("vipBadge");
   if (vipBadge) vipBadge.style.display = isVipActive() ? "inline-flex" : "none";
@@ -1323,6 +1482,12 @@ function openScreen(name) {
 
   if (name === "tasks") renderTasks();
   if (name === "game") startCountdown();
+  if (name === "home") {
+    renderFavoriteCard();
+    playFavoriteCardScene();
+  } else {
+    clearFavoriteCardAnimation();
+  }
 
   const treasury = document.getElementById("treasuryWidget");
   const sideMenu = document.getElementById("sideMenu");
@@ -1357,6 +1522,13 @@ document.querySelectorAll("[data-open]").forEach(function (button) {
 });
 
 if (earnBtn) earnBtn.addEventListener("click", () => document.querySelector('[data-screen="tasks"]')?.click());
+if (favoriteCardWidget) favoriteCardWidget.addEventListener("click", openFavoriteCardPicker);
+if (favoriteCardPickerClose) favoriteCardPickerClose.addEventListener("click", closeFavoriteCardPicker);
+if (favoriteCardPickerModal) {
+  favoriteCardPickerModal.addEventListener("click", function(event) {
+    if (event.target === favoriteCardPickerModal) closeFavoriteCardPicker();
+  });
+}
 
 if (bonusBtn) {
   bonusBtn.addEventListener("click", async function () {
