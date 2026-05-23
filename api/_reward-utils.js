@@ -4,7 +4,7 @@ export const SUPABASE_URL = (process.env.SUPABASE_URL || "https://yxwsgvsejgmzoc
 export const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
 export const BOT_TOKEN = process.env.BOT_TOKEN;
 
-const PLAYER_ID_COLUMNS = ["telegram_id", "user_id", "player_id", "id"];
+const PLAYER_ID_COLUMNS = ["username", "telegram_id"];
 
 export function sendMethodNotAllowed(res) {
   res.setHeader("Allow", "POST");
@@ -188,7 +188,7 @@ export async function updatePlayerByColumn({ idColumn, userId, patch, eligibilit
 
   if (eligibilityOr) queryParts.push(`or=${encodeURIComponent(`(${eligibilityOr})`)}`);
 
-  const optionalAliasColumns = new Set(["coins", "gems", "maxXp", "vipUntil"]);
+  const optionalAliasColumns = new Set(["coins", "gems", "crystals", "maxXp", "vipUntil"]);
   let currentPatch = { ...patch };
 
   for (let attempt = 0; attempt < 6; attempt += 1) {
@@ -234,3 +234,4 @@ export function secondsUntil(date) {
   if (!Number.isFinite(target)) return 0;
   return Math.max(0, Math.ceil((target - Date.now()) / 1000));
 }
+
