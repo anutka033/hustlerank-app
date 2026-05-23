@@ -4,7 +4,7 @@ export const SUPABASE_URL = (process.env.SUPABASE_URL || "https://yxwsgvsejgmzoc
 export const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY;
 export const BOT_TOKEN = process.env.BOT_TOKEN;
 
-const PLAYER_ID_COLUMNS = ["username", "telegram_id"];
+const PLAYER_ID_COLUMNS = ["username"];
 
 export function sendMethodNotAllowed(res) {
   res.setHeader("Allow", "POST");
