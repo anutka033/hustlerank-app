@@ -9,14 +9,45 @@ window.__HUSTLERANK_APP_LOADED__ = true;
 
 const tg = window.Telegram?.WebApp;
 
+function getTelegramWebApp() {
+  return window.Telegram?.WebApp || tg || null;
+}
+
+function getTelegramInitData() {
+  const webApp = getTelegramWebApp();
+  const initData = webApp?.initData || sessionStorage.getItem("telegramInitData") || "";
+
+  if (initData) {
+    sessionStorage.setItem("telegramInitData", initData);
+  }
+
+  return initData;
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForTelegramInitData(maxAttempts = 10) {
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const initData = getTelegramInitData();
+    if (initData) return initData;
+    await delay(100);
+  }
+
+  return "";
+}
+
 if (tg) {
   tg.ready();
   tg.expand();
+  getTelegramInitData();
 
   document.addEventListener("click", async () => {
     try {
-      if (typeof tg.requestFullscreen === "function") {
-        await tg.requestFullscreen();
+      const webApp = getTelegramWebApp();
+      if (typeof webApp?.requestFullscreen === "function") {
+        await webApp.requestFullscreen();
       }
     } catch (e) {
       console.warn("Fullscreen не підтримується в цій версії Telegram WebApp:", e?.message || e);
@@ -37,7 +68,7 @@ function safeNumber(value, fallback = 0) {
   return Number.isFinite(number) ? number : fallback;
 }
 function getTelegramPlayerId() {
-  const telegramId = tg?.initDataUnsafe?.user?.id;
+  const telegramId = getTelegramWebApp()?.initDataUnsafe?.user?.id;
 
   if (telegramId) {
     localStorage.setItem("playerId", String(telegramId));
@@ -56,8 +87,13 @@ function getTelegramPlayerId() {
   return guestId;
 }
 async function authPlayerOnServer() {
-  if (!tg?.initData) {
-    console.warn("Telegram initData отсутствует.");
+  const initData = await waitForTelegramInitData();
+
+  if (!initData) {
+    console.warn("Telegram initData отсутствует.", {
+      hasTelegramObject: Boolean(window.Telegram?.WebApp),
+      platform: getTelegramWebApp()?.platform || "unknown"
+    });
     return null;
   }
 
@@ -68,7 +104,7 @@ async function authPlayerOnServer() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        initData: tg.initData
+        initData
       })
     });
 
@@ -129,7 +165,7 @@ function applyServerPlayer(player) {
 function schedulePlayerSaveToServer() {
   if (!window.serverPlayerLoaded) return;
   if (isApplyingServerPlayer) return;
-  if (!tg?.initData) return;
+  if (!getTelegramInitData()) return;
 
   clearTimeout(serverSaveTimer);
   serverSaveTimer = setTimeout(() => {
@@ -140,7 +176,9 @@ function schedulePlayerSaveToServer() {
 async function savePlayerToServer() {
   if (!window.serverPlayerLoaded) return;
   if (isApplyingServerPlayer) return;
-  if (!tg?.initData) return;
+
+  const initData = await waitForTelegramInitData();
+  if (!initData) return;
 
   const playerPayload = {
     level: Math.max(1, Number(state.level) || 1),
@@ -163,7 +201,7 @@ async function savePlayerToServer() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        initData: tg.initData,
+        initData,
         player: playerPayload
       })
     });
@@ -181,7 +219,14 @@ async function savePlayerToServer() {
 }
 
 async function claimServerReward(endpoint, payload = {}) {
-  if (!tg?.initData) {
+  const initData = await waitForTelegramInitData();
+
+  if (!initData) {
+    console.warn("Telegram initData відсутній для claim-запиту.", {
+      endpoint,
+      hasTelegramObject: Boolean(window.Telegram?.WebApp),
+      platform: getTelegramWebApp()?.platform || "unknown"
+    });
     throw new Error("Telegram initData відсутній. Відкрий гру через Telegram Mini App.");
   }
 
@@ -191,7 +236,7 @@ async function claimServerReward(endpoint, payload = {}) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      initData: tg.initData,
+      initData,
       userId: state.playerId,
       ...payload
     })
@@ -1867,7 +1912,9 @@ if (claimRefBtn) {
 
 const openDropBtn = document.getElementById("openDropBtn");
 async function openDropOnServer() {
-  if (!tg?.initData) {
+  const initData = await waitForTelegramInitData();
+
+  if (!initData) {
     showToast("Помилка Telegram авторизації");
     return null;
   }
@@ -1879,7 +1926,7 @@ async function openDropOnServer() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        initData: tg.initData
+        initData
       })
     });
 
