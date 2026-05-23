@@ -987,10 +987,30 @@ const modalCards = [
 },
 ];
 
+function getOwnedCardsCount() {
+  const owned = new Set();
+
+  Object.keys(state.cards || {}).forEach((id) => {
+    if (state.cards[id]?.unlocked) owned.add(String(id));
+  });
+
+  (state.boughtCards || []).forEach((card) => {
+    const id = typeof card === "string" ? card : card?.id;
+    if (id) owned.add(String(id));
+  });
+
+  (state.inventory || []).forEach((card) => {
+    const id = typeof card === "string" ? card : card?.id;
+    if (id) owned.add(String(id));
+  });
+
+  return owned.size;
+}
+
 const tasks = [
   { id: "tg_channel", title: "Підписка на канал", desc: "Приєднуйся до нашої спільноти", icon: "📢", reward: { xp: 500, crystals: 20, stars: 0 }, link: "https://t.me/hustlerank", type: "social" },
   { id: "daily_checkin", title: "Щоденний бонус", desc: "Заходь у гру кожен день", icon: "📅", reward: { xp: 200, crystals: 5, stars: 1 }, type: "daily" },
-  { id: "card_collector", title: "Колекціонер", desc: "Збери 5 будь-яких карт", icon: "🃏", reward: { xp: 1000, crystals: 50, stars: 5 }, type: "achievement", check: () => Object.keys(state.cards).filter(id => state.cards[id].unlocked).length >= 5 },
+  { id: "card_collector", title: "Колекціонер", desc: "Збери 5 будь-яких карт", icon: "🃏", reward: { xp: 1000, crystals: 50, stars: 5 }, type: "achievement", check: () => getOwnedCardsCount() >= 5 },
   { id: "invite_friends", title: "Запроси друга", desc: "Грай разом з друзями", icon: "👥", reward: { xp: 1500, crystals: 100, stars: 10 }, link: "https://t.me/HustleRank033Bot", type: "social" }
 ];
 
