@@ -1,3 +1,7 @@
+html {
+  overscroll-behavior: none;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -7,7 +11,10 @@ body {
   background: #03070d;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
+  overscroll-behavior: none;
+  touch-action: manipulation;
 }
+
 
 button {
   font-family: inherit;

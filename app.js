@@ -35,6 +35,11 @@ async function waitForTelegramInitData(maxAttempts = 10) {
 if (tg) {
   tg.ready();
   tg.expand();
+
+  if (typeof tg.disableVerticalSwipes === "function") {
+    tg.disableVerticalSwipes();
+  }
+
   getTelegramInitData();
 
   document.addEventListener("click", async () => {
@@ -48,6 +53,7 @@ if (tg) {
     }
   }, { once: true });
 }
+
 
 const SUPABASE_URL = "https://yxwsgvsejgmzocgnuukn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_CAb0_OQcsJmBLymP1qmAvA_OWW_bJED";
