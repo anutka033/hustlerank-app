@@ -175,10 +175,21 @@ function encodeFilterValue(value) {
 }
 
 function extractMissingColumn(error) {
-  const message = String(error?.message || error?.data?.message || "");
-  const match = message.match(/(?:column|Column) ['\"]?([A-Za-z0-9_]+)['\"]?/i);
-  return match ? match[1] : "";
+  const message = String(error?.message || error?.data?.message || error?.data?.details || "");
+  const patterns = [
+    /Could not find the ['\"]([A-Za-z0-9_]+)['\"] column/i,
+    /['\"]([A-Za-z0-9_]+)['\"] column of ['\"]?players['\"]?/i,
+    /(?:column|Column) ['\"]?([A-Za-z0-9_]+)['\"]?/i
+  ];
+
+  for (const pattern of patterns) {
+    const match = message.match(pattern);
+    if (match?.[1]) return match[1];
+  }
+
+  return "";
 }
+
 
 export async function updatePlayerByColumn({ idColumn, userId, patch, eligibilityOr = "" }) {
   const queryParts = [
@@ -188,10 +199,12 @@ export async function updatePlayerByColumn({ idColumn, userId, patch, eligibilit
 
   if (eligibilityOr) queryParts.push(`or=${encodeURIComponent(`(${eligibilityOr})`)}`);
 
-  const optionalAliasColumns = new Set(["coins", "gems", "crystals", "maxXp", "vipUntil"]);
+  const optionalAliasColumns = new Set(["stars", "coins", "crystals", "gems", "max_xp", "maxXp", "vipUntil"]);
+
   let currentPatch = { ...patch };
 
-  for (let attempt = 0; attempt < 6; attempt += 1) {
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+
     try {
       const rows = await supabaseRequest(`players?${queryParts.join("&")}`, {
         method: "PATCH",
