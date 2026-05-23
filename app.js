@@ -2781,13 +2781,16 @@ function endGame() {
     state.xp += gameXp;
     hasGameReward = true;
   }
-  const reward = Math.floor(gameScore / 5);
+  const reward = Math.max(0, Math.floor(gameScore));
   if (reward > 0) {
     state.crystals += reward;
     hasGameReward = true;
     showPush(t("gameFinishedTitle"), t("gameEarned").replace("{amount}", reward), "🎮");
   }
-  if (hasGameReward) updateUI();
+  if (hasGameReward) {
+    save();
+    updateUI();
+  }
 }
 
 function restartGame() {
