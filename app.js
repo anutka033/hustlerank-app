@@ -1,12 +1,6 @@
 (() => {
 "use strict";
 
-if (window.__HUSTLERANK_APP_LOADED__) {
-  console.warn("HustleRank app.js вже був підключений. Повторний запуск зупинено.");
-  return;
-}
-window.__HUSTLERANK_APP_LOADED__ = true;
-
 const tg = window.Telegram?.WebApp;
 
 function getTelegramWebApp() {
