@@ -5530,3 +5530,74 @@ body {
     transform: translate(-50%, -50%) scale(0.88);
   }
 }
+/* ===== FAVORITE CARD: BIGGER + LOWER POSITION PATCH =====
+   Вставити В САМИЙ КІНЕЦЬ style.css, нижче попереднього favorite-card CSS.
+   Цей патч тільки збільшує карту і опускає її до зони напису HR.
+*/
+
+.favorite-card-stage {
+  top: 58% !important;
+  width: 190px !important;
+  height: 230px !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.favorite-card-widget {
+  width: 168px !important;
+  height: 210px !important;
+  border-radius: 22px !important;
+  transform: rotateX(58deg) rotateZ(-2deg) translateY(8px) scale(1) !important;
+  box-shadow:
+    0 30px 52px rgba(0, 0, 0, 0.52),
+    0 0 30px rgba(168, 85, 247, 0.30),
+    inset 0 0 20px rgba(255, 255, 255, 0.06) !important;
+}
+
+.favorite-card-widget:active {
+  transform: rotateX(55deg) rotateZ(-2deg) translateY(10px) scale(0.97) !important;
+}
+
+.favorite-card-image,
+.favorite-card-empty {
+  border-radius: 22px !important;
+}
+
+.favorite-card-shadow {
+  width: 160px !important;
+  height: 38px !important;
+  bottom: -22px !important;
+}
+
+.favorite-martian {
+  width: 22px !important;
+  height: 27px !important;
+}
+
+.favorite-martian-left {
+  left: 26px !important;
+}
+
+.favorite-martian-right {
+  right: 26px !important;
+}
+
+@media (max-height: 760px) {
+  .favorite-card-stage {
+    top: 59% !important;
+    transform: translate(-50%, -50%) scale(0.92) !important;
+  }
+}
+
+@media (max-height: 690px) {
+  .favorite-card-stage {
+    top: 58% !important;
+    transform: translate(-50%, -50%) scale(0.82) !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .favorite-card-stage {
+    top: 58% !important;
+    transform: translate(-50%, -50%) scale(0.86) !important;
+  }
+}
