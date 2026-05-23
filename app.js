@@ -2412,7 +2412,7 @@ function updateTreasuryUI() {
   return count;
 }
 
-document.addEventListener("click", function(e) {
+document.addEventListener("click", async function(e) {
   if (e.target.closest("#treasuryWidget")) {
     const amount = updateTreasuryUI();
     const modal = document.getElementById("treasuryModal");
@@ -2425,17 +2425,32 @@ document.addEventListener("click", function(e) {
   }
 
   if (e.target.closest("#confirmTreasuryBtn")) {
-    const amount = updateTreasuryUI();
-    if (amount > 0) {
-      state.crystals += amount;
-      state.lastTreasuryClaim = Date.now();
+    const btn = e.target.closest("#confirmTreasuryBtn");
+    if (btn.disabled) return;
+
+    btn.disabled = true;
+
+    try {
+      const data = await claimServerReward("/api/treasury/claim");
+      const amount = data?.reward?.crystals || 0;
+
+      if (data?.treasury?.claimedAt) {
+        state.lastTreasuryClaim = new Date(data.treasury.claimedAt).getTime();
+      }
+
       updateUI();
+      updateTreasuryUI();
       showToast(t("claimedAmount") + amount + " 💎");
-    }
-    const modal = document.getElementById("treasuryModal");
-    if (modal) {
-      modal.classList.remove("active");
-      setTimeout(() => modal.style.display = "none", 300);
+    } catch (error) {
+      showToast(formatClaimError(error));
+    } finally {
+      btn.disabled = false;
+
+      const modal = document.getElementById("treasuryModal");
+      if (modal) {
+        modal.classList.remove("active");
+        setTimeout(() => modal.style.display = "none", 300);
+      }
     }
   }
 
