@@ -73,6 +73,25 @@
         <span class="arrow">›</span>
       </button>
 
+      <div class="favorite-card-stage" aria-label="Улюблена карта">
+        <button id="favoriteCardWidget" class="favorite-card-widget" type="button">
+          <div id="favoriteCardEmpty" class="favorite-card-empty">
+            <span class="favorite-card-plus">＋</span>
+            <span>Обрати карту</span>
+          </div>
+
+          <img id="favoriteCardImage" class="favorite-card-image hidden" src="" alt="Улюблена карта">
+
+          <div id="favoriteCardCleaners" class="favorite-card-cleaners" aria-hidden="true">
+            <span class="favorite-martian favorite-martian-left"><i></i></span>
+            <span class="favorite-martian favorite-martian-right"><i></i></span>
+          </div>
+
+          <div class="favorite-card-shadow"></div>
+          <div class="favorite-card-shine"></div>
+        </button>
+      </div>
+
 <div id="treasuryWidget" class="treasury-widget">
     <div class="chest-icon">🎁</div>
     <div class="chest-info">
@@ -685,6 +704,15 @@
 </div>
 
 </div>
+<div id="favoriteCardPickerModal" class="favorite-card-picker-modal">
+  <div class="favorite-card-picker-box">
+    <button id="favoriteCardPickerClose" class="favorite-card-picker-close" type="button">×</button>
+    <h3>Обери улюблену карту</h3>
+    <p>Вона буде стояти по центру головного екрана.</p>
+    <div id="favoriteCardPickerGrid" class="favorite-card-picker-grid"></div>
+  </div>
+</div>
+
 <div id="dropResultModal" class="drop-result-modal">
   <div class="drop-result-box">
     <div id="dropResultTitle" class="drop-result-title" data-i18n="newCard">Нова карта!</div>
