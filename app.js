@@ -1279,7 +1279,27 @@ if (taskStarsEl) {
   save();
 }
 
+function resetHomeScroll(name) {
+  if (name !== "home") return;
+
+  const reset = () => {
+    window.scrollTo(0, 0);
+
+    if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    const homeScreen = screens.home || document.getElementById("homeScreen");
+    if (homeScreen) homeScreen.scrollTop = 0;
+  };
+
+  reset();
+  requestAnimationFrame(reset);
+  setTimeout(reset, 50);
+}
+
 function openScreen(name) {
+
   Object.values(screens).forEach(function (screen) {
     if (screen) {
       screen.classList.remove("active-screen");
@@ -1307,6 +1327,8 @@ function openScreen(name) {
     if (treasury) treasury.style.display = "none";
     if (sideMenu) sideMenu.style.display = "none";
   }
+
+  resetHomeScroll(name);
 }
 
 navButtons.forEach(function (button) {
