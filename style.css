@@ -6473,3 +6473,13 @@ body {
 .leaderboard-btn:active {
   transform: scale(0.9);
 }
+/* Опускаємо весь блок профілю нижче логотипу */
+.hero {
+  margin-top: 35px; /* Регулюй це число (більше - нижче), щоб ідеально підігнати під логотип */
+  transition: margin-top 0.3s ease;
+}
+
+/* Відступ для кнопки "Заробити XP", щоб вона не прилипала до профілю */
+.earn-card {
+  margin-top: 5px;
+}
