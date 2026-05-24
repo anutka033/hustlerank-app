@@ -3161,11 +3161,22 @@ if (giveawayCloseBtn && giveawayModal) {
     });
 }
   // --- ТАБЛИЦЯ ЛІДЕРІВ ---
+  function getAvatarByLevel(level) {
+    const lvl = Number(level) || 1;
+    if (lvl >= 25) return "img/avatars/void_king.png";
+    if (lvl >= 16) return "img/avatars/legend.png";
+    if (lvl >= 10) return "img/avatars/diamond.png";
+    if (lvl >= 7) return "img/avatars/pro.png";
+    if (lvl >= 4) return "img/avatars/hustler.png";
+    if (lvl >= 2) return "img/avatars/rookie.png";
+    return "img/avatars/newbie.png";
+  }
+
   async function loadLeaderboard() {
     const listEl = document.getElementById("leaderboardList");
     if (!listEl) return;
 
-    listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">Завантаження...</div>';
+    listEl.innerHTML = '<div style="text-align:center; padding:40px; color:#888; font-size:14px;">Шукаємо найкращих...</div>';
 
     try {
       const { data, error } = await supabaseClient
@@ -3179,7 +3190,7 @@ if (giveawayCloseBtn && giveawayModal) {
       listEl.innerHTML = "";
       
       if (!data || data.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center; padding:20px;">Список порожній</div>';
+        listEl.innerHTML = '<div style="text-align:center; padding:40px; color:#666;">Поки що нікого немає</div>';
         return;
       }
 
@@ -3188,48 +3199,56 @@ if (giveawayCloseBtn && giveawayModal) {
         const item = document.createElement("div");
         item.className = `leader-item ${isMe ? 'is-me' : ''}`;
         
-        let medal = "";
-        if (index === 0) medal = "🥇 ";
-        else if (index === 1) medal = "🥈 ";
-        else if (index === 2) medal = "🥉 ";
+        const avatarSrc = getAvatarByLevel(player.level);
+        const rank = index + 1;
 
         item.innerHTML = `
-          <div style="display:flex; align-items:center;">
-            <span style="width:30px; font-weight:bold; color:#888;">${index + 1}</span>
-            <span style="margin-left:5px;">${medal}ID: ${player.username} ${isMe ? '<b style="color:#8e44ad;">(Ти)</b>' : ''}</span>
+          <div class="leader-rank">${rank}</div>
+          <img class="leader-avatar" src="${avatarSrc}" alt="avatar" onerror="this.src='img/avatars/newbie.png'">
+          <div class="leader-info">
+            <span class="leader-name">${player.username} ${isMe ? '<small>(Ти)</small>' : ''}</span>
+            <span class="leader-level">Lvl ${player.level || 1}</span>
           </div>
-          <b style="color:#fff;">💎 ${(player.gems || 0).toLocaleString()}</b>
+          <div class="leader-score">
+            <b>💎 ${(player.gems || 0).toLocaleString()}</b>
+            <small>Gems</small>
+          </div>
         `;
         listEl.appendChild(item);
       });
     } catch (e) {
       console.error("Leaderboard error:", e);
-      listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#ff4d4d;">Помилка завантаження</div>';
+      listEl.innerHTML = '<div style="text-align:center; padding:40px; color:#ff4d4d;">Помилка бази даних</div>';
     }
   }
 
-  // Обробники натискань для модального вікна
-  document.getElementById("openLeaderboardBtn")?.addEventListener("click", () => {
+  const openLeaderboard = () => {
     const modal = document.getElementById("leaderboardModal");
     if (modal) {
       modal.style.display = "flex";
-      // Додаємо невелику затримку для анімації появи, якщо вона є
+      // Блокуємо прокрутку body
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+      
       setTimeout(() => modal.classList.add("active"), 10);
       loadLeaderboard();
     }
-  });
+  };
 
   const closeLeaderboard = () => {
     const modal = document.getElementById("leaderboardModal");
     if (modal) {
       modal.classList.remove("active");
+      // Повертаємо прокрутку body
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+      
       setTimeout(() => modal.style.display = "none", 300);
     }
   };
 
+  document.getElementById("openLeaderboardBtn")?.addEventListener("click", openLeaderboard);
   document.getElementById("closeLeaderboard")?.addEventListener("click", closeLeaderboard);
-  
-  // Закриття при кліку на фон
   document.getElementById("leaderboardModal")?.addEventListener("click", (e) => {
     if (e.target.id === "leaderboardModal") closeLeaderboard();
   });
