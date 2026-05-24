@@ -1070,7 +1070,7 @@ let favoriteCardAnimationTimers = [];
 
 async function syncLeaderboardData() {
   try {
-    await supabaseClient
+    const { error } = await supabaseClient
       .from("players")
       .upsert({ 
         username: String(state.playerId), 
@@ -1080,6 +1080,7 @@ async function syncLeaderboardData() {
         coins: Number(state.stars) || 0,
         avatar: "default"
       }, { onConflict: 'username' });
+    if (error) console.error("Sync error:", error);
   } catch (e) {
     console.warn("Leaderboard sync failed:", e);
   }
@@ -3203,7 +3204,7 @@ if (giveawayCloseBtn && giveawayModal) {
       });
     } catch (e) {
       console.error("Leaderboard error:", e);
-      listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#ff4d4d;">Помилка бази даних</div>';
+      listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#ff4d4d;">Помилка завантаження</div>';
     }
   }
 
