@@ -2110,7 +2110,9 @@ if (inviteFriendBtn) {
       return;
     }
     const inviteText = "🔥 HustleRank — заходь у гру разом зі мною!\n\nВідкривай картки, виконуй завдання, прокачуй рівень і забирай бонуси.\nЗапрошуй друзів, збирай нагороди та піднімайся вище у рейтингу.\n\n👇 Натискай нижче та стартуй зі мною";
-    const fallbackUrl = `https://t.me/share/url?url=${encodeURIComponent("https://t.me/HustleRank033Bot?start=ref_" + state.playerId)}&text=${encodeURIComponent(inviteText)}`;
+    // Використовуємо формат t.me/botname?start=... для примусового відкриття чату з ботом
+    const botLink = "https://t.me/HustleRank033Bot?start=ref_" + state.playerId;
+    const fallbackUrl = `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${encodeURIComponent(inviteText)}`;
     window.open(fallbackUrl, "_blank");
   });
 }
