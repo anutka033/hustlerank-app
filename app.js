@@ -1070,17 +1070,17 @@ let favoriteCardAnimationTimers = [];
 
 async function syncLeaderboardData() {
   try {
-    const { error } = await supabaseClient
+    const currentLevel = parseInt(state.level, 10) || 1;
+    await supabaseClient
       .from("players")
       .upsert({ 
         username: String(state.playerId), 
         gems: Number(state.crystals) || 0, 
-        level: Number(state.level) || 1,
+        level: currentLevel,
         xp: Number(state.xp) || 0,
         coins: Number(state.stars) || 0,
         avatar: "default"
       }, { onConflict: 'username' });
-    if (error) console.error("Sync error:", error);
   } catch (e) {
     console.warn("Leaderboard sync failed:", e);
   }
@@ -3162,14 +3162,14 @@ if (giveawayCloseBtn && giveawayModal) {
 }
   // --- ТАБЛИЦЯ ЛІДЕРІВ ---
   function getAvatarByLevel(level) {
-    const lvl = Number(level) || 1;
-    if (lvl >= 25) return "img/avatars/void_king.png";
-    if (lvl >= 16) return "img/avatars/legend.png";
-    if (lvl >= 10) return "img/avatars/diamond.png";
-    if (lvl >= 7) return "img/avatars/pro.png";
-    if (lvl >= 4) return "img/avatars/hustler.png";
-    if (lvl >= 2) return "img/avatars/rookie.png";
-    return "img/avatars/newbie.png";
+    const lvl = parseInt(level, 10) || 1;
+    if (lvl >= 40) return "./images/avatars/void_king.png"; // Підлаштував під твої ранги
+    if (lvl >= 25) return "./images/avatars/legend.png";
+    if (lvl >= 16) return "./images/avatars/diamond.png";
+    if (lvl >= 10) return "./images/avatars/pro.png";
+    if (lvl >= 7) return "./images/avatars/hustler.png";
+    if (lvl >= 4) return "./images/avatars/rookie.png";
+    return "./images/avatars/newbie.png";
   }
 
   async function loadLeaderboard() {
@@ -3204,7 +3204,7 @@ if (giveawayCloseBtn && giveawayModal) {
 
         item.innerHTML = `
           <div class="leader-rank">${rank}</div>
-          <img class="leader-avatar" src="${avatarSrc}" alt="avatar" onerror="this.src='img/avatars/newbie.png'">
+          <img class="leader-avatar" src="${avatarSrc}" alt="avatar" onerror="this.src='./images/avatar.png'">
           <div class="leader-info">
             <span class="leader-name">${player.username} ${isMe ? '<small>(Ти)</small>' : ''}</span>
             <span class="leader-level">Lvl ${player.level || 1}</span>
