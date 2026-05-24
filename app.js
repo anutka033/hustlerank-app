@@ -1073,14 +1073,17 @@ async function syncLeaderboardData() {
     await supabaseClient
       .from("players")
       .upsert({ 
-        id: String(state.playerId), 
-        crystals: Number(state.crystals) || 0, 
-        level: Number(state.level) || 1 
-      }, { onConflict: 'id' });
+        name: String(state.playerId), // У тебе ID в колонці 'name'
+        gems: Number(state.crystals) || 0, // У тебе кристали в колонці 'gems'
+        level: Number(state.level) || 1,
+        xp: Number(state.xp) || 0,
+        coins: Number(state.stars) || 0
+      }, { onConflict: 'name' });
   } catch (e) {
     console.warn("Leaderboard sync failed:", e);
   }
 }
+
 
 function save() {
   localStorage.setItem("xp", state.xp);
@@ -3156,56 +3159,43 @@ if (giveawayCloseBtn && giveawayModal) {
         giveawayModal.style.display = "none";
     });
 }
-  // --- ТАБЛИЦЯ ЛІДЕРІВ ---
   async function loadLeaderboard() {
-    const listEl = document.getElementById("leaderboardList");
-    if (!listEl) return;
+  const listEl = document.getElementById("leaderboardList");
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">Завантаження...</div>';
 
-    listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">Завантаження...</div>';
+  try {
+    const { data, error } = await supabaseClient
+      .from("players")
+      .select("name, gems") // Читаємо 'name' та 'gems'
+      .order("gems", { ascending: false })
+      .limit(50);
 
-    try {
-      // Отримуємо ТОП-50 гравців за кількістю кристалів
-      // У Supabase таблиця зазвичай називається 'players'
-      const { data, error } = await supabaseClient
-        .from("players") 
-        .select("id, crystals, level")
-        .order("crystals", { ascending: false })
-        .limit(50);
+    if (error) throw error;
 
-      if (error) throw error;
-
-      listEl.innerHTML = "";
+    listEl.innerHTML = "";
+    data.forEach((player, index) => {
+      const isMe = String(player.name) === String(state.playerId);
+      const item = document.createElement("div");
+      item.className = `leader-item ${isMe ? 'is-me' : ''}`;
       
-      if (!data || data.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center; padding:20px;">Список порожній</div>';
-        return;
-      }
+      let medal = (index === 0) ? "🥇 " : (index === 1) ? "🥈 " : (index === 2) ? "🥉 " : "";
 
-      data.forEach((player, index) => {
-        const isMe = String(player.id) === String(state.playerId);
-        const item = document.createElement("div");
-        item.className = `leader-item ${isMe ? 'is-me' : ''}`;
-        
-        // Стилізація перших трьох місць
-        let medal = "";
-        if (index === 0) medal = "🥇 ";
-        else if (index === 1) medal = "🥈 ";
-        else if (index === 2) medal = "🥉 ";
-
-        item.innerHTML = `
-          <div style="display:flex; align-items:center;">
-            <span style="width:30px; font-weight:bold; color:#888;">${index + 1}</span>
-            <span style="margin-left:5px;">${medal}ID: ${player.id} ${isMe ? '<b style="color:#8e44ad;">(Ти)</b>' : ''}</span>
-          </div>
-          <b style="color:#fff;">💎 ${player.crystals.toLocaleString()}</b>
-        `;
-        listEl.appendChild(item);
-      });
-    } catch (e) {
-      console.error("Leaderboard error:", e);
-      listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#ff4d4d;">Помилка завантаження</div>';
-    }
+      item.innerHTML = `
+        <div style="display:flex; align-items:center;">
+          <span style="width:30px; font-weight:bold; color:#888;">${index + 1}</span>
+          <span>${medal}ID: ${player.name} ${isMe ? '<b style="color:#8e44ad;">(Ти)</b>' : ''}</span>
+        </div>
+        <b>💎 ${(player.gems || 0).toLocaleString()}</b>
+      `;
+      listEl.appendChild(item);
+    });
+  } catch (e) {
+    console.error("Leaderboard error:", e);
+    listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#ff4d4d;">Помилка бази даних</div>';
   }
+}
+
 
   // Обробники натискань для модального вікна
   document.getElementById("openLeaderboardBtn")?.addEventListener("click", () => {
