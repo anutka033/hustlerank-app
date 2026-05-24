@@ -366,6 +366,12 @@ const translations = {
     clan: "Клан",
     soon: "Скоро",
     language: "Мова",
+    welcomeTitle: "Ласкаво просимо!",
+    welcomeText: "Стань частиною легендарного шляху HustleRank. Збирай унікальні картки, змагайся з іншими та піднімайся на вершину рейтингу!",
+    feature1: "Колекціонуй рідкісні статуси",
+    feature2: "Заробляй кристали в іграх",
+    feature3: "Стань №1 у глобальному рейтингу",
+    startGame: "ПОЧАТИ ГРУ",
     crystalFever: "Кристальна лихоманка",
     crystalFeverDesc: "Збирай кристали та отримуй нагороди",
     starFarm: "Ферма зірок",
@@ -547,6 +553,12 @@ const translations = {
     clan: "Clan",
     soon: "Soon",
     language: "Language",
+    welcomeTitle: "Welcome!",
+    welcomeText: "Become part of the legendary HustleRank journey. Collect unique cards, compete with others, and rise to the top of the rankings!",
+    feature1: "Collect rare statuses",
+    feature2: "Earn crystals in games",
+    feature3: "Become #1 in global ranking",
+    startGame: "START GAME",
     crystalFever: "Crystal Fever",
     crystalFeverDesc: "Collect crystals and earn rewards",
     starFarm: "Star Farm",
@@ -728,6 +740,12 @@ const translations = {
     clan: "Clan",
     soon: "Bientôt",
     language: "Langue",
+    welcomeTitle: "Bienvenue !",
+    welcomeText: "Faites partie du voyage légendaire de HustleRank. Collectionnez des cartes uniques, rivalisez avec les autres et montez au sommet du classement !",
+    feature1: "Collectionnez des statuts rares",
+    feature2: "Gagnez des cristaux dans les jeux",
+    feature3: "Devenez n°1 au classement mondial",
+    startGame: "COMMENCER LE JEU",
     crystalFever: "Fièvre de cristal",
     crystalFeverDesc: "Collecte des cristaux et gagne des récompenses",
     starFarm: "Ferme d'étoiles",
@@ -2091,7 +2109,7 @@ if (inviteFriendBtn) {
       tg.shareMessage(data.preparedMessageId);
       return;
     }
-    const fallbackUrl = `https://t.me/share/url?url=${encodeURIComponent(data.referralLink)}&text=${encodeURIComponent(data.text)}`;
+    const fallbackUrl = `https://t.me/share/url?url=${encodeURIComponent("https://t.me/HustleRank033Bot?start=ref_" + state.playerId)}&text=${encodeURIComponent(data.text)}`;
     window.open(fallbackUrl, "_blank");
   });
 }
@@ -3302,6 +3320,28 @@ if (!currentLang) {
   currentLang = "ua";
 }
 
+function showWelcomeModal() {
+  const modal = document.getElementById("welcomeModal");
+  if (!modal) return;
+  
+  // Оновлюємо тексти у вікні згідно з обраною мовою
+  document.getElementById("welcomeTitle").textContent = t("welcomeTitle");
+  document.getElementById("welcomeText").textContent = t("welcomeText");
+  document.getElementById("feature1").textContent = t("feature1");
+  document.getElementById("feature2").textContent = t("feature2");
+  document.getElementById("feature3").textContent = t("feature3");
+  document.getElementById("startGameBtn").textContent = t("startGame");
+  
+  modal.style.display = "flex";
+  setTimeout(() => modal.classList.add("active"), 10);
+  
+  document.getElementById("startGameBtn").onclick = () => {
+    modal.classList.remove("active");
+    setTimeout(() => modal.style.display = "none", 300);
+    localStorage.setItem("welcomeShown", "true");
+  };
+}
+
 function initLanguageModal() {
   const modal = document.getElementById("languageModal");
 
@@ -3315,6 +3355,11 @@ function initLanguageModal() {
     btn.addEventListener("click", () => {
       setLanguage(btn.dataset.lang);
       modal.classList.remove("show");
+      
+      // Після вибору мови, якщо це перший раз, показуємо Welcome Modal
+      if (!localStorage.getItem("welcomeShown")) {
+        showWelcomeModal();
+      }
     });
   });
 
