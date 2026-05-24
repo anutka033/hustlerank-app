@@ -2109,7 +2109,8 @@ if (inviteFriendBtn) {
       tg.shareMessage(data.preparedMessageId);
       return;
     }
-    const fallbackUrl = `https://t.me/share/url?url=${encodeURIComponent("https://t.me/HustleRank033Bot?start=ref_" + state.playerId)}&text=${encodeURIComponent(data.text)}`;
+    const inviteText = "🔥 HustleRank — заходь у гру разом зі мною!\n\nВідкривай картки, виконуй завдання, прокачуй рівень і забирай бонуси.\nЗапрошуй друзів, збирай нагороди та піднімайся вище у рейтингу.\n\n👇 Натискай нижче та стартуй зі мною";
+    const fallbackUrl = `https://t.me/share/url?url=${encodeURIComponent("https://t.me/HustleRank033Bot?start=ref_" + state.playerId)}&text=${encodeURIComponent(inviteText)}`;
     window.open(fallbackUrl, "_blank");
   });
 }
