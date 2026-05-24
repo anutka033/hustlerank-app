@@ -6061,3 +6061,181 @@ body {
 .favorite-martian {
   z-index: 13 !important;
 }
+/* ===== FAVORITE CARD: CLEAN PREMIUM SHINE PATCH =====
+   Вставити В САМИЙ КІНЕЦЬ style.css.
+   Цей патч повністю перекриває стару криву "полосу" блиску.
+
+   Важливо:
+   1) Якщо можеш — НЕ вставляй старий favorite-card-shine-inside-patch.css.
+   2) Якщо він уже вставлений — нічого страшного, цей патч має бути НИЖЧЕ нього.
+*/
+
+/* Контейнер блиску тепер рівно накладається на внутрішню частину карти. */
+.favorite-card-shine {
+  position: absolute !important;
+  left: 8px !important;
+  top: 8px !important;
+  right: 8px !important;
+  bottom: 8px !important;
+  width: auto !important;
+  height: auto !important;
+  z-index: 9 !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+  transform: none !important;
+  clip-path: inset(0 round 18px) !important;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.22), transparent 24%),
+    radial-gradient(circle at 76% 72%, rgba(255, 214, 120, 0.16), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.00) 0%, rgba(255, 255, 255, 0.10) 44%, rgba(255, 255, 255, 0.18) 50%, rgba(255, 255, 255, 0.08) 56%, rgba(255, 255, 255, 0.00) 100%) !important;
+  mix-blend-mode: screen;
+}
+
+/* Відключаємо старі псевдоелементи, які робили смугу, паз або королівські лінії поза межами карти. */
+.favorite-card-shine::before,
+.favorite-card-shine::after,
+.favorite-card-widget.frame-royal .favorite-card-shine::before,
+.favorite-card-widget.frame-royal .favorite-card-shine::after {
+  content: none !important;
+  display: none !important;
+  animation: none !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Замість рухомої полоси — коротке акуратне мерехтіння всієї поверхні карти. */
+.favorite-card-widget.is-shining .favorite-card-shine {
+  animation: favoriteCardPremiumGlow 1.85s ease-out 1 !important;
+}
+
+@keyframes favoriteCardPremiumGlow {
+  0% {
+    opacity: 0;
+    filter: brightness(1) saturate(1);
+  }
+  18% {
+    opacity: 0.34;
+    filter: brightness(1.08) saturate(1.06);
+  }
+  42% {
+    opacity: 0.58;
+    filter: brightness(1.16) saturate(1.12);
+  }
+  68% {
+    opacity: 0.30;
+    filter: brightness(1.08) saturate(1.06);
+  }
+  100% {
+    opacity: 0;
+    filter: brightness(1) saturate(1);
+  }
+}
+
+/* Додаємо рівний преміальний "глянець" без руху, який завжди сидить всередині карти. */
+.favorite-card-image,
+.favorite-card-empty {
+  overflow: hidden !important;
+  position: absolute !important;
+}
+
+.favorite-card-image::before,
+.favorite-card-empty::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.18) 0%, transparent 24%, transparent 72%, rgba(255, 255, 255, 0.08) 100%),
+    radial-gradient(circle at 30% 14%, rgba(255, 255, 255, 0.20), transparent 18%);
+  opacity: 0.34;
+  mix-blend-mode: screen;
+}
+
+/* При активному блиску підсвічується сама картинка, а не вилітає окрема смуга. */
+.favorite-card-widget.is-shining .favorite-card-image,
+.favorite-card-widget.is-shining .favorite-card-empty {
+  animation: favoriteCardImagePulse 1.85s ease-out 1 !important;
+}
+
+@keyframes favoriteCardImagePulse {
+  0% {
+    filter: brightness(1) contrast(1) saturate(1);
+  }
+  28% {
+    filter: brightness(1.12) contrast(1.04) saturate(1.10);
+  }
+  56% {
+    filter: brightness(1.20) contrast(1.06) saturate(1.15);
+  }
+  100% {
+    filter: brightness(1) contrast(1) saturate(1);
+  }
+}
+
+/* Рамка завжди поверх блиску, тому краї чисті й рівні. */
+.favorite-card-widget::before {
+  z-index: 12 !important;
+}
+
+.favorite-card-widget::after {
+  z-index: 1 !important;
+}
+
+.favorite-martian {
+  z-index: 13 !important;
+}
+
+/* Для LIMITED робимо ефект дорожчим, але без жодних смуг за межами карти. */
+.favorite-card-widget.frame-royal .favorite-card-shine {
+  background:
+    radial-gradient(circle at 24% 16%, rgba(255, 255, 255, 0.30), transparent 24%),
+    radial-gradient(circle at 78% 30%, rgba(255, 226, 120, 0.24), transparent 24%),
+    radial-gradient(circle at 50% 78%, rgba(168, 85, 247, 0.20), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.00) 0%, rgba(255, 226, 120, 0.14) 42%, rgba(255, 255, 255, 0.24) 50%, rgba(168, 85, 247, 0.12) 58%, rgba(255, 255, 255, 0.00) 100%) !important;
+}
+
+.favorite-card-widget.frame-royal.is-shining .favorite-card-shine {
+  animation: favoriteCardRoyalPremiumGlow 2s ease-out 1 !important;
+}
+
+@keyframes favoriteCardRoyalPremiumGlow {
+  0% {
+    opacity: 0;
+    filter: brightness(1) saturate(1);
+  }
+  20% {
+    opacity: 0.42;
+    filter: brightness(1.10) saturate(1.12);
+  }
+  48% {
+    opacity: 0.72;
+    filter: brightness(1.22) saturate(1.22);
+  }
+  72% {
+    opacity: 0.34;
+    filter: brightness(1.10) saturate(1.10);
+  }
+  100% {
+    opacity: 0;
+    filter: brightness(1) saturate(1);
+  }
+}
+
+/* Якщо потрібен паз під карту, він тепер не через shine, а через саму сцену — рівно під картою. */
+.favorite-card-stage .favorite-card-widget + .favorite-card-shadow::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -12px;
+  width: 118px;
+  height: 12px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 235, 170, 0.54), rgba(130, 60, 210, 0.48), rgba(24, 8, 52, 0.70));
+  box-shadow: 0 0 12px rgba(255, 215, 120, 0.18);
+  pointer-events: none;
+}
