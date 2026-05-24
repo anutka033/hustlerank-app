@@ -1118,6 +1118,46 @@ function getFavoriteCardData() {
   return card;
 }
 
+function getFavoriteCardFrameClass(card) {
+  if (!card) return "frame-empty";
+
+  const rawRarity = String(card.rarity || "").toLowerCase();
+
+  if (card.specialGlow || rawRarity.includes("limited")) {
+    return "frame-royal";
+  }
+
+  if (
+    rawRarity.includes("миф") ||
+    rawRarity.includes("міф") ||
+    rawRarity.includes("myth") ||
+    rawRarity.includes("legend") ||
+    rawRarity.includes("леген") ||
+    rawRarity.includes("légend")
+  ) {
+    return "frame-gold";
+  }
+
+  if (
+    rawRarity.includes("эпич") ||
+    rawRarity.includes("епіч") ||
+    rawRarity.includes("epic") ||
+    rawRarity.includes("rare") ||
+    rawRarity.includes("редк") ||
+    rawRarity.includes("рідк")
+  ) {
+    return "frame-silver";
+  }
+
+  return "frame-bronze";
+}
+
+function setFavoriteCardFrameClass(element, card) {
+  if (!element) return;
+  element.classList.remove("frame-empty", "frame-bronze", "frame-silver", "frame-gold", "frame-royal");
+  element.classList.add(getFavoriteCardFrameClass(card));
+}
+
 function clearFavoriteCardAnimation() {
   favoriteCardAnimationTimers.forEach(timer => clearTimeout(timer));
   favoriteCardAnimationTimers = [];
@@ -1161,6 +1201,7 @@ function renderFavoriteCard() {
     favoriteCardImage.classList.add("hidden");
     favoriteCardEmpty.classList.remove("hidden");
     favoriteCardWidget.classList.remove("has-card");
+    setFavoriteCardFrameClass(favoriteCardWidget, null);
     favoriteCardWidget.title = "Обрати улюблену карту";
     clearFavoriteCardAnimation();
     return;
@@ -1172,6 +1213,7 @@ function renderFavoriteCard() {
   favoriteCardImage.classList.remove("hidden");
   favoriteCardEmpty.classList.add("hidden");
   favoriteCardWidget.classList.add("has-card");
+  setFavoriteCardFrameClass(favoriteCardWidget, card);
   favoriteCardWidget.title = localizedName + " — улюблена карта";
 }
 
@@ -1193,6 +1235,7 @@ function renderFavoriteCardPicker() {
 
     item.type = "button";
     item.className = "favorite-card-picker-item";
+    setFavoriteCardFrameClass(item, card);
     if (card.id === state.favoriteCardId) item.classList.add("selected");
     item.innerHTML = `
       <img src="${card.img}" alt="${localizedName}">

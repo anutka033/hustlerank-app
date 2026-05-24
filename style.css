@@ -5601,3 +5601,229 @@ body {
     transform: translate(-50%, -50%) scale(0.86) !important;
   }
 }
+/* ===== FAVORITE CARD: UPRIGHT VIEW + STATUS FRAMES PATCH =====
+   Вставити В САМИЙ КІНЕЦЬ style.css, нижче всіх попередніх favorite-card CSS.
+   Потрібен оновлений app.js, який додає класи frame-bronze / frame-silver / frame-gold / frame-royal.
+*/
+
+/* Карта менше лежить і краще читається, але все ще має перспективу сцени. */
+.favorite-card-stage {
+  top: 59% !important;
+  width: 205px !important;
+  height: 255px !important;
+  perspective: 780px !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.favorite-card-widget {
+  width: 176px !important;
+  height: 224px !important;
+  border-radius: 24px !important;
+  overflow: visible !important;
+  transform: rotateX(34deg) rotateZ(-1.5deg) translateY(4px) scale(1) !important;
+  transform-style: preserve-3d !important;
+  background: rgba(8, 8, 20, 0.34) !important;
+  box-shadow:
+    0 34px 58px rgba(0, 0, 0, 0.55),
+    0 0 34px rgba(168, 85, 247, 0.26),
+    inset 0 0 20px rgba(255, 255, 255, 0.05) !important;
+}
+
+.favorite-card-widget:active {
+  transform: rotateX(31deg) rotateZ(-1.5deg) translateY(6px) scale(0.975) !important;
+}
+
+.favorite-card-image,
+.favorite-card-empty {
+  inset: 8px !important;
+  width: calc(100% - 16px) !important;
+  height: calc(100% - 16px) !important;
+  border-radius: 18px !important;
+  z-index: 2 !important;
+}
+
+/* Загальна декоративна рамка поверх карти. */
+.favorite-card-widget::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  z-index: 5;
+  pointer-events: none;
+  border-radius: 28px;
+  border: 4px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 0 18px rgba(255, 255, 255, 0.13),
+    0 0 22px rgba(255, 255, 255, 0.08);
+}
+
+.favorite-card-widget::after {
+  content: "";
+  position: absolute;
+  inset: -13px;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 32px;
+  opacity: 0.72;
+  filter: blur(7px);
+}
+
+.favorite-card-widget.frame-empty::before {
+  border-color: rgba(168, 85, 247, 0.35);
+  box-shadow: inset 0 0 18px rgba(168, 85, 247, 0.12), 0 0 18px rgba(168, 85, 247, 0.16);
+}
+
+.favorite-card-widget.frame-empty::after {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.22), transparent 66%);
+}
+
+/* COMMON / базові карти — бронзова рамка. */
+.favorite-card-widget.frame-bronze::before,
+.favorite-card-picker-item.frame-bronze {
+  border-color: #b87333 !important;
+  box-shadow:
+    inset 0 0 14px rgba(255, 204, 128, 0.26),
+    0 0 20px rgba(184, 115, 51, 0.42),
+    0 0 4px rgba(255, 224, 170, 0.55) !important;
+}
+
+.favorite-card-widget.frame-bronze::after {
+  background: radial-gradient(circle, rgba(184, 115, 51, 0.40), rgba(120, 70, 28, 0.10) 42%, transparent 70%);
+}
+
+/* RARE / EPIC — срібна рамка, холодніша й дорожча. */
+.favorite-card-widget.frame-silver::before,
+.favorite-card-picker-item.frame-silver {
+  border-color: #d9e7ff !important;
+  box-shadow:
+    inset 0 0 16px rgba(255, 255, 255, 0.34),
+    0 0 22px rgba(168, 205, 255, 0.50),
+    0 0 6px rgba(255, 255, 255, 0.68) !important;
+}
+
+.favorite-card-widget.frame-silver::after {
+  background: radial-gradient(circle, rgba(190, 220, 255, 0.42), rgba(90, 150, 255, 0.12) 45%, transparent 72%);
+}
+
+/* LEGENDARY / MYTHIC — насичена золота рамка. */
+.favorite-card-widget.frame-gold::before,
+.favorite-card-picker-item.frame-gold {
+  border-color: #ffd166 !important;
+  box-shadow:
+    inset 0 0 18px rgba(255, 240, 170, 0.38),
+    0 0 27px rgba(255, 196, 54, 0.62),
+    0 0 8px rgba(255, 255, 180, 0.70) !important;
+}
+
+.favorite-card-widget.frame-gold::after {
+  background: radial-gradient(circle, rgba(255, 202, 64, 0.52), rgba(255, 120, 0, 0.14) 48%, transparent 74%);
+}
+
+/* LIMITED — королівська рамка: золото + фіолет + діамантове світіння. */
+.favorite-card-widget.frame-royal::before,
+.favorite-card-picker-item.frame-royal {
+  border-color: #ffe082 !important;
+  border-width: 5px !important;
+  box-shadow:
+    inset 0 0 20px rgba(255, 248, 190, 0.44),
+    0 0 18px rgba(255, 215, 90, 0.70),
+    0 0 34px rgba(168, 85, 247, 0.72),
+    0 0 9px rgba(255, 255, 255, 0.86) !important;
+}
+
+.favorite-card-widget.frame-royal::after {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.42), transparent 18%),
+    radial-gradient(circle, rgba(255, 214, 92, 0.58), rgba(168, 85, 247, 0.28) 46%, transparent 76%);
+  opacity: 0.95;
+  animation: favoriteRoyalAura 2.8s ease-in-out infinite;
+}
+
+.favorite-card-widget.frame-royal .favorite-card-image {
+  box-shadow: inset 0 0 20px rgba(255, 220, 120, 0.18) !important;
+}
+
+/* Невеликі “королівські” акценти зверху й знизу limited-карти без додаткового HTML. */
+.favorite-card-widget.frame-royal .favorite-card-shine::before,
+.favorite-card-widget.frame-royal .favorite-card-shine::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 52px;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 232, 120, 0.95), rgba(255, 255, 255, 0.95), rgba(255, 232, 120, 0.95), transparent);
+  box-shadow: 0 0 12px rgba(255, 218, 91, 0.72);
+}
+
+.favorite-card-widget.frame-royal .favorite-card-shine::before {
+  top: 2px;
+}
+
+.favorite-card-widget.frame-royal .favorite-card-shine::after {
+  bottom: 2px;
+}
+
+@keyframes favoriteRoyalAura {
+  0%, 100% {
+    opacity: 0.72;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+/* Тінь під картою підлаштована під більш вертикальну позицію. */
+.favorite-card-shadow {
+  width: 156px !important;
+  height: 34px !important;
+  bottom: -24px !important;
+  opacity: 0.56 !important;
+}
+
+.favorite-martian {
+  z-index: 8 !important;
+}
+
+.favorite-card-shine {
+  z-index: 9 !important;
+  border-radius: 24px !important;
+}
+
+/* Рамки в модалці вибору також отримують той самий статус. */
+.favorite-card-picker-item {
+  border-width: 2px !important;
+}
+
+.favorite-card-picker-item.frame-royal {
+  background:
+    linear-gradient(145deg, rgba(255, 209, 102, 0.16), rgba(168, 85, 247, 0.18)),
+    rgba(255, 255, 255, 0.06) !important;
+}
+
+@media (max-height: 760px) {
+  .favorite-card-stage {
+    top: 59% !important;
+    transform: translate(-50%, -50%) scale(0.92) !important;
+  }
+}
+
+@media (max-height: 690px) {
+  .favorite-card-stage {
+    top: 58% !important;
+    transform: translate(-50%, -50%) scale(0.82) !important;
+  }
+
+  .favorite-card-widget {
+    transform: rotateX(32deg) rotateZ(-1.5deg) translateY(2px) scale(1) !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .favorite-card-stage {
+    top: 58.5% !important;
+    transform: translate(-50%, -50%) scale(0.86) !important;
+  }
+}
