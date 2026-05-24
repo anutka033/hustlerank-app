@@ -914,10 +914,12 @@ async function updateOnlineCollectors() {
 
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
 
-    const { data, error } = await supabaseClient
-        .from("online_collectors")
-        .select("*")
-        .gt("last_seen", fiveMinutesAgo);
+  const { data, error } = await supabaseClient
+  .from("players") // Має бути точно як у Supabase
+  .select("id, crystals")
+  .order("crystals", { ascending: false })
+  .limit(50);
+
 
     if (error) {
         console.log(error);
@@ -1066,6 +1068,20 @@ const favoriteCardPickerGrid = document.getElementById("favoriteCardPickerGrid")
 const favoriteCardPickerClose = document.getElementById("favoriteCardPickerClose");
 let favoriteCardAnimationTimers = [];
 
+async function syncLeaderboardData() {
+  try {
+    await supabaseClient
+      .from("players")
+      .upsert({ 
+        id: String(state.playerId), 
+        crystals: Number(state.crystals) || 0, 
+        level: Number(state.level) || 1 
+      }, { onConflict: 'id' });
+  } catch (e) {
+    console.warn("Leaderboard sync failed:", e);
+  }
+}
+
 function save() {
   localStorage.setItem("xp", state.xp);
   localStorage.setItem("maxXp", state.maxXp);
@@ -1084,6 +1100,7 @@ function save() {
   localStorage.setItem("dailyStreak", state.dailyStreak);
   localStorage.setItem("lastTreasuryClaim", state.lastTreasuryClaim);
   schedulePlayerSaveToServer();
+  syncLeaderboardData();
 }
 
 function getCardIdFromStorageItem(item) {
