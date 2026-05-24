@@ -1582,6 +1582,14 @@ function resetHomeScroll(name) {
 }
 
 function openScreen(name) {
+  if (name === "home") {
+    const cardImg = document.getElementById("favoriteCardImage");
+    if (cardImg) {
+      cardImg.classList.remove("card-shine-effect");
+      void cardImg.offsetWidth; // Trigger reflow
+      cardImg.classList.add("card-shine-effect");
+    }
+  }
 
   Object.values(screens).forEach(function (screen) {
     if (screen) {
@@ -2624,6 +2632,9 @@ function updateDailyTimer() {
   }
 }
 
+const dailyModal = document.getElementById("dailyModal");
+const dailyCloseBtn = document.getElementById("dailyCloseBtn");
+
 if (dailyClaimBtn) {
   dailyClaimBtn.addEventListener("click", async function () {
     if (dailyDropEndTime > Date.now() || dailyClaimBtn.disabled) return;
@@ -2635,7 +2646,12 @@ if (dailyClaimBtn) {
       const reward = data.reward || { stars: 50, xp: 500 };
       if (data.nextClaimAt) setDailyDropCooldown(data.nextClaimAt);
       updateUI();
-      showToast("+" + reward.stars + " ⭐ " + t("and") + " +" + reward.xp + " XP");
+      
+      // Показуємо нове модальне вікно замість тоста
+      if (dailyModal) {
+        dailyModal.style.display = "flex";
+        setTimeout(() => dailyModal.classList.add("active"), 10);
+      }
     } catch (error) {
       if (error?.data?.nextClaimAt) {
         setDailyDropCooldown(error.data.nextClaimAt);
@@ -2645,6 +2661,21 @@ if (dailyClaimBtn) {
       showToast(formatClaimError(error));
     }
   });
+}
+
+if (dailyCloseBtn && dailyModal) {
+  dailyCloseBtn.onclick = () => {
+    dailyModal.classList.remove("active");
+    setTimeout(() => dailyModal.style.display = "none", 300);
+  };
+}
+
+const claimDailyBtnFinal = document.getElementById("claimDailyBtn");
+if (claimDailyBtnFinal && dailyModal) {
+  claimDailyBtnFinal.onclick = () => {
+    dailyModal.classList.remove("active");
+    setTimeout(() => dailyModal.style.display = "none", 300);
+  };
 }
 
 async function loadIncomingCards() {

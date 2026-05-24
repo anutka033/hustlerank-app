@@ -81,12 +81,9 @@
             <span>Обрати карту</span>
           </div>
 
-          <img id="favoriteCardImage" class="favorite-card-image hidden" src="" alt="Улюблена карта">
+          <img id="favoriteCardImage" class="favorite-card-image hidden card-shine-effect" src="" alt="Улюблена карта">
 
-          <div id="favoriteCardCleaners" class="favorite-card-cleaners" aria-hidden="true">
-            <span class="favorite-martian favorite-martian-left"><i></i></span>
-            <span class="favorite-martian favorite-martian-right"><i></i></span>
-          </div>
+          <!-- Martian cleaners removed -->
 
           <div class="favorite-card-shadow"></div>
           <div class="favorite-card-shine"></div>
@@ -497,18 +494,23 @@
     <div class="toast" id="toast"></div>
 
     
-    <div class="daily-modal" id="dailyModal">
-      <div class="daily-modal-box">
-        <button class="daily-close" id="dailyCloseBtn">✕</button>
-        <div class="daily-glow"></div>
-        <div class="daily-big-icon">🎁</div>
-        <h2 data-i18n="dailyDrop">Щоденний дроп</h2>
-        <p data-i18n="dailyRewardReceived">Ти отримав щоденну нагороду</p>
-        <div class="daily-reward">
-          <span>⭐ +50</span>
-          <span>⚡ +500 XP</span>
+    <div id="dailyModal" class="modal-overlay">
+      <div class="modal-content treasury-modal-content">
+        <div class="modal-header">
+          <span class="modal-close" id="dailyCloseBtn">×</span>
         </div>
-        <button id="claimDailyBtn" data-i18n="claim">Забрати</button>
+        <div class="modal-body">
+          <div class="reward-icon-anim">🎁</div>
+          <h2 class="reward-title" data-i18n="dailyDrop">Щоденний дроп</h2>
+          <p class="reward-desc" data-i18n="dailyRewardReceived">Ти отримав щоденну нагороду</p>
+          <div class="reward-amount-box">
+            <div style="font-size: 18px; color: #ffd700; margin-bottom: 5px;">⭐ +50</div>
+            <div style="font-size: 18px; color: #00f2ff;">⚡ +500 XP</div>
+          </div>
+          <button class="modal-buy-btn" id="claimDailyBtn">
+            <span data-i18n="claim">Забрати</span>
+          </button>
+        </div>
       </div>
     </div>
 
