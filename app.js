@@ -199,6 +199,17 @@ async function savePlayerToServer() {
   const initData = await waitForTelegramInitData();
   if (!initData) return;
 
+  // Пряме оновлення імені в Supabase для лідерборду
+  if (state.playerId && state.displayName) {
+    supabaseClient
+      .from("players")
+      .update({ display_name: state.displayName })
+      .eq("username", state.playerId)
+      .then(({ error }) => {
+        if (error) console.warn("Error updating display_name in Supabase:", error);
+      });
+  }
+
   const playerPayload = {
     level: Math.max(1, Number(state.level) || 1),
     xp: Math.max(0, Number(state.xp) || 0),
@@ -2162,10 +2173,28 @@ async function loadReferrals() {
   const referrals = data || [];
   const rewards = calculateReferralRewards(referrals);
 
+  // Спробуємо отримати імена запрошених друзів з таблиці players
+  const invitedIds = referrals.map(r => r.invited_id);
+  let playerNamesMap = {};
+  
+  if (invitedIds.length > 0) {
+    const { data: namesData } = await supabaseClient
+      .from("players")
+      .select("username, display_name")
+      .in("username", invitedIds);
+    
+    if (namesData) {
+      namesData.forEach(p => {
+        playerNamesMap[p.username] = p.display_name;
+      });
+    }
+  }
+
   referrals.forEach(function(ref) {
     const friendLevel = normalizedLevel(ref.invited_level);
+    const displayName = playerNamesMap[ref.invited_id] || ("ID: " + ref.invited_id);
     invitedFriends.push({
-      name: "ID: " + ref.invited_id,
+      name: displayName,
       level: friendLevel,
       income: 0,
       reward: ref.reward_claimed ? "✅" : (friendLevel >= 3 ? "🎁" : "⏳")
