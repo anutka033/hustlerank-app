@@ -60,6 +60,7 @@
           <div class="rating-box coins-box">
             <div class="stars-line">
               <span>💎 <b id="coins">0</b></span>
+               <button id="openLeaderboardBtn" class="leaderboard-btn">🏆</button>
             </div>
           </div>
         </div>
@@ -734,7 +735,22 @@
 </div>
 </div>
 </div>
+
+<div id="leaderboardModal" class="modal-overlay">
+  <div class="modal-content leaderboard-modal">
+    <div class="modal-header">
+      <h2 data-i18n="leaderboard">Таблиця лідерів</h2>
+      <span class="modal-close" id="closeLeaderboard">×</span>
+    </div>
+    <div class="leaderboard-list" id="leaderboardList">
+      <!-- Тут будуть лідери -->
+      <div class="loading-text">Завантаження...</div>
+    </div>
+  </div>
+</div>
+
 <!-- ================= SCRIPTS ================= -->
+<audio id="clickSound" src="audio/click.mp3" preload="auto"></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 

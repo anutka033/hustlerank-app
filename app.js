@@ -1,5 +1,14 @@
 (() => {
 "use strict";
+function playClick() {
+  const sound = document.getElementById("clickSound");
+  if (sound) {
+    sound.volume = 0.20; // Встановлюємо гучність на 45% (діапазон від 0.0 до 1.0)
+    sound.currentTime = 0; 
+    sound.play().catch(e => console.log("Sound play error:", e));
+  }
+}
+
 
 const tg = window.Telegram?.WebApp;
 
@@ -3130,6 +3139,83 @@ if (giveawayCloseBtn && giveawayModal) {
         giveawayModal.style.display = "none";
     });
 }
+  // --- ТАБЛИЦЯ ЛІДЕРІВ ---
+  async function loadLeaderboard() {
+    const listEl = document.getElementById("leaderboardList");
+    if (!listEl) return;
+
+    listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">Завантаження...</div>';
+
+    try {
+      // Отримуємо ТОП-50 гравців за кількістю кристалів
+      // У Supabase таблиця зазвичай називається 'players'
+      const { data, error } = await supabaseClient
+        .from("players") 
+        .select("id, crystals, level")
+        .order("crystals", { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      listEl.innerHTML = "";
+      
+      if (!data || data.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center; padding:20px;">Список порожній</div>';
+        return;
+      }
+
+      data.forEach((player, index) => {
+        const isMe = String(player.id) === String(state.playerId);
+        const item = document.createElement("div");
+        item.className = `leader-item ${isMe ? 'is-me' : ''}`;
+        
+        // Стилізація перших трьох місць
+        let medal = "";
+        if (index === 0) medal = "🥇 ";
+        else if (index === 1) medal = "🥈 ";
+        else if (index === 2) medal = "🥉 ";
+
+        item.innerHTML = `
+          <div style="display:flex; align-items:center;">
+            <span style="width:30px; font-weight:bold; color:#888;">${index + 1}</span>
+            <span style="margin-left:5px;">${medal}ID: ${player.id} ${isMe ? '<b style="color:#8e44ad;">(Ти)</b>' : ''}</span>
+          </div>
+          <b style="color:#fff;">💎 ${player.crystals.toLocaleString()}</b>
+        `;
+        listEl.appendChild(item);
+      });
+    } catch (e) {
+      console.error("Leaderboard error:", e);
+      listEl.innerHTML = '<div style="text-align:center; padding:20px; color:#ff4d4d;">Помилка завантаження</div>';
+    }
+  }
+
+  // Обробники натискань для модального вікна
+  document.getElementById("openLeaderboardBtn")?.addEventListener("click", () => {
+    const modal = document.getElementById("leaderboardModal");
+    if (modal) {
+      modal.style.display = "flex";
+      // Додаємо невелику затримку для анімації появи, якщо вона є
+      setTimeout(() => modal.classList.add("active"), 10);
+      loadLeaderboard();
+    }
+  });
+
+  const closeLeaderboard = () => {
+    const modal = document.getElementById("leaderboardModal");
+    if (modal) {
+      modal.classList.remove("active");
+      setTimeout(() => modal.style.display = "none", 300);
+    }
+  };
+
+  document.getElementById("closeLeaderboard")?.addEventListener("click", closeLeaderboard);
+  
+  // Закриття при кліку на фон
+  document.getElementById("leaderboardModal")?.addEventListener("click", (e) => {
+    if (e.target.id === "leaderboardModal") closeLeaderboard();
+  });
+
 if (!currentLang) {
   currentLang = "ua";
 }
@@ -3161,5 +3247,11 @@ function initLanguageModal() {
 
 initLanguageModal();
 applyLanguage();
-
+document.addEventListener("click", (event) => {
+  // Якщо натиснули на кнопку (button) або на елемент всередині кнопки
+  if (event.target.closest("button")) {
+    playClick();
+  }
+});
 })();
+

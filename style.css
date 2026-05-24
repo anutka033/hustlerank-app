@@ -6239,3 +6239,60 @@ body {
   box-shadow: 0 0 12px rgba(255, 215, 120, 0.18);
   pointer-events: none;
 }
+.leaderboard-btn {
+  background: #8e44ad; /* Фіолетовий колір */
+  border: none;
+  border-radius: 8px; /* Гладкі кути */
+  color: white;
+  padding: 4px 8px;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.leaderboard-btn:active {
+  transform: scale(0.9); /* Ефект натискання */
+}
+
+/* Стилі для списку лідерів */
+.leaderboard-list {
+  margin-top: 15px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.leader-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.leader-item.is-me {
+  background: rgba(142, 68, 173, 0.2); /* Виділяємо себе */
+  border-radius: 8px;
+}
+/* Компактне вікно лідерів */
+.leaderboard-modal {
+  width: 85%; /* Вікно буде займати 85% ширини екрану */
+  max-width: 350px; /* Але не більше 350px на великих екранах */
+  height: auto; /* Висота підлаштовується під контент */
+  max-height: 70vh; /* Але не більше 70% висоти екрану, щоб не вилазило за межі */
+  border-radius: 20px; /* Гарні закруглені кути */
+  padding: 20px;
+  background: #1a1c23; /* Темний фон, як у гри */
+  border: 1px solid rgba(142, 68, 173, 0.3); /* Ледь помітна фіолетова рамка */
+}
+
+/* Стилізація заголовка */
+.leaderboard-modal h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  text-align: center;
+  color: #fff;
+}
