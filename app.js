@@ -3,7 +3,7 @@
 function playClick() {
   const sound = document.getElementById("clickSound");
   if (sound) {
-    sound.volume = 0.20; // Встановлюємо гучність на 45% (діапазон від 0.0 до 1.0)
+    sound.volume = 0.05; // Встановлюємо гучність на 45% (діапазон від 0.0 до 1.0)
     sound.currentTime = 0; 
     sound.play().catch(e => console.log("Sound play error:", e));
   }
@@ -76,6 +76,16 @@ function safeNumber(value, fallback = 0) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
 }
+function getTelegramPlayerDisplayName() {
+  const user = getTelegramWebApp()?.initDataUnsafe?.user;
+  if (user) {
+    const name = user.first_name + (user.last_name ? " " + user.last_name : "");
+    localStorage.setItem("playerDisplayName", name);
+    return name;
+  }
+  return localStorage.getItem("playerDisplayName") || "Гравець";
+}
+
 function getTelegramPlayerId() {
   const telegramId = getTelegramWebApp()?.initDataUnsafe?.user?.id;
 
@@ -200,7 +210,8 @@ async function savePlayerToServer() {
     gems: Math.max(0, Number(state.crystals) || 0),
     vip: Boolean(state.vip),
     vip_until: Math.max(0, Number(state.vipUntil) || 0),
-    vipUntil: Math.max(0, Number(state.vipUntil) || 0)
+    vipUntil: Math.max(0, Number(state.vipUntil) || 0),
+    display_name: state.displayName
   };
 
   try {
@@ -305,6 +316,7 @@ function formatClaimError(error) {
 const state = {
   xp: safeNumber(localStorage.getItem("xp"), 0),
   playerId: getTelegramPlayerId(),
+  displayName: getTelegramPlayerDisplayName(),
   maxXp: Math.max(100, safeNumber(localStorage.getItem("maxXp"), 100)),
   level: Math.max(1, safeNumber(localStorage.getItem("level"), 1)),
   coins: safeNumber(localStorage.getItem("coins"), 0),
@@ -395,7 +407,7 @@ const translations = {
     no: "Ні",
     giftCard: "Подарувати карту",
     enterReceiverId: "Введіть ID отримувача",
-    giftPlaceholder: "Наприклад: 48291",
+    giftPlaceholder: "Наприклад: 1234567890",
     send: "Надіслати",
     cancel: "Скасувати",
     vipStatus: "VIP-статус",
@@ -576,7 +588,7 @@ const translations = {
     no: "No",
     giftCard: "Gift card",
     enterReceiverId: "Enter receiver ID",
-    giftPlaceholder: "Example: 48291",
+    giftPlaceholder: "Example: 1234567890",
     send: "Send",
     cancel: "Cancel",
     vipStatus: "VIP Status",
@@ -757,7 +769,7 @@ const translations = {
     no: "Non",
     giftCard: "Offrir une carte",
     enterReceiverId: "Entre l'ID du destinataire",
-    giftPlaceholder: "Exemple : 48291",
+    giftPlaceholder: "Exemple: 1234567890",
     send: "Envoyer",
     cancel: "Annuler",
     vipStatus: "Statut VIP",
@@ -1477,6 +1489,10 @@ function updateUI() {
   }
 
   if (levelEl) levelEl.textContent = state.level;
+  const playerIdEl = document.getElementById("playerId");
+  if (playerIdEl) playerIdEl.textContent = state.displayName;
+  const myIdDisplay = document.getElementById("myIdDisplay");
+  if (myIdDisplay) myIdDisplay.textContent = state.playerId;
   if (rankName) rankName.textContent = rankByLevel(state.level);
   if (xpText) xpText.textContent = state.xp + " / " + state.maxXp + " XP";
   if (xpFill) xpFill.style.width = percent + "%";
@@ -1944,9 +1960,9 @@ document.addEventListener("input", function (event) {
     const sendBtn = document.getElementById("sendGiftBtn");
     const value = event.target.value.trim();
     if (sendBtn) {
-      sendBtn.disabled = value.length !== 9;
-      sendBtn.style.opacity = value.length === 9 ? "1" : ".5";
-      sendBtn.style.cursor = value.length === 9 ? "pointer" : "not-allowed";
+      sendBtn.disabled = value.length !== 10;
+      sendBtn.style.opacity = value.length === 10 ? "1" : ".5";
+      sendBtn.style.cursor = value.length === 10 ? "pointer" : "not-allowed";
     }
   }
 });
@@ -1963,7 +1979,7 @@ document.addEventListener("click", async function (event) {
     const giftUserIdEl = document.getElementById("giftUserId");
     const receiverId = giftUserIdEl ? giftUserIdEl.value.trim() : "";
 
-    if (receiverId.length !== 9) return alert(t("idNineDigits"));
+    if (receiverId.length !== 10) return alert("ID має складатися з 10 цифр");
     if (!selectedGiftCard) return alert(t("chooseCardFirst"));
     if (receiverId === state.playerId) return alert(t("cannotGiftSelf"));
 
@@ -3181,7 +3197,7 @@ if (giveawayCloseBtn && giveawayModal) {
     try {
       const { data, error } = await supabaseClient
         .from("players") 
-        .select("username, gems, level")
+        .select("username, gems, level, display_name")
         .order("gems", { ascending: false })
         .limit(50);
 
@@ -3206,7 +3222,7 @@ if (giveawayCloseBtn && giveawayModal) {
           <div class="leader-rank">${rank}</div>
           <img class="leader-avatar" src="${avatarSrc}" alt="avatar" onerror="this.src='./images/avatar.png'">
           <div class="leader-info">
-            <span class="leader-name">${player.username} ${isMe ? '<small>(Ти)</small>' : ''}</span>
+            <span class="leader-name">${player.display_name || player.username} ${isMe ? '<small>(Ти)</small>' : ''}</span>
             <span class="leader-level">Lvl ${player.level || 1}</span>
           </div>
           <div class="leader-score">

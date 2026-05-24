@@ -40,7 +40,7 @@
         <div class="hero-info">
           <div class="top-row">
             <div class="player-info">
-              <h2 id="playerId">ID: </h2>
+              <h2 id="playerId">Гравець</h2>
               <div class="player-sub">
                 <div class="player-xp" id="xpText">0 / 100 XP</div>
                 <div class="player-level">Lv. <b id="level">1</b></div>
@@ -282,8 +282,9 @@
           <h1 data-i18n="cards">Картки</h1>
           <p data-i18n="cardsDescription">Збирай, прокачуй і відкривай статуси.</p>
         </div>
-        <div class="stars-box">
-          ⭐ <span id="cardStars">0</span>
+<div class="stars-box">
+          <div class="user-id-display" style="font-size: 10px; opacity: 0.7; margin-bottom: 2px;">ID: <span id="myIdDisplay">---</span></div>
+          <div>⭐ <span id="cardStars">0</span></div>
         </div>
       </div>
       <div class="cards-tabs">
@@ -527,8 +528,8 @@
     <div class="gift-modal" id="giftModal">
       <div class="gift-modal-box">
         <h3><span>🎁</span> <span data-i18n="giftCard">Подарувати карту</span></h3>
-        <p data-i18n="enterReceiverId">Введіть ID отримувача</p>
-        <input type="text" id="giftUserId" placeholder="Наприклад: 48291" data-i18n-placeholder="giftPlaceholder">
+<p data-i18n="enterReceiverId">Введіть ID отримувача (10 цифр)</p>
+        <input type="text" id="giftUserId" placeholder="Наприклад: 1234567890" data-i18n-placeholder="giftPlaceholder">
         <div class="gift-actions">
           <button id="sendGiftBtn" class="send-btn" data-i18n="send">Надіслати</button>
           <button id="cancelGiftBtn" class="cancel-btn" data-i18n="cancel">Скасувати</button>
