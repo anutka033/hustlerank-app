@@ -1112,6 +1112,7 @@ let favoriteCardAnimationTimers = [];
 async function syncLeaderboardData() {
   try {
     const currentLevel = parseInt(state.level, 10) || 1;
+    const displayName = state.displayName || getTelegramPlayerDisplayName();
     await supabaseClient
       .from("players")
       .upsert({ 
@@ -1120,7 +1121,8 @@ async function syncLeaderboardData() {
         level: currentLevel,
         xp: Number(state.xp) || 0,
         coins: Number(state.stars) || 0,
-        avatar: "default"
+        avatar: "default",
+        display_name: displayName || String(state.playerId)
       }, { onConflict: 'username' });
   } catch (e) {
     console.warn("Leaderboard sync failed:", e);
@@ -2455,7 +2457,26 @@ if (openDropBtn) {
       fillRouletteTrack(rouletteTrack);
     }
 
-    const dropResult = await openDropOnServer();
+    // OPTIMISTIC UI: запускаємо рулетку одразу, сервер чекаємо паралельно
+    const serverPromise = openDropOnServer();
+
+    // Рулетка крутиться зразу — без очікування сервера
+    if (rouletteTrack) {
+      rouletteTrack.style.transition = "none";
+      rouletteTrack.style.transform = "translate3d(0,0,0)";
+    }
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (rouletteTrack) {
+          rouletteTrack.style.transition = `transform ${DROP_ROULETTE_DURATION}ms cubic-bezier(.08,.6,0,1)`;
+          const tempOffset = (DROP_WINNER_INDEX * 134) - Math.floor(roulette?.clientWidth / 2 || 150);
+          rouletteTrack.style.transform = `translate3d(-${Math.max(0, tempOffset)}px,0,0)`;
+        }
+      });
+    });
+
+    // Очікуємо відповідь сервера (паралельно з анімацією)
+    const dropResult = await serverPromise;
 
     if (!dropResult) {
       isDropRolling = false;
@@ -2483,6 +2504,7 @@ if (openDropBtn) {
     lastDropDuplicate = !!dropResult.duplicate;
     lastDropCompensation = Number(dropResult.compensation || 0);
 
+    // Оновлюємо рулетку з правильним віннером (без відимого ресету)
     fillRouletteTrack(rouletteTrack, winner);
     rouletteTrack.style.transition = "none";
     rouletteTrack.style.transform = "translate3d(0,0,0)";
@@ -2641,24 +2663,37 @@ if (dailyClaimBtn) {
 
     dailyClaimBtn.disabled = true;
 
+    // OPTIMISTIC UI: одразу нараховуємо нагороду та відкриваємо модал
+    state.stars += 50;
+    state.xp += 500;
+    updateUI();
+    setDailyDropCooldown(new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString());
+
+    if (dailyModal) {
+      dailyModal.style.display = "flex";
+      setTimeout(() => dailyModal.classList.add("active"), 10);
+    }
+
+    // Сервер підтверджує у фоні
     try {
       const data = await claimServerReward("/api/daily/claim");
       const reward = data.reward || { stars: 50, xp: 500 };
+      // Коригуємо значення з сервера якщо вони відрізняються
       if (data.nextClaimAt) setDailyDropCooldown(data.nextClaimAt);
+      if (reward.stars && reward.stars !== 50) { state.stars += (reward.stars - 50); }
+      if (reward.xp && reward.xp !== 500) { state.xp += (reward.xp - 500); }
       updateUI();
-      
-      // Показуємо нове модальне вікно замість тоста
-      if (dailyModal) {
-        dailyModal.style.display = "flex";
-        setTimeout(() => dailyModal.classList.add("active"), 10);
-      }
+      save();
     } catch (error) {
       if (error?.data?.nextClaimAt) {
         setDailyDropCooldown(error.data.nextClaimAt);
-      } else {
-        dailyClaimBtn.disabled = false;
       }
-      showToast(formatClaimError(error));
+      // Якщо сервер повернув ALREADY_CLAIMED — відкатуємо optimistic нарахування
+      if (error?.message?.includes("ALREADY_CLAIMED")) {
+        state.stars = Math.max(0, state.stars - 50);
+        state.xp = Math.max(0, state.xp - 500);
+        updateUI();
+      }
     }
   });
 }
@@ -2861,28 +2896,38 @@ document.addEventListener("click", async function(e) {
 
     btn.disabled = true;
 
-    try {
-      const data = await claimServerReward("/api/treasury/claim");
-      const amount = data?.reward?.crystals || 0;
+    // OPTIMISTIC UI: одразу нараховуємо кристали та закриваємо модал
+    const optimisticAmount = updateTreasuryUI();
+    state.crystals += optimisticAmount;
+    state.lastTreasuryClaim = Date.now();
+    updateUI();
+    updateTreasuryUI();
+    showToast(t("claimedAmount") + optimisticAmount + " 💎");
 
+    const modal = document.getElementById("treasuryModal");
+    if (modal) {
+      modal.classList.remove("active");
+      setTimeout(() => modal.style.display = "none", 300);
+    }
+
+    btn.disabled = false;
+
+    // Сервер підтверджує у фоні
+    claimServerReward("/api/treasury/claim").then(data => {
       if (data?.treasury?.claimedAt) {
         state.lastTreasuryClaim = new Date(data.treasury.claimedAt).getTime();
       }
-
-      updateUI();
-      updateTreasuryUI();
-      showToast(t("claimedAmount") + amount + " 💎");
-    } catch (error) {
-      showToast(formatClaimError(error));
-    } finally {
-      btn.disabled = false;
-
-      const modal = document.getElementById("treasuryModal");
-      if (modal) {
-        modal.classList.remove("active");
-        setTimeout(() => modal.style.display = "none", 300);
+      // Коригуємо значення якщо сервер дав іншу суму
+      const serverAmount = data?.reward?.crystals || 0;
+      if (serverAmount !== optimisticAmount) {
+        state.crystals += (serverAmount - optimisticAmount);
+        updateUI();
       }
-    }
+      save();
+    }).catch(() => {
+      // Помилка сервера — нагорода вже нарахована, зберігаємо
+      save();
+    });
   }
 
   if (e.target.closest("#closeTreasuryModal") || e.target.id === "treasuryModal") {
