@@ -1129,6 +1129,22 @@ async function syncLeaderboardData() {
   }
 }
 
+// Отримуємо реальне місце гравця в рейтингу з Supabase
+async function updateRealRating() {
+  if (!ratingEl || !state.playerId) return;
+  try {
+    const { count } = await supabaseClient
+      .from("players")
+      .select("username", { count: "exact", head: true })
+      .gt("level", Number(state.level) || 1);
+    const rank = (count || 0) + 1;
+    ratingEl.textContent = "#" + rank;
+    ratingEl.dataset.realRating = "true";
+  } catch (e) {
+    // Не вдалось — залишаємо #---
+  }
+}
+
 function save() {
   localStorage.setItem("xp", state.xp);
   localStorage.setItem("maxXp", state.maxXp);
@@ -1148,6 +1164,7 @@ function save() {
   localStorage.setItem("lastTreasuryClaim", state.lastTreasuryClaim);
   schedulePlayerSaveToServer();
   syncLeaderboardData();
+  updateRealRating();
 }
 
 function getCardIdFromStorageItem(item) {
@@ -1412,8 +1429,8 @@ function checkLevelUp() {
   while (state.maxXp > 0 && state.xp >= state.maxXp) {
     state.xp -= state.maxXp;
     state.level += 1;
-    state.maxXp = Math.floor(state.maxXp * 2);
-    if (!state.maxXp || state.maxXp < 1) state.maxXp = 100;
+    state.maxXp = Math.floor(state.maxXp * 1.5); // 1.5 — плавна прогресія замість різкого x2
+    if (!state.maxXp || state.maxXp < 100) state.maxXp = 100;
     leveledUp = true;
   }
 
@@ -1580,7 +1597,10 @@ if (dropCrystalsEl) {
 if (taskStarsEl) {
     taskStarsEl.textContent = state.stars.toLocaleString("ru-RU");
 }
-  if (ratingEl) ratingEl.textContent = state.level >= 2 ? "#" + (900 - state.level * 37) : "#---";
+  // Рейтинг оновлюється асинхронно з Supabase (див. updateRealRating)
+  if (ratingEl && !ratingEl.dataset.realRating) {
+    ratingEl.textContent = state.level >= 2 ? "#---" : "#---";
+  }
   if (incomePerHourEl) incomePerHourEl.textContent = t("incomePerHourZero");
   if (earnText) earnText.textContent = t("earnGoTasks");
 
@@ -2699,7 +2719,7 @@ if (dailyClaimBtn) {
 
     // OPTIMISTIC UI: одразу нараховуємо нагороду та відкриваємо модал
     state.stars += 50;
-    state.xp += 500;
+    addXp(500); // addXp враховує VIP +25% бонус
     updateUI();
     setDailyDropCooldown(new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString());
 
@@ -2725,7 +2745,8 @@ if (dailyClaimBtn) {
       // Якщо сервер повернув ALREADY_CLAIMED — відкатуємо optimistic нарахування
       if (error?.message?.includes("ALREADY_CLAIMED")) {
         state.stars = Math.max(0, state.stars - 50);
-        state.xp = Math.max(0, state.xp - 500);
+        const xpToRollback = isVipActive() ? Math.floor(500 * 1.25) : 500;
+        state.xp = Math.max(0, state.xp - xpToRollback);
         updateUI();
       }
     }
@@ -2886,6 +2907,10 @@ async function completeTask(task) {
     const data = await claimServerReward("/api/tasks/claim", { taskId: task.id });
     localStorage.setItem(`task_${task.id}_completed`, "true");
     const reward = data.reward || task.reward || {};
+    // Нараховуємо нагороду локально (з VIP бонусом +25% XP)
+    if (reward.xp) addXp(reward.xp);
+    if (reward.crystals) state.crystals += Number(reward.crystals);
+    if (reward.stars) state.stars += Number(reward.stars);
     showToast(`+${reward.xp || 0} XP +${reward.crystals || 0} 💎 +${reward.stars || 0} ⭐`);
     updateUI();
     renderTasks();
@@ -3360,7 +3385,7 @@ if (giveawayCloseBtn && giveawayModal) {
     try {
       const { data, error } = await supabaseClient
         .from("players") 
-        .select("username, gems, level, display_name")
+        .select("username, gems, level, display_name, vip, vip_until")
         .order("gems", { ascending: false })
         .limit(50);
 
@@ -3375,15 +3400,19 @@ if (giveawayCloseBtn && giveawayModal) {
 
       data.forEach((player, index) => {
         const isMe = String(player.username) === String(state.playerId);
+        const isVip = player.vip === true && player.vip_until > Date.now();
         const item = document.createElement("div");
-        item.className = `leader-item ${isMe ? 'is-me' : ''}`;
+        item.className = `leader-item ${isMe ? 'is-me' : ''} ${isVip ? 'leader-vip' : ''}`;
         
         const avatarSrc = getAvatarByLevel(player.level);
         const rank = index + 1;
 
         item.innerHTML = `
           <div class="leader-rank">${rank}</div>
-          <img class="leader-avatar" src="${avatarSrc}" alt="avatar" onerror="this.src='./images/avatar.png'">
+          <div class="leader-avatar-wrap${isVip ? ' leader-avatar-vip' : ''}">
+            <img class="leader-avatar" src="${avatarSrc}" alt="avatar" onerror="this.src='./images/avatar.png'">
+            ${isVip ? '<span class="leader-vip-badge">👑</span>' : ''}
+          </div>
           <div class="leader-info">
             <span class="leader-name">${player.display_name || player.username} ${isMe ? '<small>(Ти)</small>' : ''}</span>
             <span class="leader-level">Lvl ${player.level || 1}</span>
