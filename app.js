@@ -2053,9 +2053,9 @@ document.addEventListener("input", function (event) {
     const sendBtn = document.getElementById("sendGiftBtn");
     const value = event.target.value.trim();
     if (sendBtn) {
-      sendBtn.disabled = value.length !== 10;
-      sendBtn.style.opacity = value.length === 10 ? "1" : ".5";
-      sendBtn.style.cursor = value.length === 10 ? "pointer" : "not-allowed";
+     sendBtn.disabled = value.length < 5;
+sendBtn.style.opacity = value.length >= 5 ? "1" : ".5";
+sendBtn.style.cursor = value.length >= 5 ? "pointer" : "not-allowed";
     }
   }
 });
@@ -2072,7 +2072,7 @@ document.addEventListener("click", async function (event) {
     const giftUserIdEl = document.getElementById("giftUserId");
     const receiverId = giftUserIdEl ? giftUserIdEl.value.trim() : "";
 
-    if (receiverId.length !== 10) return alert("ID має складатися з 10 цифр");
+    if (receiverId.length < 5) return alert("Введіть коректний ID");
     if (!selectedGiftCard) return alert(t("chooseCardFirst"));
     if (receiverId === state.playerId) return alert(t("cannotGiftSelf"));
 
