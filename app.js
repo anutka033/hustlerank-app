@@ -1510,6 +1510,42 @@ function updateCards() {
   });
 }
 
+// Функція золотого підсвічування VIP бонусних статів
+function applyVipGoldenUI() {
+  const vip = isVipActive();
+  // XP текст
+  const xpEl = document.getElementById("xpText");
+  if (xpEl) {
+    xpEl.style.color = vip ? "#ffd700" : "";
+    xpEl.style.fontWeight = vip ? "700" : "";
+    xpEl.style.textShadow = vip ? "0 0 8px rgba(255,215,0,0.6)" : "";
+  }
+  // Зірки (золоті зірки завжди золоті, але додаємо glow)
+  const starsParent = starsEl?.parentElement;
+  if (starsParent) {
+    starsParent.style.textShadow = vip ? "0 0 10px rgba(255,215,0,0.8)" : "";
+  }
+  // Кристали
+  const coinsParent = coinsEl?.parentElement;
+  if (coinsParent) {
+    coinsParent.style.color = vip ? "#ffd700" : "";
+    coinsParent.style.textShadow = vip ? "0 0 10px rgba(255,215,0,0.7)" : "";
+  }
+  // XP бар — золотий при VIP
+  if (xpFill) {
+    xpFill.style.background = vip ? "linear-gradient(90deg, #ffd700, #ffaa00)" : "";
+    xpFill.style.boxShadow = vip ? "0 0 8px rgba(255,215,0,0.7)" : "";
+  }
+  // Рівень — золотий
+  if (levelEl) {
+    levelEl.style.color = vip ? "#ffd700" : "";
+    levelEl.style.textShadow = vip ? "0 0 8px rgba(255,215,0,0.6)" : "";
+  }
+  // VIP значок під аватаркою
+  const vipBadgeEl = document.getElementById("vipBadge");
+  if (vipBadgeEl) vipBadgeEl.style.display = vip ? "inline-flex" : "none";
+}
+
 function updateUI() {
   checkLevelUp();
   const percent = Math.min(100, Math.floor((state.xp / state.maxXp) * 100));
@@ -1529,6 +1565,7 @@ function updateUI() {
   if (xpFill) xpFill.style.width = percent + "%";
   if (coinsEl) coinsEl.textContent = state.crystals.toLocaleString("ru-RU");
   if (starsEl) starsEl.textContent = state.stars.toLocaleString("ru-RU");
+  applyVipGoldenUI();
   const dropStarsEl = document.getElementById("dropStars");
 if (dropStarsEl) {
     dropStarsEl.textContent = state.stars.toLocaleString("ru-RU");
@@ -1552,9 +1589,6 @@ if (taskStarsEl) {
   updateDrops();
   updateCards();
   renderFavoriteCard();
-
-  const vipBadge = document.getElementById("vipBadge");
-  if (vipBadge) vipBadge.style.display = isVipActive() ? "inline-flex" : "none";
 
   const vipBtn = document.getElementById("vipBtn");
   if (vipBtn) {
@@ -2776,10 +2810,13 @@ if (vipMenuBtn && vipModal && vipCancelBtn && vipBuyBtn) {
             state.vipUntil = Date.now() + (30 * 24 * 60 * 60 * 1000);
             vipFreeDropClaimed = false;
             localStorage.setItem("vipFreeDropClaimed", "false");
+            // +100 кристалів одразу після придбання VIP
+            state.crystals += 100;
             save();
             vipModal.classList.remove("show");
             showToast(t("vipActivated"));
             updateUI();
+            applyVipGoldenUI();
           }
         });
       }
