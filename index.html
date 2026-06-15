@@ -188,7 +188,7 @@
             <button class="game-play-btn" data-i18n="play">Грати</button>
         </div>
     </div>
-    <div class="game-card-ios soon-game-card">
+    <div class="game-card-ios" onclick="openScreen('farm')">
     <div class="game-icon-wrapper">
         <img src="images/star-farm.png" alt="Star Farm" class="game-icon-ios">
     </div>
@@ -198,8 +198,70 @@
         <div class="game-desc" data-i18n="starFarmDesc">Будуй ферму та добувай зірки</div>
     </div>
 
-    <button class="game-play-btn soon-game-btn" disabled data-i18n="soon">Скоро</button>
+    <button class="game-play-btn">🌟 Играть</button>
 </div>
+</div>
+
+<div id="farmScreen" class="screen">
+  <div class="farm-hero">
+    <button class="farm-back" onclick="openScreen('tasks')">‹</button>
+    <div>
+      <h1>🌟 Звёздная ферма</h1>
+      <p>Орбитальная ферма, редкие планеты, дроны и космический урожай.</p>
+    </div>
+  </div>
+
+  <section class="farm-stats">
+    <div><small>LVL</small><b id="farmLevel">1</b></div>
+    <div><small>⭐ Энергия</small><b id="farmEnergy">0</b></div>
+    <div><small>🌌 Пыль</small><b id="farmDust">0</b></div>
+    <div><small>💎 Алмазы</small><b id="farmStars">0</b></div>
+  </section>
+
+  <section class="farm-panel farm-status-panel">
+    <img src="images/star-farm.png" alt="Star Farm">
+    <div>
+      <h2 id="farmPlanet">Орбитальная грядка</h2>
+      <p id="farmStatus">Грядка свободна</p>
+      <p id="farmDroneInfo">0 шт. / сбор 0%</p>
+    </div>
+  </section>
+
+  <section class="farm-actions">
+    <button id="farmHarvestBtn">⭐ Собрать урожай</button>
+    <button id="farmSpeedBtn">💎 Ускорить</button>
+    <button id="farmDailyBtn">🎁 Ежедневный бонус</button>
+    <button id="farmLeaderboardBtn">🏆 Рейтинг фермеров</button>
+  </section>
+
+  <section class="farm-panel">
+    <h2>🌱 Посадить культуру</h2>
+    <div id="farmCrops" class="farm-list"></div>
+  </section>
+
+  <section class="farm-panel">
+    <h2>🛠 Улучшения</h2>
+    <button id="farmUpgradeBtn" class="farm-wide-btn">Улучшить ферму · <span id="farmUpgradeCost">0</span></button>
+    <button id="farmDroneBtn" class="farm-wide-btn">🚀 Дроны · <span id="farmDroneCost">0</span></button>
+  </section>
+
+  <section class="farm-panel">
+    <h2>🪐 Планеты</h2>
+    <div id="farmPlanets" class="farm-list"></div>
+  </section>
+
+  <section class="farm-panel">
+    <h2>ℹ️ Помощь</h2>
+    <p class="farm-help">Сажай культуры, жди созревания и собирай урожай. Энергия развивает ферму, пыль открывает крупные улучшения, алмазы ускоряют рост и усиливают дронов. Дроны повышают часть автоматического сбора, а редкие планеты усиливают доход.</p>
+    <p id="farmLog" class="farm-log">Ферма готова к запуску.</p>
+  </section>
+
+  <section class="farm-panel">
+    <h2>🏆 Рейтинг фермеров</h2>
+    <div id="farmLeaderboard" class="farm-leaderboard">
+      <div class="farm-muted">Нажми «Рейтинг фермеров», чтобы обновить список.</div>
+    </div>
+  </section>
 </div>
 
 

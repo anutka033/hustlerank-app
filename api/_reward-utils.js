@@ -199,7 +199,12 @@ export async function updatePlayerByColumn({ idColumn, userId, patch, eligibilit
 
   if (eligibilityOr) queryParts.push(`or=${encodeURIComponent(`(${eligibilityOr})`)}`);
 
-  const optionalAliasColumns = new Set(["stars", "coins", "crystals", "gems", "max_xp", "maxXp", "vipUntil"]);
+  const optionalAliasColumns = new Set([
+    "stars", "coins", "crystals", "gems", "max_xp", "maxXp", "vipUntil",
+    "display_name", "star_farm", "farm_level", "farm_energy", "farm_dust",
+    "farm_planet_rarity", "farm_total_energy", "last_daily_claim_at",
+    "last_bonus_claim_at", "last_treasury_claim_at"
+  ]);
 
   let currentPatch = { ...patch };
 

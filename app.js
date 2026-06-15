@@ -76,6 +76,15 @@ function safeNumber(value, fallback = 0) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
 }
+
+function safeJsonParse(value, fallback) {
+  try {
+    const parsed = JSON.parse(value || "");
+    return parsed && typeof parsed === "object" ? parsed : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
 function getTelegramPlayerDisplayName() {
   const user = getTelegramWebApp()?.initDataUnsafe?.user;
   if (user) {
@@ -173,6 +182,10 @@ function applyServerPlayer(player) {
 
     state.vipUntil = Math.max(0, getPlayerNumber(player, ["vip_until", "vipUntil"], state.vipUntil || 0));
 
+    if (player.star_farm) {
+      state.starFarm = normalizeStarFarm(player.star_farm);
+    }
+
     window.serverPlayerLoaded = true;
     save();
     updateUI();
@@ -222,7 +235,13 @@ async function savePlayerToServer() {
     vip: Boolean(state.vip),
     vip_until: Math.max(0, Number(state.vipUntil) || 0),
     vipUntil: Math.max(0, Number(state.vipUntil) || 0),
-    display_name: state.displayName
+    display_name: state.displayName,
+    star_farm: getStarFarm(),
+    farm_level: Math.max(1, Number(getStarFarm().level) || 1),
+    farm_energy: Math.max(0, Number(getStarFarm().energy) || 0),
+    farm_dust: Math.max(0, Number(getStarFarm().dust) || 0),
+    farm_planet_rarity: getCurrentPlanet().rarity || 1,
+    farm_total_energy: Math.max(0, Number(getStarFarm().totalEnergy) || 0)
   };
 
   try {
@@ -336,9 +355,10 @@ const state = {
   vip: localStorage.getItem("vip") === "true",
   vipUntil: Number(localStorage.getItem("vipUntil")) || 0,
   bonusTaken: localStorage.getItem("bonusTaken") === "true" && safeNumber(localStorage.getItem("bonusClaimEndTime"), 0) > Date.now(),
-  inventory: JSON.parse(localStorage.getItem("inventory") || "[]"),
-  boughtCards: JSON.parse(localStorage.getItem("boughtCards") || "[]"),
-  cards: JSON.parse(localStorage.getItem("cards") || "{}"),
+  inventory: safeJsonParse(localStorage.getItem("inventory"), []),
+  boughtCards: safeJsonParse(localStorage.getItem("boughtCards"), []),
+  cards: safeJsonParse(localStorage.getItem("cards"), {}),
+  starFarm: safeJsonParse(localStorage.getItem("starFarm"), null),
   favoriteCardId: localStorage.getItem("favoriteCardId") || "",
   lastLoginDate: localStorage.getItem("lastLoginDate") || "",
   dailyStreak: safeNumber(localStorage.getItem("dailyStreak"), 0),
@@ -1073,6 +1093,26 @@ const tasks = [
   { id: "invite_friends", title: "Запроси друга", desc: "Грай разом з друзями", icon: "👥", reward: { xp: 1500, crystals: 100, stars: 10 }, link: "https://t.me/HustleRank033Bot", type: "social" }
 ];
 
+const STAR_FARM_CONFIG = {
+  dailyCooldownMs: 24 * 60 * 60 * 1000,
+  eventCooldownMs: 20 * 60 * 1000,
+  crops: [
+    { id: "spark", name: "Искровая пшеница", level: 1, costEnergy: 0, costStars: 0, growMs: 10 * 60 * 1000, rewardEnergy: 35, rewardDust: 1 },
+    { id: "nova", name: "Нова-ягоды", level: 2, costEnergy: 55, costStars: 0, growMs: 30 * 60 * 1000, rewardEnergy: 120, rewardDust: 3 },
+    { id: "comet", name: "Кометный лен", level: 3, costEnergy: 160, costStars: 0, growMs: 90 * 60 * 1000, rewardEnergy: 360, rewardDust: 9 },
+    { id: "nebula", name: "Туманная орхидея", level: 5, costEnergy: 500, costStars: 2, growMs: 4 * 60 * 60 * 1000, rewardEnergy: 1100, rewardDust: 22 }
+  ],
+  planets: [
+    { id: "orbit", name: "Орбитальная грядка", level: 1, rarity: 1, costEnergy: 0, costDust: 0 },
+    { id: "luna", name: "Лунная теплица", level: 3, rarity: 2, costEnergy: 800, costDust: 25 },
+    { id: "mars", name: "Марсианский купол", level: 5, rarity: 3, costEnergy: 2600, costDust: 90 },
+    { id: "titan", name: "Сад Титана", level: 8, rarity: 5, costEnergy: 9000, costDust: 240 }
+  ],
+  upgradeCost: level => ({ energy: 140 * level * level, dust: 8 * level }),
+  droneCost: level => ({ stars: Math.min(18, 3 + level * 2), dust: 12 * level }),
+  speedupCostStars: 3
+};
+
 const levelEl = document.getElementById("level");
 const rankName = document.getElementById("rankName");
 const xpText = document.getElementById("xpText");
@@ -1097,6 +1137,7 @@ const screens = {
   drops: document.getElementById("dropsScreen"),
   friends: document.getElementById("friendsScreen"),
   cards: document.getElementById("cardsScreen"),
+  farm: document.getElementById("farmScreen"),
   game: document.getElementById("gameScreen")
 };
 
@@ -1122,7 +1163,13 @@ async function syncLeaderboardData() {
         xp: Number(state.xp) || 0,
         coins: Number(state.stars) || 0,
         avatar: "default",
-        display_name: displayName || String(state.playerId)
+        display_name: displayName || String(state.playerId),
+        star_farm: getStarFarm(),
+        farm_level: Math.max(1, Number(getStarFarm().level) || 1),
+        farm_energy: Math.max(0, Number(getStarFarm().energy) || 0),
+        farm_dust: Math.max(0, Number(getStarFarm().dust) || 0),
+        farm_planet_rarity: getCurrentPlanet().rarity || 1,
+        farm_total_energy: Math.max(0, Number(getStarFarm().totalEnergy) || 0)
       }, { onConflict: 'username' });
   } catch (e) {
     console.warn("Leaderboard sync failed:", e);
@@ -1162,6 +1209,7 @@ function save() {
   localStorage.setItem("lastLoginDate", state.lastLoginDate);
   localStorage.setItem("dailyStreak", state.dailyStreak);
   localStorage.setItem("lastTreasuryClaim", state.lastTreasuryClaim);
+  localStorage.setItem("starFarm", JSON.stringify(getStarFarm()));
   schedulePlayerSaveToServer();
   syncLeaderboardData();
   updateRealRating();
@@ -1608,6 +1656,7 @@ if (taskStarsEl) {
   updateBonus();
   updateDrops();
   updateCards();
+  renderStarFarm();
   renderFavoriteCard();
 
   const vipBtn = document.getElementById("vipBtn");
@@ -1663,6 +1712,7 @@ function openScreen(name) {
   }
 
   if (name === "tasks") renderTasks();
+  if (name === "farm") renderStarFarm();
   if (name === "game") startCountdown();
   if (name === "home") {
     renderFavoriteCard();
@@ -2717,38 +2767,23 @@ if (dailyClaimBtn) {
 
     dailyClaimBtn.disabled = true;
 
-    // OPTIMISTIC UI: одразу нараховуємо нагороду та відкриваємо модал
-    state.stars += 50;
-    addXp(500); // addXp враховує VIP +25% бонус
-    updateUI();
-    setDailyDropCooldown(new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString());
-
-    if (dailyModal) {
-      dailyModal.style.display = "flex";
-      setTimeout(() => dailyModal.classList.add("active"), 10);
-    }
-
-    // Сервер підтверджує у фоні
     try {
       const data = await claimServerReward("/api/daily/claim");
       const reward = data.reward || { stars: 50, xp: 500 };
-      // Коригуємо значення з сервера якщо вони відрізняються
       if (data.nextClaimAt) setDailyDropCooldown(data.nextClaimAt);
-      if (reward.stars && reward.stars !== 50) { state.stars += (reward.stars - 50); }
-      if (reward.xp && reward.xp !== 500) { state.xp += (reward.xp - 500); }
       updateUI();
       save();
+      showToast(`+${reward.stars || 0} ⭐ +${reward.xp || 0} XP`);
+      if (dailyModal) {
+        dailyModal.style.display = "flex";
+        setTimeout(() => dailyModal.classList.add("active"), 10);
+      }
     } catch (error) {
       if (error?.data?.nextClaimAt) {
         setDailyDropCooldown(error.data.nextClaimAt);
       }
-      // Якщо сервер повернув ALREADY_CLAIMED — відкатуємо optimistic нарахування
-      if (error?.message?.includes("ALREADY_CLAIMED")) {
-        state.stars = Math.max(0, state.stars - 50);
-        const xpToRollback = isVipActive() ? Math.floor(500 * 1.25) : 500;
-        state.xp = Math.max(0, state.xp - xpToRollback);
-        updateUI();
-      }
+      dailyClaimBtn.disabled = false;
+      showToast(formatClaimError(error));
     }
   });
 }
@@ -2899,6 +2934,293 @@ function handleTaskAction(task) {
   }
 }
 
+function normalizeStarFarm(rawFarm) {
+  const parsedFarm = typeof rawFarm === "string" ? safeJsonParse(rawFarm, {}) : rawFarm;
+  const farm = parsedFarm && typeof parsedFarm === "object" ? parsedFarm : {};
+  return {
+    level: Math.max(1, safeNumber(farm.level, 1)),
+    energy: Math.max(0, safeNumber(farm.energy, 20)),
+    dust: Math.max(0, safeNumber(farm.dust, 0)),
+    drones: Math.max(0, safeNumber(farm.drones, 0)),
+    droneLevel: Math.max(1, safeNumber(farm.droneLevel, 1)),
+    planetId: farm.planetId || "orbit",
+    plantedCropId: farm.plantedCropId || "",
+    plantedAt: Math.max(0, safeNumber(farm.plantedAt, 0)),
+    readyAt: Math.max(0, safeNumber(farm.readyAt, 0)),
+    lastDailyAt: Math.max(0, safeNumber(farm.lastDailyAt, 0)),
+    lastEventAt: Math.max(0, safeNumber(farm.lastEventAt, 0)),
+    totalEnergy: Math.max(0, safeNumber(farm.totalEnergy, 0)),
+    harvests: Math.max(0, safeNumber(farm.harvests, 0)),
+    unlockedPlanets: Array.isArray(farm.unlockedPlanets) && farm.unlockedPlanets.length ? farm.unlockedPlanets : ["orbit"]
+  };
+}
+
+function getStarFarm() {
+  state.starFarm = normalizeStarFarm(state.starFarm);
+  return state.starFarm;
+}
+
+function getCurrentPlanet() {
+  const farm = getStarFarm();
+  return STAR_FARM_CONFIG.planets.find(planet => planet.id === farm.planetId) || STAR_FARM_CONFIG.planets[0];
+}
+
+function getPlantedCrop() {
+  const farm = getStarFarm();
+  return STAR_FARM_CONFIG.crops.find(crop => crop.id === farm.plantedCropId) || null;
+}
+
+function formatFarmTime(ms) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours) return `${hours}ч ${minutes}м`;
+  if (minutes) return `${minutes}м ${seconds}с`;
+  return `${seconds}с`;
+}
+
+function addFarmLog(message) {
+  const log = document.getElementById("farmLog");
+  if (log) log.textContent = message;
+}
+
+function maybeApplyFarmEvent(farm) {
+  const now = Date.now();
+  if (now - farm.lastEventAt < STAR_FARM_CONFIG.eventCooldownMs || Math.random() > 0.28) return "";
+  farm.lastEventAt = now;
+  const roll = Math.random();
+  if (roll < 0.35) {
+    const bonus = 15 + farm.level * 5;
+    farm.energy += bonus;
+    farm.totalEnergy += bonus;
+    return `Солнечная вспышка дала +${bonus} энергии.`;
+  }
+  if (roll < 0.62) {
+    const dust = 2 + Math.floor(farm.level / 2);
+    farm.dust += dust;
+    return `Метеоритный дождь оставил +${dust} пыли.`;
+  }
+  if (roll < 0.88) return "Редкий урожай удвоил космическую пыль.";
+  if (Math.random() < 0.25) {
+    state.stars += 1;
+    return "Дрон нашел 1 алмаз среди обломков.";
+  }
+  return "Сканеры нашли редкий, но пустой астероид.";
+}
+
+function renderStarFarm() {
+  const root = document.getElementById("farmScreen");
+  if (!root) return;
+
+  const farm = getStarFarm();
+  const now = Date.now();
+  const crop = getPlantedCrop();
+  const planet = getCurrentPlanet();
+  const ready = crop && farm.readyAt <= now;
+  const remaining = crop ? Math.max(0, farm.readyAt - now) : 0;
+  const droneShare = Math.min(45, farm.drones * 8 + (farm.droneLevel - 1) * 4);
+  const nextUpgrade = STAR_FARM_CONFIG.upgradeCost(farm.level);
+  const nextDrone = STAR_FARM_CONFIG.droneCost(farm.droneLevel);
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+
+  setText("farmLevel", farm.level);
+  setText("farmEnergy", farm.energy.toLocaleString("ru-RU"));
+  setText("farmDust", farm.dust.toLocaleString("ru-RU"));
+  setText("farmStars", state.stars.toLocaleString("ru-RU"));
+  setText("farmPlanet", planet.name);
+  setText("farmDroneInfo", `${farm.drones} шт. / сбор ${droneShare}%`);
+  setText("farmStatus", crop ? `${crop.name}: ${ready ? "готово" : formatFarmTime(remaining)}` : "Грядка свободна");
+  setText("farmUpgradeCost", `${nextUpgrade.energy} энергии · ${nextUpgrade.dust} 🌌`);
+  setText("farmDroneCost", `${nextDrone.stars} 💎 · ${nextDrone.dust} 🌌`);
+
+  const cropsEl = document.getElementById("farmCrops");
+  if (cropsEl) {
+    cropsEl.innerHTML = "";
+    STAR_FARM_CONFIG.crops.forEach(cropItem => {
+      const locked = farm.level < cropItem.level;
+      const btn = document.createElement("button");
+      btn.className = "farm-list-btn";
+      btn.disabled = locked || Boolean(farm.plantedCropId);
+      btn.innerHTML = `<b>${cropItem.name}</b><span>${locked ? `LVL ${cropItem.level}` : `${formatFarmTime(cropItem.growMs)} · +${cropItem.rewardEnergy} энергии · +${cropItem.rewardDust} 🌌 · ${cropItem.costEnergy} энергии${cropItem.costStars ? ` · ${cropItem.costStars} 💎` : ""}`}</span>`;
+      btn.addEventListener("click", () => plantStarCrop(cropItem.id));
+      cropsEl.appendChild(btn);
+    });
+  }
+
+  const planetsEl = document.getElementById("farmPlanets");
+  if (planetsEl) {
+    planetsEl.innerHTML = "";
+    STAR_FARM_CONFIG.planets.forEach(planetItem => {
+      const unlocked = farm.unlockedPlanets.includes(planetItem.id);
+      const btn = document.createElement("button");
+      btn.className = `farm-list-btn ${planetItem.id === farm.planetId ? "active" : ""}`;
+      btn.innerHTML = `<b>${planetItem.name}</b><span>${unlocked ? "Открыта" : `LVL ${planetItem.level} · ${planetItem.costEnergy} энергии · ${planetItem.costDust} 🌌`} · редкость ${planetItem.rarity}</span>`;
+      btn.addEventListener("click", () => selectOrUnlockPlanet(planetItem.id));
+      planetsEl.appendChild(btn);
+    });
+  }
+
+  const harvestBtn = document.getElementById("farmHarvestBtn");
+  if (harvestBtn) harvestBtn.disabled = !ready;
+  const speedBtn = document.getElementById("farmSpeedBtn");
+  if (speedBtn) speedBtn.disabled = !crop || ready || state.stars < STAR_FARM_CONFIG.speedupCostStars;
+  const dailyBtn = document.getElementById("farmDailyBtn");
+  if (dailyBtn) dailyBtn.disabled = now - farm.lastDailyAt < STAR_FARM_CONFIG.dailyCooldownMs;
+}
+
+function plantStarCrop(cropId) {
+  const farm = getStarFarm();
+  const crop = STAR_FARM_CONFIG.crops.find(item => item.id === cropId);
+  if (!crop || farm.plantedCropId) return;
+  if (farm.level < crop.level) return showToast("Нужен уровень фермы " + crop.level);
+  if (farm.energy < crop.costEnergy) return showToast("Не хватает звездной энергии");
+  if (state.stars < crop.costStars) return showToast("Не хватает алмазов");
+  farm.energy -= crop.costEnergy;
+  state.stars -= crop.costStars;
+  farm.plantedCropId = crop.id;
+  farm.plantedAt = Date.now();
+  farm.readyAt = farm.plantedAt + crop.growMs;
+  addFarmLog(`Посажено: ${crop.name}.`);
+  save();
+  updateUI();
+}
+
+function harvestStarCrop() {
+  const farm = getStarFarm();
+  const crop = getPlantedCrop();
+  if (!crop) return showToast("Сначала посадите культуру");
+  if (farm.readyAt > Date.now()) return showToast("Урожай еще растет");
+  const eventText = maybeApplyFarmEvent(farm);
+  const rareMultiplier = eventText.includes("Редкий урожай") ? 2 : 1;
+  const planetBonus = 1 + (getCurrentPlanet().rarity - 1) * 0.08;
+  const droneBonus = 1 + Math.min(0.45, farm.drones * 0.08 + (farm.droneLevel - 1) * 0.04);
+  const gainedEnergy = Math.floor(crop.rewardEnergy * planetBonus * droneBonus);
+  const gainedDust = Math.max(1, Math.floor(crop.rewardDust * rareMultiplier));
+  farm.energy += gainedEnergy;
+  farm.dust += gainedDust;
+  farm.totalEnergy += gainedEnergy;
+  farm.harvests += 1;
+  farm.plantedCropId = "";
+  farm.plantedAt = 0;
+  farm.readyAt = 0;
+  addFarmLog(`${eventText ? eventText + " " : ""}Собрано +${gainedEnergy} энергии и +${gainedDust} пыли.`);
+  save();
+  updateUI();
+}
+
+function speedUpStarCrop() {
+  const farm = getStarFarm();
+  if (!farm.plantedCropId || farm.readyAt <= Date.now()) return;
+  if (state.stars < STAR_FARM_CONFIG.speedupCostStars) return showToast("Не хватает алмазов");
+  state.stars -= STAR_FARM_CONFIG.speedupCostStars;
+  farm.readyAt = Date.now();
+  addFarmLog("Рост ускорен за 3 алмаза.");
+  save();
+  updateUI();
+}
+
+function upgradeStarFarm() {
+  const farm = getStarFarm();
+  const cost = STAR_FARM_CONFIG.upgradeCost(farm.level);
+  if (farm.energy < cost.energy || farm.dust < cost.dust) return showToast("Не хватает ресурсов для улучшения");
+  farm.energy -= cost.energy;
+  farm.dust -= cost.dust;
+  farm.level += 1;
+  addFarmLog("Ферма улучшена до LVL " + farm.level + ".");
+  save();
+  updateUI();
+}
+
+function upgradeFarmDrones() {
+  const farm = getStarFarm();
+  const cost = STAR_FARM_CONFIG.droneCost(farm.droneLevel);
+  if (state.stars < cost.stars || farm.dust < cost.dust) return showToast("Не хватает алмазов или пыли");
+  state.stars -= cost.stars;
+  farm.dust -= cost.dust;
+  if (farm.drones < 5) farm.drones += 1;
+  else farm.droneLevel += 1;
+  addFarmLog("Дроны усилены. Автосбор стал выше.");
+  save();
+  updateUI();
+}
+
+function selectOrUnlockPlanet(planetId) {
+  const farm = getStarFarm();
+  const planet = STAR_FARM_CONFIG.planets.find(item => item.id === planetId);
+  if (!planet) return;
+  if (farm.unlockedPlanets.includes(planet.id)) {
+    farm.planetId = planet.id;
+    addFarmLog("Выбрана планета: " + planet.name + ".");
+    save();
+    updateUI();
+    return;
+  }
+  if (farm.level < planet.level) return showToast("Нужен уровень фермы " + planet.level);
+  if (farm.energy < planet.costEnergy || farm.dust < planet.costDust) return showToast("Не хватает ресурсов для планеты");
+  farm.energy -= planet.costEnergy;
+  farm.dust -= planet.costDust;
+  farm.unlockedPlanets.push(planet.id);
+  farm.planetId = planet.id;
+  addFarmLog("Открыта планета: " + planet.name + ".");
+  save();
+  updateUI();
+}
+
+function claimFarmDailyBonus() {
+  const farm = getStarFarm();
+  const now = Date.now();
+  if (now - farm.lastDailyAt < STAR_FARM_CONFIG.dailyCooldownMs) return showToast("Бонус уже забран");
+  const energy = 45 + farm.level * 12;
+  const dust = 2 + Math.floor(farm.level / 2);
+  farm.energy += energy;
+  farm.dust += dust;
+  farm.totalEnergy += energy;
+  farm.lastDailyAt = now;
+  addFarmLog(`Ежедневный бонус: +${energy} энергии и +${dust} пыли.`);
+  save();
+  updateUI();
+}
+
+async function loadFarmLeaderboard() {
+  const list = document.getElementById("farmLeaderboard");
+  if (!list) return;
+  list.innerHTML = "<div class=\"farm-muted\">Загрузка рейтинга...</div>";
+  try {
+    const { data, error } = await supabaseClient
+      .from("players")
+      .select("username, display_name, farm_level, farm_total_energy, farm_planet_rarity")
+      .order("farm_level", { ascending: false })
+      .order("farm_total_energy", { ascending: false })
+      .limit(20);
+    if (error) throw error;
+    if (!data || !data.length) {
+      list.innerHTML = "<div class=\"farm-muted\">Пока нет фермеров в рейтинге.</div>";
+      return;
+    }
+    list.innerHTML = data.map((player, index) => `
+      <div class="farm-rank-row">
+        <b>#${index + 1}</b>
+        <span>${player.display_name || player.username || "Игрок"}</span>
+        <small>LVL ${player.farm_level || 1} · ${(player.farm_total_energy || 0).toLocaleString("ru-RU")} энергии · R${player.farm_planet_rarity || 1}</small>
+      </div>
+    `).join("");
+  } catch (error) {
+    list.innerHTML = "<div class=\"farm-muted\">Рейтинг появится после добавления farm_* колонок в Supabase.</div>";
+  }
+}
+
+document.getElementById("farmHarvestBtn")?.addEventListener("click", harvestStarCrop);
+document.getElementById("farmSpeedBtn")?.addEventListener("click", speedUpStarCrop);
+document.getElementById("farmUpgradeBtn")?.addEventListener("click", upgradeStarFarm);
+document.getElementById("farmDroneBtn")?.addEventListener("click", upgradeFarmDrones);
+document.getElementById("farmDailyBtn")?.addEventListener("click", claimFarmDailyBonus);
+document.getElementById("farmLeaderboardBtn")?.addEventListener("click", loadFarmLeaderboard);
+setInterval(renderStarFarm, 1000);
+
 async function completeTask(task) {
   const btn = document.getElementById(`btn_${task.id}`);
   if (btn) btn.disabled = true;
@@ -2907,10 +3229,6 @@ async function completeTask(task) {
     const data = await claimServerReward("/api/tasks/claim", { taskId: task.id });
     localStorage.setItem(`task_${task.id}_completed`, "true");
     const reward = data.reward || task.reward || {};
-    // Нараховуємо нагороду локально (з VIP бонусом +25% XP)
-    if (reward.xp) addXp(reward.xp);
-    if (reward.crystals) state.crystals += Number(reward.crystals);
-    if (reward.stars) state.stars += Number(reward.stars);
     showToast(`+${reward.xp || 0} XP +${reward.crystals || 0} 💎 +${reward.stars || 0} ⭐`);
     updateUI();
     renderTasks();
@@ -2958,38 +3276,27 @@ document.addEventListener("click", async function(e) {
 
     btn.disabled = true;
 
-    // OPTIMISTIC UI: одразу нараховуємо кристали та закриваємо модал
-    const optimisticAmount = updateTreasuryUI();
-    state.crystals += optimisticAmount;
-    state.lastTreasuryClaim = Date.now();
-    updateUI();
-    updateTreasuryUI();
-    showToast(t("claimedAmount") + optimisticAmount + " 💎");
-
-    const modal = document.getElementById("treasuryModal");
-    if (modal) {
-      modal.classList.remove("active");
-      setTimeout(() => modal.style.display = "none", 300);
-    }
-
-    btn.disabled = false;
-
-    // Сервер підтверджує у фоні
-    claimServerReward("/api/treasury/claim").then(data => {
+    try {
+      const data = await claimServerReward("/api/treasury/claim");
       if (data?.treasury?.claimedAt) {
         state.lastTreasuryClaim = new Date(data.treasury.claimedAt).getTime();
       }
-      // Коригуємо значення якщо сервер дав іншу суму
       const serverAmount = data?.reward?.crystals || 0;
-      if (serverAmount !== optimisticAmount) {
-        state.crystals += (serverAmount - optimisticAmount);
-        updateUI();
+      updateUI();
+      updateTreasuryUI();
+      showToast(t("claimedAmount") + serverAmount + " 💎");
+
+      const modal = document.getElementById("treasuryModal");
+      if (modal) {
+        modal.classList.remove("active");
+        setTimeout(() => modal.style.display = "none", 300);
       }
       save();
-    }).catch(() => {
-      // Помилка сервера — нагорода вже нарахована, зберігаємо
-      save();
-    });
+    } catch (error) {
+      showToast(formatClaimError(error));
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   if (e.target.closest("#closeTreasuryModal") || e.target.id === "treasuryModal") {
@@ -3526,4 +3833,3 @@ document.addEventListener("click", (event) => {
   }
 });
 })();
-
