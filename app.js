@@ -3191,38 +3191,126 @@ function renderStarFarm() {
   setText("farmReactorCost", `${nextReactor.energy} енергии · ${nextReactor.dust} 🌌 · ${nextReactor.stars} 💎`);
 
   const cropsEl = document.getElementById("farmCrops");
+  // Культури — використовуємо window.plantStarCrop щоб drawer закривався
+  const CROP_EMOJIS = { spark: "🌾", nova: "🍇", comet: "☄️", nebula: "🌸", quasar: "🌠" };
   if (cropsEl) {
     cropsEl.innerHTML = "";
     STAR_FARM_CONFIG.crops.forEach(cropItem => {
       const locked = farm.level < cropItem.level;
+      const isPlanted = farm.plantedCropId === cropItem.id;
+      // Баг #2 fix: сіріємо кнопку якщо недостатньо ресурсів
+      const cantAfford = !locked && !isPlanted && !farm.plantedCropId &&
+        (farm.energy < cropItem.costEnergy || state.stars < (cropItem.costStars || 0));
       const btn = document.createElement("button");
-      btn.className = "farm-list-btn";
-      btn.disabled = locked || Boolean(farm.plantedCropId);
-      btn.innerHTML = `<b>${cropItem.name}</b><span>${locked ? `LVL ${cropItem.level}` : `${formatFarmTime(cropItem.growMs)} · +${cropItem.rewardEnergy} энергии · +${cropItem.rewardDust} 🌌 · ${cropItem.costEnergy} энергии${cropItem.costStars ? ` · ${cropItem.costStars} 💎` : ""}`}</span>`;
-      btn.addEventListener("click", () => plantStarCrop(cropItem.id));
+      btn.className = "farm-list-btn" + (isPlanted ? " active" : "") + (cantAfford ? " nf-cant-afford" : "");
+      btn.disabled = locked || (Boolean(farm.plantedCropId) && !isPlanted);
+      const emoji = CROP_EMOJIS[cropItem.id] || "🌱";
+      let costText;
+      if (locked) {
+        costText = `🔒 Потрібен LVL ${cropItem.level}`;
+      } else if (isPlanted) {
+        costText = `⏳ Росте — ${crop ? formatFarmTime(remaining) : ""}`;
+      } else if (cantAfford) {
+        const needEnergy = cropItem.costEnergy > farm.energy ? `⚡ недостатньо ${cropItem.costEnergy - farm.energy}` : "";
+        const needStars = (cropItem.costStars || 0) > state.stars ? `💎 недостатньо ${(cropItem.costStars || 0) - state.stars}` : "";
+        costText = `❌ ${[needEnergy, needStars].filter(Boolean).join(" · ")}`;
+      } else {
+        costText = `⏱ ${formatFarmTime(cropItem.growMs)} · +${cropItem.rewardEnergy}⚡ · +${cropItem.rewardDust}🌌${cropItem.costEnergy ? ` · ${cropItem.costEnergy}⚡` : ""}${cropItem.costStars ? ` · ${cropItem.costStars}💎` : ""}`;
+      }
+      btn.innerHTML = `<b>${emoji} ${cropItem.name}</b><span>${costText}</span>`;
+      btn.addEventListener("click", () => {
+        const fn = window.plantStarCrop || plantStarCrop;
+        fn(cropItem.id);
+      });
       cropsEl.appendChild(btn);
     });
   }
 
+  // Планети — з емодзі та індикацією рідкості
+  const PLANET_EMOJIS_R = { orbit: "🌍", luna: "🌙", mars: "🔴", titan: "🪐" };
   const planetsEl = document.getElementById("farmPlanets");
   if (planetsEl) {
     planetsEl.innerHTML = "";
     STAR_FARM_CONFIG.planets.forEach(planetItem => {
       const unlocked = farm.unlockedPlanets.includes(planetItem.id);
+      const isActive = planetItem.id === farm.planetId;
       const btn = document.createElement("button");
-      btn.className = `farm-list-btn ${planetItem.id === farm.planetId ? "active" : ""}`;
-      btn.innerHTML = `<b>${planetItem.name}</b><span>${unlocked ? "Открыта" : `LVL ${planetItem.level} · ${planetItem.costEnergy} энергии · ${planetItem.costDust} 🌌`} · редкость ${planetItem.rarity}</span>`;
+      btn.className = "farm-list-btn" + (isActive ? " active" : "");
+      btn.disabled = !unlocked && farm.level < planetItem.level;
+      const emoji = PLANET_EMOJIS_R[planetItem.id] || "🌍";
+      const rarityStars = "⭐".repeat(Math.min(planetItem.rarity, 5));
+      const statusText = isActive
+        ? `✅ Активна · ${rarityStars}`
+        : unlocked
+          ? `✓ Відкрита · ${rarityStars}`
+          : `🔒 LVL ${planetItem.level} · ${planetItem.costEnergy}⚡ · ${planetItem.costDust}🌌`;
+      btn.innerHTML = `<b>${emoji} ${planetItem.name}</b><span>${statusText}</span>`;
       btn.addEventListener("click", () => selectOrUnlockPlanet(planetItem.id));
       planetsEl.appendChild(btn);
     });
   }
 
+  // Кнопка збору
   const harvestBtn = document.getElementById("farmHarvestBtn");
-  if (harvestBtn) harvestBtn.disabled = !ready;
+  if (harvestBtn) {
+    harvestBtn.disabled = !ready;
+    harvestBtn.textContent = ready ? "⭐ Зібрати!" : (crop ? `⏳ ${formatFarmTime(remaining)}` : "⭐ Зібрати");
+  }
+
+  // Кнопка "Прискорити" — оновлюємо видимість в новому UI
   const speedBtn = document.getElementById("farmSpeedBtn");
-  if (speedBtn) speedBtn.disabled = !crop || ready || state.stars < STAR_FARM_CONFIG.speedupCostStars;
+  if (speedBtn) {
+    const canSpeed = crop && !ready && state.stars >= STAR_FARM_CONFIG.speedupCostStars;
+    speedBtn.disabled = !canSpeed;
+    const speedIconEl = speedBtn.querySelector(".nf-action-icon");
+    if (speedIconEl) speedIconEl.textContent = canSpeed ? "💎" : "🔒";
+  }
+
+  // Кнопка "Бонус" — показуємо cooldown
   const dailyBtn = document.getElementById("farmDailyBtn");
-  if (dailyBtn) dailyBtn.disabled = now - farm.lastDailyAt < STAR_FARM_CONFIG.dailyCooldownMs;
+  if (dailyBtn) {
+    const dailyCooldown = now - farm.lastDailyAt < STAR_FARM_CONFIG.dailyCooldownMs;
+    dailyBtn.disabled = dailyCooldown;
+    const dailyIconEl = dailyBtn.querySelector(".nf-action-icon");
+    if (dailyIconEl) dailyIconEl.textContent = dailyCooldown ? "✅" : "🎁";
+    const dailyLblEl = dailyBtn.querySelector(".nf-action-lbl");
+    if (dailyLblEl) {
+      if (dailyCooldown) {
+        const left = STAR_FARM_CONFIG.dailyCooldownMs - (now - farm.lastDailyAt);
+        const h = Math.floor(left / 3600000);
+        const m = Math.floor((left % 3600000) / 60000);
+        dailyLblEl.textContent = h > 0 ? `${h}г ${m}хв` : `${m} хв`;
+      } else {
+        dailyLblEl.textContent = "Бонус";
+      }
+    }
+  }
+
+  // Кнопки апгрейдів — показуємо чи достатньо ресурсів
+  const upgradeBtn = document.getElementById("farmUpgradeBtn");
+  if (upgradeBtn) {
+    const canUpgrade = farm.energy >= nextUpgrade.energy && farm.dust >= nextUpgrade.dust;
+    upgradeBtn.disabled = !canUpgrade;
+    upgradeBtn.style.background = canUpgrade
+      ? "linear-gradient(135deg, #7c3aed, #ec4899)"
+      : "rgba(255,255,255,.15)";
+  }
+  const droneBtn = document.getElementById("farmDroneBtn");
+  if (droneBtn) {
+    const canDrone = state.stars >= nextDrone.stars && farm.dust >= nextDrone.dust;
+    droneBtn.disabled = !canDrone;
+    droneBtn.style.background = canDrone
+      ? "linear-gradient(135deg, #7c3aed, #ec4899)"
+      : "rgba(255,255,255,.15)";
+  }
+  const reactorBtn = document.getElementById("farmReactorBtn");
+  if (reactorBtn) {
+    const canReactor = farm.energy >= nextReactor.energy && farm.dust >= nextReactor.dust && state.stars >= nextReactor.stars;
+    reactorBtn.disabled = !canReactor;
+    reactorBtn.style.background = canReactor
+      ? "linear-gradient(135deg, #0088cc, #00e5ff)"
+      : "rgba(255,255,255,.15)";
+  }
 }
 
 function plantStarCrop(cropId) {
@@ -3449,12 +3537,41 @@ setInterval(renderStarFarm, 1000);
   const upgradesOverlay = document.getElementById("nfDrawerUpgradesOverlay");
   if (upgradesOverlay) upgradesOverlay.addEventListener("click", () => closeDrawer("nfDrawerUpgrades", "nfDrawerUpgradesOverlay"));
 
-  // Закриваємо дравер після вибору культури
+  // Баг #1 fix: закриваємо дравер ТІЛЬКИ при успішній посадці (перевіряємо чи змінився plantedCropId)
   const origPlantStarCrop = window.plantStarCrop || plantStarCrop;
   window.plantStarCrop = function(cropId) {
+    const farmBefore = typeof getStarFarm === "function" ? getStarFarm() : null;
+    const plantedBefore = farmBefore ? farmBefore.plantedCropId : null;
     origPlantStarCrop(cropId);
-    closeDrawer("nfDrawerCrops", "nfDrawerCropsOverlay");
+    const farmAfter = typeof getStarFarm === "function" ? getStarFarm() : null;
+    const plantedAfter = farmAfter ? farmAfter.plantedCropId : null;
+    // Закриваємо дравер лише якщо посадка відбулась
+    if (plantedAfter && plantedAfter !== plantedBefore) {
+      closeDrawer("nfDrawerCrops", "nfDrawerCropsOverlay");
+    }
   };
+
+  // Клік на планету — збираємо якщо готово, інакше відкриваємо drawer культур
+  const planetEl0 = document.getElementById("nfPlanet");
+  if (planetEl0) {
+    planetEl0.addEventListener("click", function() {
+      const farm0 = typeof getStarFarm === "function" ? getStarFarm() : null;
+      if (!farm0) return;
+      const now0 = Date.now();
+      const crop0 = typeof getPlantedCrop === "function" ? getPlantedCrop() : null;
+      const ready0 = crop0 && farm0.readyAt <= now0;
+      if (ready0) {
+        // Збираємо врожай
+        const fn = window.harvestStarCrop || harvestStarCrop;
+        fn();
+      } else if (!farm0.plantedCropId) {
+        // Відкриваємо drawer посадки
+        openDrawer("nfDrawerCrops", "nfDrawerCropsOverlay");
+      }
+      // Haptic
+      try { window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); } catch(e) {}
+    });
+  }
 
   // —— Оновлення планети та кільця прогресу ——
   const PLANET_EMOJIS = { orbit: "🌍", luna: "🌙", mars: "🔴", titan: "🪐" };
@@ -3531,9 +3648,35 @@ setInterval(renderStarFarm, 1000);
       lastResVals[id] = cur;
     });
 
-    // Світління кнопки "Посадити" якщо є посаджена культура
+    // Кнопка "Посадити" — світління та текст
     const btnCropsEl = document.getElementById("nfBtnCrops");
-    if (btnCropsEl) btnCropsEl.classList.toggle("nf-active", Boolean(farm.plantedCropId));
+    if (btnCropsEl) {
+      btnCropsEl.classList.toggle("nf-active", Boolean(farm.plantedCropId));
+      const cropsIconEl = btnCropsEl.querySelector(".nf-action-icon");
+      const cropsLblEl = btnCropsEl.querySelector(".nf-action-lbl");
+      if (cropsIconEl) cropsIconEl.textContent = ready ? "⭐" : (farm.plantedCropId ? "⏳" : "🌱");
+      if (cropsLblEl) cropsLblEl.textContent = ready ? "Зібрати" : (farm.plantedCropId ? "Росте" : "Посадити");
+    }
+
+    // Підказка на планеті (під планетою)
+    const statusEl = document.getElementById("farmStatus");
+    if (statusEl) {
+      if (ready) {
+        statusEl.textContent = "⭐ Готово! Тапніть";
+        statusEl.style.color = "#ffd700";
+        statusEl.style.borderColor = "rgba(255,215,0,.4)";
+      } else if (farm.plantedCropId) {
+        const crop2 = typeof getPlantedCrop === "function" ? getPlantedCrop() : null;
+        const rem2 = farm.readyAt - Date.now();
+        statusEl.textContent = crop2 ? `🌱 ${crop2.name}: ${formatFarmTime(Math.max(0, rem2))}` : "⏳ Росте...";
+        statusEl.style.color = "rgba(255,255,255,.7)";
+        statusEl.style.borderColor = "rgba(255,255,255,.1)";
+      } else {
+        statusEl.textContent = "🌍 Тапніть щоб посадити";
+        statusEl.style.color = "rgba(255,255,255,.5)";
+        statusEl.style.borderColor = "rgba(255,255,255,.1)";
+      }
+    }
   }
 
   // —— Ефект збору — частинки і floating text ——
@@ -3596,6 +3739,176 @@ setInterval(renderStarFarm, 1000);
   // —— Запуск циклу оновлення ——
   setInterval(updateFarmPlanetUI, 500);
   updateFarmPlanetUI();
+
+  // ═══════════════════════════════════════════════════════════
+  // FARM TUTORIAL — показуємо тільки при першому заході
+  // ═══════════════════════════════════════════════════════════
+  const FARM_TUTORIAL_KEY = "farmTutorialDone_v1";
+
+  const TUTORIAL_STEPS = [
+    {
+      icon: "🌍",
+      title: "Твоя орбітальна ферма",
+      text: "Це космічна ферма, де ти вирощуєш енергію ⚡ і пил 🌌. Вони нужні для апгрейдів і розвитку ферми.",
+      targetId: "nfPlanet",
+      position: "top"
+    },
+    {
+      icon: "🌱",
+      title: "Посади культуру",
+      text: "Натисни «Посадити» або тапни на планету. Обери культуру — чим довше росте, тим більше нагорода.",
+      targetId: "nfBtnCrops",
+      position: "top"
+    },
+    {
+      icon: "⭐",
+      title: "Збери врожай",
+      text: "Коли планета засвітиться золотом — врожай готовий! Тапни на планету або натисни кнопку «⭐ Зібрати!».",
+      targetId: "farmHarvestBtn",
+      position: "top"
+    },
+    {
+      icon: "🛠️",
+      title: "Апгрейди",
+      text: "Накопич енергію і пил — покращуй ферму, додай дронів і реактор. Чим вищий рівень — тим більше нагорода.",
+      targetId: "nfBtnUpgrades",
+      position: "top"
+    },
+    {
+      icon: "🎁",
+      title: "Щоденний бонус",
+      text: "Не забувай заходити щодня за бонусом — це безкоштовна енергія і пил для розвитку. Удачи фермеру! 🚀",
+      targetId: "farmDailyBtn",
+      position: "top"
+    }
+  ];
+
+  let tutStep = 0;
+  let tutPulseEl = null;
+
+  function getTutorialOverlay() { return document.getElementById("nfTutorialOverlay"); }
+  function getTutorialSpotlight() { return document.getElementById("nfTutorialSpotlight"); }
+  function getTutorialTooltip() { return document.getElementById("nfTutorialTooltip"); }
+
+  function updateTutorialSpotlight(targetId) {
+    const spotlight = getTutorialSpotlight();
+    if (!spotlight) return;
+    if (!targetId) {
+      spotlight.style.clipPath = "none";
+      spotlight.style.background = "rgba(0,0,0,0.78)";
+      return;
+    }
+    const el = document.getElementById(targetId);
+    if (!el) {
+      spotlight.style.clipPath = "none";
+      return;
+    }
+    const rect = el.getBoundingClientRect();
+    const pad = 14;
+    const x1 = rect.left - pad;
+    const y1 = rect.top - pad;
+    const x2 = rect.right + pad;
+    const y2 = rect.bottom + pad;
+    const r = 18; // border-radius
+    // Створюємо виріз через clip-path
+    spotlight.style.background = "rgba(0,0,0,0.78)";
+    spotlight.style.clipPath = `polygon(
+      0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%,
+      ${x1+r}px ${y1}px,
+      ${x1}px ${y1+r}px,
+      ${x1}px ${y2-r}px,
+      ${x1+r}px ${y2}px,
+      ${x2-r}px ${y2}px,
+      ${x2}px ${y2-r}px,
+      ${x2}px ${y1+r}px,
+      ${x2-r}px ${y1}px,
+      ${x1+r}px ${y1}px
+    )`;
+
+    // Пульсуючий індикатор
+    if (tutPulseEl) tutPulseEl.remove();
+    tutPulseEl = document.createElement("div");
+    tutPulseEl.className = "nf-tutorial-pulse";
+    tutPulseEl.style.left = (rect.left + rect.width / 2) + "px";
+    tutPulseEl.style.top = (rect.top + rect.height / 2) + "px";
+    document.body.appendChild(tutPulseEl);
+  }
+
+  function renderTutorialStep(step) {
+    const data = TUTORIAL_STEPS[step];
+    if (!data) return;
+    const ov = getTutorialOverlay();
+    const tt = getTutorialTooltip();
+    if (!ov || !tt) return;
+
+    document.getElementById("nfTutorialStepNum").textContent = `${step + 1} / ${TUTORIAL_STEPS.length}`;
+    document.getElementById("nfTutorialIcon").textContent = data.icon;
+    document.getElementById("nfTutorialTitle").textContent = data.title;
+    document.getElementById("nfTutorialText").textContent = data.text;
+
+    // Додаємо прогрес-доти
+    let progressEl = tt.querySelector(".nf-tutorial-progress");
+    if (!progressEl) {
+      progressEl = document.createElement("div");
+      progressEl.className = "nf-tutorial-progress";
+      tt.insertBefore(progressEl, tt.querySelector(".nf-tutorial-icon"));
+    }
+    progressEl.innerHTML = TUTORIAL_STEPS.map((_, i) =>
+      `<div class="nf-tutorial-dot${i < step ? " done" : i === step ? " active" : ""}"></div>`
+    ).join("");
+
+    // Позиція tooltip
+    tt.className = "nf-tutorial-tooltip nf-tut-" + (data.position || "top");
+
+    // Останній крок
+    const nextBtn = document.getElementById("nfTutorialNext");
+    if (nextBtn) nextBtn.textContent = step === TUTORIAL_STEPS.length - 1 ? "Грати! 🚀" : "Далі →";
+
+    updateTutorialSpotlight(data.targetId);
+
+    // Анімація появи tooltip
+    tt.style.animation = "none";
+    void tt.offsetWidth;
+    tt.style.animation = "nfTutFadeIn 0.3s ease-out";
+  }
+
+  function startFarmTutorial() {
+    const ov = getTutorialOverlay();
+    if (!ov) return;
+    tutStep = 0;
+    ov.style.display = "block";
+    ov.classList.add("nf-tut-active");
+    renderTutorialStep(0);
+  }
+
+  function endFarmTutorial() {
+    const ov = getTutorialOverlay();
+    if (ov) { ov.classList.remove("nf-tut-active"); ov.style.display = "none"; }
+    if (tutPulseEl) { tutPulseEl.remove(); tutPulseEl = null; }
+    localStorage.setItem(FARM_TUTORIAL_KEY, "1");
+  }
+
+  // Кнопка "Далі"
+  const nextBtn = document.getElementById("nfTutorialNext");
+  if (nextBtn) {
+    nextBtn.addEventListener("click", function() {
+      tutStep++;
+      if (tutStep >= TUTORIAL_STEPS.length) {
+        endFarmTutorial();
+      } else {
+        renderTutorialStep(tutStep);
+      }
+    });
+  }
+
+  // Кнопка "Пропустити"
+  const skipBtn = document.getElementById("nfTutorialSkip");
+  if (skipBtn) skipBtn.addEventListener("click", endFarmTutorial);
+
+  // Запускаємо туторіал через глобальну функцію (window.startFarmTutorial)
+  // Override не робимо тут — це робиться після window.openScreen = openScreen
+  window.startFarmTutorial = startFarmTutorial;
+  window.endFarmTutorial = endFarmTutorial;
 
 })();
 
@@ -3985,6 +4298,23 @@ window.openScreen = openScreen;
 window.startCountdown = startCountdown;
 window.restartGame = restartGame;
 window.exitGame = exitGame;
+
+// Перехоплюємо openScreen для туторіалу ферми
+// (робимо після window.openScreen = openScreen, щоб не було перезаписано)
+(function() {
+  const FARM_TUT_KEY = "farmTutorialDone_v1";
+  const _origOpen = window.openScreen;
+  window.openScreen = function(name) {
+    _origOpen(name);
+    if (name === "farm" && !localStorage.getItem(FARM_TUT_KEY)) {
+      setTimeout(function() {
+        if (typeof window.startFarmTutorial === "function") {
+          window.startFarmTutorial();
+        }
+      }, 450);
+    }
+  };
+})();
 authPlayerOnServer().then((serverPlayer) => {
   if (!serverPlayer) return;
 

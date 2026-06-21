@@ -8619,8 +8619,17 @@ body {
   cursor: pointer;
   transition: transform .2s ease;
   z-index: 3;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
-.nf-planet:active { transform: scale(.94); }
+.nf-planet:active { transform: scale(.92); }
+/* Планета підсвічується при hover */
+.nf-planet:hover .nf-planet-surface {
+  box-shadow:
+    0 0 40px rgba(139,92,255,.55),
+    0 0 80px rgba(88,28,135,.35),
+    inset 0 0 25px rgba(139,92,255,.15);
+}
 
 .nf-planet-glow {
   position: absolute; inset: -18px; border-radius: 50%;
@@ -8665,6 +8674,9 @@ body {
   padding: 4px 12px; border-radius: 20px;
   backdrop-filter: blur(6px);
   border: 1px solid rgba(255,255,255,.1);
+  transition: color .3s ease, border-color .3s ease;
+  pointer-events: none;
+  z-index: 10;
 }
 
 /* Планета "готово" — золоте пульсування */
@@ -8776,7 +8788,17 @@ body {
   backdrop-filter: blur(6px);
 }
 .nf-action-btn:active { transform: scale(.92); background: rgba(255,255,255,.14); }
-.nf-action-btn:disabled { opacity: .4; cursor: not-allowed; }
+.nf-action-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+/* Активна кнопка "Зібрати" */
+#nfBtnCrops.nf-active[data-ready] {
+  background: linear-gradient(135deg, rgba(255,215,0,.25), rgba(255,140,0,.2));
+  border-color: rgba(255,215,0,.5);
+  box-shadow: 0 0 16px rgba(255,215,0,.3);
+}
 .nf-action-icon { font-size: 22px; line-height: 1; }
 .nf-action-lbl { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.75); white-space: nowrap; }
 
@@ -8899,11 +8921,19 @@ body {
 }
 .nf-crops-grid .farm-list-btn b { font-size: 14px; }
 .nf-crops-grid .farm-list-btn span { font-size: 11px; color: rgba(255,255,255,.5); line-height: 1.4; }
-.nf-crops-grid .farm-list-btn:not([disabled]):hover {
+.nf-crops-grid .farm-list-btn:not([disabled]):not(.nf-cant-afford):hover {
   background: rgba(139,92,255,.15) !important;
   border-color: rgba(139,92,255,.4) !important;
 }
 .nf-crops-grid .farm-list-btn[disabled] { opacity: .4; cursor: not-allowed; }
+/* Недостатньо ресурсів */
+.nf-crops-grid .farm-list-btn.nf-cant-afford {
+  opacity: .55;
+  border-color: rgba(255,80,80,.25) !important;
+  background: rgba(255,50,50,.06) !important;
+}
+.nf-crops-grid .farm-list-btn.nf-cant-afford b { color: rgba(255,255,255,.6); }
+.nf-crops-grid .farm-list-btn.nf-cant-afford span { color: rgba(255,100,100,.8); }
 
 /* ── АПГРЕЙДИ В DRAWER ── */
 .nf-upgrade-card {
@@ -8991,4 +9021,161 @@ body {
   position: fixed;
   width: 8px; height: 8px; border-radius: 50%;
   pointer-events: none; z-index: 99998;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FARM TUTORIAL — ПЕРШИЙ ЗАХІД
+   ═══════════════════════════════════════════════════════════ */
+
+.nf-tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60000;
+  pointer-events: none;
+}
+.nf-tutorial-overlay.nf-tut-active {
+  pointer-events: auto;
+}
+
+/* Темний фон з "дірою" для спотлайту */
+.nf-tutorial-spotlight {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  transition: clip-path 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* За замовчуванням — повністю темний */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%,
+    0 0,
+    0 0, 0 0, 0 0, 0 0
+  );
+}
+
+/* Tooltip */
+.nf-tutorial-tooltip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(340px, calc(100vw - 32px));
+  padding: 20px 20px 16px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #1a0d2e, #0d0818);
+  border: 1px solid rgba(139, 92, 255, 0.4);
+  box-shadow:
+    0 0 40px rgba(139, 92, 255, 0.3),
+    0 20px 50px rgba(0, 0, 0, 0.6);
+  animation: nfTutFadeIn 0.3s ease-out;
+  z-index: 2;
+}
+@keyframes nfTutFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Позиції tooltip */
+.nf-tutorial-tooltip.nf-tut-top    { bottom: calc(env(safe-area-inset-bottom) + 90px); }
+.nf-tutorial-tooltip.nf-tut-center { top: 50%; transform: translateX(-50%) translateY(-50%); }
+.nf-tutorial-tooltip.nf-tut-bottom { top: 120px; }
+
+.nf-tutorial-step {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(139, 92, 255, 0.8);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.nf-tutorial-icon {
+  font-size: 40px;
+  line-height: 1;
+  margin-bottom: 10px;
+  display: block;
+  text-align: center;
+}
+
+.nf-tutorial-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.nf-tutorial-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.55;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.nf-tutorial-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.nf-tutorial-skip {
+  padding: 10px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.nf-tutorial-skip:active { background: rgba(255, 255, 255, 0.08); }
+
+.nf-tutorial-next {
+  padding: 10px 28px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #8b5cff, #ec4899);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(139, 92, 255, 0.4);
+  transition: transform 0.12s;
+}
+.nf-tutorial-next:active { transform: scale(0.95); }
+
+/* Прогрес-бар кроків */
+.nf-tutorial-progress {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.nf-tutorial-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background 0.2s, transform 0.2s;
+}
+.nf-tutorial-dot.active {
+  background: #8b5cff;
+  transform: scale(1.4);
+}
+.nf-tutorial-dot.done {
+  background: rgba(139, 92, 255, 0.5);
+}
+
+/* Пульсуючий індикатор на цільовому елементі */
+.nf-tutorial-pulse {
+  position: fixed;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 215, 0, 0.8);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  pointer-events: none;
+  z-index: 60001;
+  animation: nfTutPulse 1.2s ease-in-out infinite;
+  transform: translate(-50%, -50%);
+}
+@keyframes nfTutPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50%       { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
 }
