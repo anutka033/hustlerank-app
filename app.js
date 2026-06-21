@@ -268,7 +268,7 @@ async function savePlayerToServer() {
   }
 }
 
-async function claimServerReward(endpoint, payload = {}) {
+async function claimServerReward(endpoint, payload = {}, options = {}) {
   const initData = await waitForTelegramInitData();
 
   if (!initData) {
@@ -301,7 +301,10 @@ async function claimServerReward(endpoint, payload = {}) {
     throw error;
   }
 
-  if (data.player) applyServerPlayer(data.player);
+  // Застосовуємо серверний стан гравця тільки якщо options.skipApplyPlayer не встановлено.
+  // Це запобігає подвійний підйом рівня: сервер повертає новий xp/level,
+  // а checkLevelUp() вже підняв рівень локально — це призводило до подвійного level up.
+  if (data.player && !options.skipApplyPlayer) applyServerPlayer(data.player);
   return data;
 }
 
@@ -1100,7 +1103,8 @@ const STAR_FARM_CONFIG = {
     { id: "spark", name: "Искровая пшеница", level: 1, costEnergy: 0, costStars: 0, growMs: 10 * 60 * 1000, rewardEnergy: 35, rewardDust: 1 },
     { id: "nova", name: "Нова-ягоды", level: 2, costEnergy: 55, costStars: 0, growMs: 30 * 60 * 1000, rewardEnergy: 120, rewardDust: 3 },
     { id: "comet", name: "Кометный лен", level: 3, costEnergy: 160, costStars: 0, growMs: 90 * 60 * 1000, rewardEnergy: 360, rewardDust: 9 },
-    { id: "nebula", name: "Туманная орхидея", level: 5, costEnergy: 500, costStars: 2, growMs: 4 * 60 * 60 * 1000, rewardEnergy: 1100, rewardDust: 22 }
+    { id: "nebula", name: "Туманная орхидея", level: 5, costEnergy: 500, costStars: 2, growMs: 4 * 60 * 60 * 1000, rewardEnergy: 1100, rewardDust: 22 },
+    { id: "quasar", name: "Квазарный цвет", level: 7, costEnergy: 1200, costStars: 5, growMs: 8 * 60 * 60 * 1000, rewardEnergy: 2800, rewardDust: 55 }
   ],
   planets: [
     { id: "orbit", name: "Орбитальная грядка", level: 1, rarity: 1, costEnergy: 0, costDust: 0 },
@@ -1110,6 +1114,9 @@ const STAR_FARM_CONFIG = {
   ],
   upgradeCost: level => ({ energy: 140 * level * level, dust: 8 * level }),
   droneCost: level => ({ stars: Math.min(18, 3 + level * 2), dust: 12 * level }),
+  // Новий апгрейд: Космічний реактор — підвищує пасивний дохід енергії за годину
+  reactorCost: level => ({ energy: 500 * level, dust: 20 * level, stars: Math.floor(level * 1.5) }),
+  reactorBonus: level => 1 + level * 0.12, // +12% до врожаю за кожен рівень
   speedupCostStars: 3
 };
 
@@ -2378,6 +2385,192 @@ if (claimRefBtn) {
 }
 
 const openDropBtn = document.getElementById("openDropBtn");
+
+// ═══════════════════════════════════════════════════════════
+// PREMIUM DROP ANIMATION ENGINE
+// ═══════════════════════════════════════════════════════════
+(function() {
+  const ov   = document.getElementById('premiumDropOverlay');
+  const cv   = document.getElementById('premiumDropCanvas');
+  const fl   = document.getElementById('premiumDropFlash');
+  const cb   = document.getElementById('premiumCaseBox');
+  const rays = document.getElementById('premiumCaseRays');
+  const ol   = document.getElementById('premiumOpenLabel');
+  const cr   = document.getElementById('premiumCardResult');
+  const pc   = document.getElementById('premiumCard');
+  const pi   = document.getElementById('premiumCardImg');
+  const pr   = document.getElementById('premiumCardRarity');
+  const pn   = document.getElementById('premiumCardName');
+  const pa   = document.getElementById('premiumCardAura');
+  const rl   = document.getElementById('premiumRewardLabel');
+  const clb  = document.getElementById('premiumClaimBtn');
+
+  if (!ov || !cb) return;
+
+  // Партикли на canvas
+  let pts = [], pActive = false, pFrame;
+  const ctx = cv ? cv.getContext('2d') : null;
+  function rsz() { if(cv){ cv.width = innerWidth; cv.height = innerHeight; } }
+  rsz(); window.addEventListener('resize', rsz);
+
+  function mkPt() {
+    const cols = ['rgba(139,92,255,','rgba(255,79,216,','rgba(0,242,255,','rgba(255,215,0,'];
+    return { x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+      r:Math.random()*2.5+.8, vx:(Math.random()-.5)*.7, vy:(Math.random()-.5)*.7,
+      op:Math.random()*.5+.2, col:cols[Math.floor(Math.random()*cols.length)], life:Math.random()*180+80 };
+  }
+  function drawPts() {
+    if (!pActive || !ctx) return;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if (pts.length < 90) pts.push(mkPt());
+    pts = pts.filter(p => p.life > 0);
+    pts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.life--;
+      const a = Math.min(.75, p.op*(p.life/80));
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle = p.col+a+')'; ctx.fill();
+      pts.forEach(q => {
+        const d = Math.hypot(p.x-q.x,p.y-q.y);
+        if (d < 75) { ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y);
+          ctx.strokeStyle = p.col+(0.07*(1-d/75))+')'; ctx.lineWidth=.5; ctx.stroke(); }
+      });
+    });
+    pFrame = requestAnimationFrame(drawPts);
+  }
+
+  function buildRays(n) {
+    rays.innerHTML = '';
+    for (let i=0;i<n;i++) {
+      const d=document.createElement('div'); d.className='pcase-ray';
+      d.style.transform=`rotate(${(360/n)*i}deg)`;
+      d.style.opacity=.35+Math.random()*.45;
+      const h=Math.random()>.5?'255,215,0':'139,92,255';
+      d.style.background=`linear-gradient(90deg,rgba(${h},.9),transparent)`;
+      rays.appendChild(d);
+    }
+  }
+
+  function sparks(n) {
+    const cols=['#ffd700','#ff4fd8','#8b5cff','#00f2ff'];
+    const cx2=innerWidth/2, cy2=innerHeight/2;
+    for(let i=0;i<n;i++) setTimeout(()=>{
+      const e=document.createElement('div');
+      e.style.cssText=`position:fixed;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:60001;
+        left:${cx2}px;top:${cy2}px;background:${cols[Math.floor(Math.random()*cols.length)]};
+        box-shadow:0 0 8px currentColor;
+        transition:transform ${.5+Math.random()*.8}s cubic-bezier(.25,.46,.45,.94),opacity ${.5+Math.random()*.8}s ease`;
+      document.body.appendChild(e);
+      const a=Math.random()*Math.PI*2, d=90+Math.random()*260;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        e.style.transform=`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(0)`;
+        e.style.opacity='0';
+      }));
+      setTimeout(()=>e.remove(),1500);
+    }, i*18);
+  }
+
+  function confetti(n) {
+    const cols=['#ffd700','#ff4fd8','#8b5cff','#00f2ff','#ff6b35','#fff'];
+    const cx2=innerWidth/2, cy2=innerHeight/2;
+    for(let i=0;i<n;i++) {
+      const e=document.createElement('div');
+      const c=cols[Math.floor(Math.random()*cols.length)];
+      const dur=1.6+Math.random()*2;
+      const w=Math.random()*10+4, h2=Math.random()*10+4;
+      e.style.cssText=`position:fixed;width:${w}px;height:${h2}px;background:${c};
+        border-radius:${Math.random()>.5?'50%':'2px'};
+        left:${cx2+(Math.random()-.5)*180}px;top:${cy2}px;
+        pointer-events:none;z-index:60002;
+        transition:transform ${dur}s cubic-bezier(.25,.46,.45,.94),opacity ${dur}s ease`;
+      document.body.appendChild(e);
+      const dx=(Math.random()-.5)*650, dy=-(Math.random()*420+180);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        e.style.transform=`translate(${dx}px,${dy}px) rotate(${Math.random()*720}deg) scale(.15)`;
+        e.style.opacity='0';
+      }));
+      setTimeout(()=>e.remove(), dur*1000+100);
+    }
+  }
+
+  function resetPremiumDrop() {
+    cb.className=''; cb.style.transform='scale(0)'; cb.style.opacity='0';
+    fl.className='';
+    cr.style.opacity='0'; cr.className='';
+    pc.className=''; rl.className=''; clb.className='';
+    ol.className=''; rays.className=''; rays.innerHTML='';
+    pts=[]; pActive=false; cancelAnimationFrame(pFrame);
+    if(ctx) ctx.clearRect(0,0,cv.width,cv.height);
+  }
+
+  // Головна функція запуску анімації
+  window.startPremiumDropAnimation = function(card, isDuplicate, compensation) {
+    resetPremiumDrop();
+    ov.classList.add('pdo-visible');
+    setTimeout(()=>ov.classList.add('pdo-bg'), 50);
+    setTimeout(()=>{ pActive=true; drawPts(); }, 200);
+
+    // Кейс з'являється
+    setTimeout(()=>cb.classList.add('pcb-appear'), 420);
+
+    // Idle + промені
+    setTimeout(()=>{
+      cb.classList.remove('pcb-appear'); cb.classList.add('pcb-idle');
+      buildRays(16); rays.classList.add('pcr-show');
+      setTimeout(()=>rays.classList.add('pcr-spin'), 400);
+    }, 1120);
+
+    // Текст
+    setTimeout(()=>ol.classList.add('pol-blink'), 1600);
+
+    // Тряска
+    setTimeout(()=>{
+      cb.classList.remove('pcb-idle'); cb.classList.add('pcb-shake');
+      sparks(18);
+    }, 3300);
+
+    // Вибух
+    setTimeout(()=>{
+      cb.classList.remove('pcb-shake'); cb.classList.add('pcb-explode');
+      fl.classList.add('pdf-burst');
+      sparks(45); confetti(70);
+    }, 3980);
+
+    // Карта
+    setTimeout(()=>{
+      // Заповнюємо дані карти
+      if (card) {
+        pi.src = card.img || card.image || '';
+        pi.alt = card.name || '';
+        const rarity = String(card.rarity || '').toLowerCase();
+        pr.textContent = (card.rarity || 'COMMON').toUpperCase();
+        pn.textContent = card.name || '';
+        // Аура за рідкістю
+        pa.className = '';
+        if (rarity.includes('limited')) pa.classList.add('aura-limited');
+        else if (rarity.includes('myth')) pa.classList.add('aura-mythic');
+        else if (rarity.includes('legend')) pa.classList.add('aura-legendary');
+        else if (rarity.includes('epic')) pa.classList.add('aura-epic');
+        else if (rarity.includes('rare')) pa.classList.add('aura-rare');
+        else pa.classList.add('aura-common');
+      }
+      if (isDuplicate) {
+        rl.textContent = `Повторна карта — +${compensation || 0} ⭐ компенсація`;
+      } else {
+        rl.textContent = 'Нова карта додана до колекції!';
+      }
+      cr.style.opacity='1'; cr.classList.add('pcr-on');
+      pc.classList.add('pcard-reveal');
+      rl.classList.add('prl-show'); clb.classList.add('pcb-show');
+    }, 4350);
+  };
+
+  // Кнопка "Забрати"
+  clb.addEventListener('click', ()=>{
+    ov.classList.remove('pdo-bg');
+    setTimeout(()=>{ ov.classList.remove('pdo-visible'); resetPremiumDrop(); }, 400);
+  });
+})();
+
 async function openDropOnServer() {
   const initData = await waitForTelegramInitData();
 
@@ -2549,38 +2742,14 @@ if (openDropBtn) {
     }
 
     lastDropCard = null;
-    if (closeDropModal) closeDropModal.style.display = "none";
-    if (dropModal) dropModal.classList.add("show");
 
-    const roulette = document.getElementById("caseRoulette");
-    const rouletteTrack = document.getElementById("rouletteTrack");
-    if (roulette) roulette.style.display = "flex";
-    if (rouletteTrack) {
-      rouletteTrack.style.transition = "none";
-      rouletteTrack.style.transform = "translate3d(0,0,0)";
-      fillRouletteTrack(rouletteTrack);
+    // Запускаємо преміальну анімацію одразу (без очікування сервера)
+    if (typeof window.startPremiumDropAnimation === 'function') {
+      window.startPremiumDropAnimation(null, false, 0);
     }
 
-    // OPTIMISTIC UI: запускаємо рулетку одразу, сервер чекаємо паралельно
-    const serverPromise = openDropOnServer();
-
-    // Рулетка крутиться зразу — без очікування сервера
-    if (rouletteTrack) {
-      rouletteTrack.style.transition = "none";
-      rouletteTrack.style.transform = "translate3d(0,0,0)";
-    }
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if (rouletteTrack) {
-          rouletteTrack.style.transition = `transform ${DROP_ROULETTE_DURATION}ms cubic-bezier(.08,.6,0,1)`;
-          const tempOffset = (DROP_WINNER_INDEX * 134) - Math.floor(roulette?.clientWidth / 2 || 150);
-          rouletteTrack.style.transform = `translate3d(-${Math.max(0, tempOffset)}px,0,0)`;
-        }
-      });
-    });
-
-    // Очікуємо відповідь сервера (паралельно з анімацією)
-    const dropResult = await serverPromise;
+    // Паралельно чекаємо сервер
+    const dropResult = await openDropOnServer();
 
     if (!dropResult) {
       isDropRolling = false;
@@ -2589,7 +2758,9 @@ if (openDropBtn) {
         vipFreeDropClaimed = false;
         localStorage.setItem("vipFreeDropClaimed", "false");
       }
-      if (dropModal) dropModal.classList.remove("show");
+      // Закриваємо оверлей при помилці
+      const ov = document.getElementById('premiumDropOverlay');
+      if (ov) { ov.classList.remove('pdo-bg'); setTimeout(()=>ov.classList.remove('pdo-visible'),400); }
       return;
     }
 
@@ -2597,7 +2768,7 @@ if (openDropBtn) {
     updateUI();
 
     const winner = getDropCardById(dropResult.cardId || dropResult.card?.id);
-    if (!winner || !rouletteTrack) {
+    if (!winner) {
       showToast("Помилка карти");
       isDropRolling = false;
       openDropBtn.disabled = false;
@@ -2608,59 +2779,28 @@ if (openDropBtn) {
     lastDropDuplicate = !!dropResult.duplicate;
     lastDropCompensation = Number(dropResult.compensation || 0);
 
-    // Оновлюємо рулетку з правильним віннером (без відимого ресету)
-    fillRouletteTrack(rouletteTrack, winner);
-    rouletteTrack.style.transition = "none";
-    rouletteTrack.style.transform = "translate3d(0,0,0)";
+    // Додаємо карту до стану (якщо не дублікат)
+    if (!lastDropDuplicate) {
+      if (!state.cards[winner.id]) state.cards[winner.id] = { unlocked: false, level: 0 };
+      state.cards[winner.id].unlocked = true;
+      if (!state.inventory) state.inventory = [];
+      if (!state.inventory.includes(winner.id)) state.inventory.push(winner.id);
+      save();
+      updateUI();
+    }
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        rouletteTrack.style.transition = `transform ${DROP_ROULETTE_DURATION}ms cubic-bezier(.08,.6,0,1)`;
-        const targetOffset = getRouletteTargetOffset(roulette, rouletteTrack, DROP_WINNER_INDEX);
-        rouletteTrack.style.transform = `translate3d(-${targetOffset}px,0,0)`;
-      });
-    });
-
+    // Оновлюємо анімацію з реальною картою (після отримання від сервера)
+    // Анімація вже запущена, оновлюємо карту на кроку reveal (~4.35с)
+    // Але сервер може відповісти швидше анімації — чекаємо мінімум 3.5с перед reveal
+    const revealDelay = Math.max(3500, DROP_RESULT_DELAY);
     setTimeout(() => {
       isDropRolling = false;
       openDropBtn.disabled = false;
-
-      if (closeDropModal) closeDropModal.style.display = "block";
-
-      const resultModal = document.getElementById("dropResultModal");
-      const resultTitle = document.getElementById("dropResultTitle");
-      const resultImage = document.getElementById("dropResultImage");
-      const resultText = document.getElementById("dropResultText");
-      const resultBtn = document.getElementById("dropResultAgainBtn");
-      const cancelBtn = document.getElementById("dropResultCancelBtn");
-
-      if (resultModal && resultTitle && resultImage && resultText && resultBtn && lastDropCard) {
-        resultModal.classList.add("show");
-        resultImage.src = lastDropCard.img || lastDropCard.image;
-
-        if (lastDropDuplicate) {
-          resultTitle.textContent = "Повторна карта";
-          resultText.textContent = `Компенсація: +${lastDropCompensation} ⭐`;
-        } else {
-          resultTitle.textContent = "Нова карта";
-          resultText.textContent = "Карта додана до вашого інвентарю!";
-        }
-
-        cancelBtn.onclick = () => {
-          resultModal.classList.remove("show");
-        };
-
-        resultBtn.onclick = async () => {
-          if (state.stars < 100) {
-            showToast("Недостатньо зірок");
-            return;
-          }
-
-          resultModal.classList.remove("show");
-          setTimeout(() => openDropBtn.click(), 120);
-        };
+      // Оновлюємо преміальну анімацію з реальною картою
+      if (typeof window.startPremiumDropAnimation === 'function') {
+        window.startPremiumDropAnimation(winner, lastDropDuplicate, lastDropCompensation);
       }
-    }, DROP_RESULT_DELAY);
+    }, revealDelay);
   });
 }
 
@@ -2768,9 +2908,15 @@ if (dailyClaimBtn) {
     dailyClaimBtn.disabled = true;
 
     try {
-      const data = await claimServerReward("/api/daily/claim");
+      // skipApplyPlayer: true — запобігаємо подвійний підйом рівня:
+      // сервер повертає xp/level вже з доданою нагородою, а ми додаємо нагороду локально
+      const data = await claimServerReward("/api/daily/claim", {}, { skipApplyPlayer: true });
       const reward = data.reward || { stars: 50, xp: 500 };
       if (data.nextClaimAt) setDailyDropCooldown(data.nextClaimAt);
+      // Застосовуємо нагороду ЛОКАЛЬНО, щоб уникнути подвійного підйому рівня.
+      if (reward.stars) state.stars += reward.stars;
+      if (reward.xp) addXp(reward.xp);
+      if (reward.crystals) state.crystals += reward.crystals;
       updateUI();
       save();
       showToast(`+${reward.stars || 0} ⭐ +${reward.xp || 0} XP`);
@@ -2951,6 +3097,7 @@ function normalizeStarFarm(rawFarm) {
     lastEventAt: Math.max(0, safeNumber(farm.lastEventAt, 0)),
     totalEnergy: Math.max(0, safeNumber(farm.totalEnergy, 0)),
     harvests: Math.max(0, safeNumber(farm.harvests, 0)),
+    reactorLevel: Math.max(0, safeNumber(farm.reactorLevel, 0)),
     unlockedPlanets: Array.isArray(farm.unlockedPlanets) && farm.unlockedPlanets.length ? farm.unlockedPlanets : ["orbit"]
   };
 }
@@ -3036,6 +3183,12 @@ function renderStarFarm() {
   setText("farmStatus", crop ? `${crop.name}: ${ready ? "готово" : formatFarmTime(remaining)}` : "Грядка свободна");
   setText("farmUpgradeCost", `${nextUpgrade.energy} энергии · ${nextUpgrade.dust} 🌌`);
   setText("farmDroneCost", `${nextDrone.stars} 💎 · ${nextDrone.dust} 🌌`);
+  const reactorLvl = farm.reactorLevel || 0;
+  const nextReactor = STAR_FARM_CONFIG.reactorCost(reactorLvl + 1);
+  const reactorBonusPct = Math.round((STAR_FARM_CONFIG.reactorBonus(reactorLvl) - 1) * 100);
+  setText("farmReactorLevel", `LVL ${reactorLvl}`);
+  setText("farmReactorBonus", `+${reactorBonusPct}% до врожаю`);
+  setText("farmReactorCost", `${nextReactor.energy} енергии · ${nextReactor.dust} 🌌 · ${nextReactor.stars} 💎`);
 
   const cropsEl = document.getElementById("farmCrops");
   if (cropsEl) {
@@ -3098,7 +3251,8 @@ function harvestStarCrop() {
   const rareMultiplier = eventText.includes("Редкий урожай") ? 2 : 1;
   const planetBonus = 1 + (getCurrentPlanet().rarity - 1) * 0.08;
   const droneBonus = 1 + Math.min(0.45, farm.drones * 0.08 + (farm.droneLevel - 1) * 0.04);
-  const gainedEnergy = Math.floor(crop.rewardEnergy * planetBonus * droneBonus);
+  const reactorBonus = STAR_FARM_CONFIG.reactorBonus(farm.reactorLevel || 0);
+  const gainedEnergy = Math.floor(crop.rewardEnergy * planetBonus * droneBonus * reactorBonus);
   const gainedDust = Math.max(1, Math.floor(crop.rewardDust * rareMultiplier));
   farm.energy += gainedEnergy;
   farm.dust += gainedDust;
@@ -3131,6 +3285,23 @@ function upgradeStarFarm() {
   farm.dust -= cost.dust;
   farm.level += 1;
   addFarmLog("Ферма улучшена до LVL " + farm.level + ".");
+  save();
+  updateUI();
+}
+
+function upgradeReactor() {
+  const farm = getStarFarm();
+  const reactorLvl = farm.reactorLevel || 0;
+  const cost = STAR_FARM_CONFIG.reactorCost(reactorLvl + 1);
+  if (farm.energy < cost.energy) return showToast("Не хватает звездной энергии для реактора");
+  if (farm.dust < cost.dust) return showToast("Не хватает пыли для реактора");
+  if (state.stars < cost.stars) return showToast("Не хватает алмазов для реактора");
+  farm.energy -= cost.energy;
+  farm.dust -= cost.dust;
+  state.stars -= cost.stars;
+  farm.reactorLevel = reactorLvl + 1;
+  const newBonus = Math.round((STAR_FARM_CONFIG.reactorBonus(farm.reactorLevel) - 1) * 100);
+  addFarmLog(`Реактор покачан до LVL ${farm.reactorLevel}. Бонус врожая: +${newBonus}%.`);
   save();
   updateUI();
 }
@@ -3217,9 +3388,216 @@ document.getElementById("farmHarvestBtn")?.addEventListener("click", harvestStar
 document.getElementById("farmSpeedBtn")?.addEventListener("click", speedUpStarCrop);
 document.getElementById("farmUpgradeBtn")?.addEventListener("click", upgradeStarFarm);
 document.getElementById("farmDroneBtn")?.addEventListener("click", upgradeFarmDrones);
+document.getElementById("farmReactorBtn")?.addEventListener("click", upgradeReactor);
 document.getElementById("farmDailyBtn")?.addEventListener("click", claimFarmDailyBonus);
 document.getElementById("farmLeaderboardBtn")?.addEventListener("click", loadFarmLeaderboard);
 setInterval(renderStarFarm, 1000);
+
+// ═══════════════════════════════════════════════════════════
+// NEW FARM UI — DRAWER + PLANET ANIMATIONS
+// ═══════════════════════════════════════════════════════════
+(function() {
+
+  // —— SVG градієнт для кільця прогресу ——
+  const svgNS = "http://www.w3.org/2000/svg";
+  const ringEl = document.getElementById("farmProgressRing");
+  if (ringEl) {
+    const svg = ringEl.closest("svg");
+    if (svg) {
+      const defs = document.createElementNS(svgNS, "defs");
+      const grad = document.createElementNS(svgNS, "linearGradient");
+      grad.setAttribute("id", "nfRingGrad");
+      grad.setAttribute("x1", "0%"); grad.setAttribute("y1", "0%");
+      grad.setAttribute("x2", "100%"); grad.setAttribute("y2", "0%");
+      const s1 = document.createElementNS(svgNS, "stop");
+      s1.setAttribute("offset", "0%"); s1.setAttribute("stop-color", "#ffd700");
+      const s2 = document.createElementNS(svgNS, "stop");
+      s2.setAttribute("offset", "100%"); s2.setAttribute("stop-color", "#8b5cff");
+      grad.appendChild(s1); grad.appendChild(s2);
+      defs.appendChild(grad); svg.insertBefore(defs, svg.firstChild);
+    }
+  }
+
+  // —— DRAWER логіка ——
+  function openDrawer(drawerId, overlayId) {
+    const drawer = document.getElementById(drawerId);
+    const overlay = document.getElementById(overlayId);
+    if (!drawer || !overlay) return;
+    overlay.classList.add("nf-open");
+    setTimeout(() => drawer.classList.add("nf-open"), 10);
+  }
+  function closeDrawer(drawerId, overlayId) {
+    const drawer = document.getElementById(drawerId);
+    const overlay = document.getElementById(overlayId);
+    if (!drawer || !overlay) return;
+    drawer.classList.remove("nf-open");
+    setTimeout(() => overlay.classList.remove("nf-open"), 320);
+  }
+
+  // Кнопка "Посадити"
+  const btnCrops = document.getElementById("nfBtnCrops");
+  if (btnCrops) btnCrops.addEventListener("click", () => openDrawer("nfDrawerCrops", "nfDrawerCropsOverlay"));
+
+  // Кнопка "Апгрейди"
+  const btnUpgrades = document.getElementById("nfBtnUpgrades");
+  if (btnUpgrades) btnUpgrades.addEventListener("click", () => openDrawer("nfDrawerUpgrades", "nfDrawerUpgradesOverlay"));
+
+  // Закриття через overlay
+  const cropsOverlay = document.getElementById("nfDrawerCropsOverlay");
+  if (cropsOverlay) cropsOverlay.addEventListener("click", () => closeDrawer("nfDrawerCrops", "nfDrawerCropsOverlay"));
+
+  const upgradesOverlay = document.getElementById("nfDrawerUpgradesOverlay");
+  if (upgradesOverlay) upgradesOverlay.addEventListener("click", () => closeDrawer("nfDrawerUpgrades", "nfDrawerUpgradesOverlay"));
+
+  // Закриваємо дравер після вибору культури
+  const origPlantStarCrop = window.plantStarCrop || plantStarCrop;
+  window.plantStarCrop = function(cropId) {
+    origPlantStarCrop(cropId);
+    closeDrawer("nfDrawerCrops", "nfDrawerCropsOverlay");
+  };
+
+  // —— Оновлення планети та кільця прогресу ——
+  const PLANET_EMOJIS = { orbit: "🌍", luna: "🌙", mars: "🔴", titan: "🪐" };
+  const PLANET_COLORS = {
+    orbit: { from: "#1e3a5f", to: "#0d1b2a", glow: "rgba(139,92,255,.35)" },
+    luna:  { from: "#2a2a3f", to: "#0d0d1a", glow: "rgba(180,180,255,.3)" },
+    mars:  { from: "#5f1e1e", to: "#2a0d0d", glow: "rgba(255,80,80,.35)" },
+    titan: { from: "#3f2a1e", to: "#1a0d08", glow: "rgba(255,185,0,.35)" }
+  };
+
+  let lastPlanetId = null;
+  let lastReadyState = false;
+  let lastResVals = {};
+
+  function updateFarmPlanetUI() {
+    const farm = typeof getStarFarm === "function" ? getStarFarm() : null;
+    if (!farm) return;
+
+    const now = Date.now();
+    const crop = typeof getPlantedCrop === "function" ? getPlantedCrop() : null;
+    const ready = crop && farm.readyAt <= now;
+    const remaining = crop ? Math.max(0, farm.readyAt - now) : 0;
+    const totalMs = crop ? (farm.readyAt - farm.plantedAt) : 0;
+    const progress = (totalMs > 0 && crop && !ready) ? Math.min(1, 1 - remaining / totalMs) : (ready ? 1 : 0);
+
+    // Кільце прогресу
+    const ringEl2 = document.getElementById("farmProgressRing");
+    if (ringEl2) {
+      const circumference = 553;
+      const offset = circumference - progress * circumference;
+      ringEl2.style.strokeDashoffset = offset;
+      ringEl2.style.stroke = ready ? "#ffd700" : "url(#nfRingGrad)";
+    }
+
+    // Планета — емодзі та колір
+    const planetEl = document.getElementById("nfPlanet");
+    const emojiEl = planetEl ? planetEl.querySelector(".nf-planet-emoji") : null;
+    const surfaceEl = planetEl ? planetEl.querySelector(".nf-planet-surface") : null;
+    const glowEl = planetEl ? planetEl.querySelector(".nf-planet-glow") : null;
+
+    if (farm.planetId !== lastPlanetId) {
+      lastPlanetId = farm.planetId;
+      if (emojiEl) emojiEl.textContent = PLANET_EMOJIS[farm.planetId] || "🌍";
+      const colors = PLANET_COLORS[farm.planetId] || PLANET_COLORS.orbit;
+      if (surfaceEl) {
+        surfaceEl.style.background = `radial-gradient(circle at 35% 30%, rgba(255,255,255,.18), transparent 55%), linear-gradient(135deg, ${colors.from}, ${colors.to})`;
+        surfaceEl.style.borderColor = colors.glow.replace("rgba", "rgba").replace(".35", ".45").replace(".3", ".45").replace(".35", ".45");
+      }
+      if (glowEl) glowEl.style.background = `radial-gradient(circle, ${colors.glow.replace(".35", ".55").replace(".3", ".45")} 0%, transparent 70%)`;
+    }
+
+    // Стан готовності
+    if (ready !== lastReadyState) {
+      lastReadyState = ready;
+      if (planetEl) planetEl.classList.toggle("nf-ready", ready);
+    }
+
+    // Дрони — показуємо тільки якщо є
+    const scene = document.querySelector(".nf-planet-scene");
+    if (scene) scene.classList.toggle("nf-has-drones", farm.drones > 0);
+
+    // Анімація чисел ресурсів при зміні
+    const resIds = ["farmLevel", "farmEnergy", "farmDust", "farmStars"];
+    resIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const cur = el.textContent;
+      if (lastResVals[id] !== undefined && lastResVals[id] !== cur) {
+        el.classList.remove("nf-bounce");
+        void el.offsetWidth;
+        el.classList.add("nf-bounce");
+        setTimeout(() => el.classList.remove("nf-bounce"), 400);
+      }
+      lastResVals[id] = cur;
+    });
+
+    // Світління кнопки "Посадити" якщо є посаджена культура
+    const btnCropsEl = document.getElementById("nfBtnCrops");
+    if (btnCropsEl) btnCropsEl.classList.toggle("nf-active", Boolean(farm.plantedCropId));
+  }
+
+  // —— Ефект збору — частинки і floating text ——
+  function spawnHarvestEffect() {
+    const planetEl = document.getElementById("nfPlanet");
+    if (!planetEl) return;
+    const rect = planetEl.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    // Floating text
+    const txt = document.createElement("div");
+    txt.className = "nf-float-text";
+    txt.textContent = "⚡ Зібрано!";
+    txt.style.left = (cx - 40) + "px";
+    txt.style.top = cy + "px";
+    document.body.appendChild(txt);
+    setTimeout(() => txt.remove(), 1300);
+
+    // Частинки
+    const colors = ["#ffd700", "#8b5cff", "#ff4fd8", "#00f2ff", "#fff"];
+    for (let i = 0; i < 16; i++) {
+      const p = document.createElement("div");
+      p.className = "nf-particle";
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+      p.style.boxShadow = `0 0 6px ${p.style.background}`;
+      p.style.left = cx + "px";
+      p.style.top = cy + "px";
+      const angle = (Math.PI * 2 / 16) * i;
+      const dist = 60 + Math.random() * 80;
+      const dur = 0.6 + Math.random() * 0.5;
+      p.style.transition = `transform ${dur}s cubic-bezier(.25,.46,.45,.94), opacity ${dur}s ease`;
+      document.body.appendChild(p);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        p.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px) scale(0)`;
+        p.style.opacity = "0";
+      }));
+      setTimeout(() => p.remove(), dur * 1000 + 100);
+    }
+
+    // Haptic feedback (Telegram)
+    try { window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("medium"); } catch(e) {}
+  }
+
+  // Перехоплюємо harvestStarCrop щоб додати ефект
+  const origHarvest = window.harvestStarCrop || harvestStarCrop;
+  window.harvestStarCrop = function() {
+    const farm = typeof getStarFarm === "function" ? getStarFarm() : null;
+    const wasReady = farm && farm.readyAt <= Date.now() && farm.plantedCropId;
+    origHarvest();
+    if (wasReady) spawnHarvestEffect();
+  };
+  // Перепризначаємо listener для нової функції
+  const harvestBtn2 = document.getElementById("farmHarvestBtn");
+  if (harvestBtn2) {
+    harvestBtn2.removeEventListener("click", origHarvest);
+    harvestBtn2.addEventListener("click", window.harvestStarCrop);
+  }
+
+  // —— Запуск циклу оновлення ——
+  setInterval(updateFarmPlanetUI, 500);
+  updateFarmPlanetUI();
+
+})();
 
 async function completeTask(task) {
   const btn = document.getElementById(`btn_${task.id}`);

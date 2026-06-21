@@ -202,66 +202,167 @@
 </div>
 </div>
 
-<div id="farmScreen" class="screen">
-  <div class="farm-hero">
-    <button class="farm-back" onclick="openScreen('tasks')">‹</button>
-    <div>
-      <h1>🌟 Звёздная ферма</h1>
-      <p>Орбитальная ферма, редкие планеты, дроны и космический урожай.</p>
+<div id="farmScreen" class="screen nf-screen">
+
+  <!-- Зірки на фоні -->
+  <div class="nf-stars-bg" aria-hidden="true">
+    <div class="nf-star"></div><div class="nf-star"></div><div class="nf-star"></div>
+    <div class="nf-star"></div><div class="nf-star"></div><div class="nf-star"></div>
+    <div class="nf-star"></div><div class="nf-star"></div><div class="nf-star"></div>
+    <div class="nf-star"></div><div class="nf-star"></div><div class="nf-star"></div>
+  </div>
+
+  <!-- Хедер -->
+  <div class="nf-header">
+    <button class="nf-back-btn" onclick="openScreen('tasks')">&#8249;</button>
+    <div class="nf-title-wrap">
+      <span class="nf-title">🌟 Зіркова ферма</span>
+      <span class="nf-subtitle" id="farmPlanet">Орбітальна грядка</span>
+    </div>
+    <button class="nf-leaderboard-btn" id="farmLeaderboardBtn">🏆</button>
+  </div>
+
+  <!-- Панель ресурсів -->
+  <div class="nf-resources">
+    <div class="nf-res-card">
+      <span class="nf-res-icon">🏗️</span>
+      <span class="nf-res-val" id="farmLevel">1</span>
+      <span class="nf-res-lbl">LVL</span>
+    </div>
+    <div class="nf-res-card">
+      <span class="nf-res-icon">⚡</span>
+      <span class="nf-res-val" id="farmEnergy">0</span>
+      <span class="nf-res-lbl">Енергія</span>
+    </div>
+    <div class="nf-res-card">
+      <span class="nf-res-icon">🌌</span>
+      <span class="nf-res-val" id="farmDust">0</span>
+      <span class="nf-res-lbl">Пил</span>
+    </div>
+    <div class="nf-res-card">
+      <span class="nf-res-icon">💎</span>
+      <span class="nf-res-val" id="farmStars">0</span>
+      <span class="nf-res-lbl">Алмази</span>
     </div>
   </div>
 
-  <section class="farm-stats">
-    <div><small>LVL</small><b id="farmLevel">1</b></div>
-    <div><small>⭐ Энергия</small><b id="farmEnergy">0</b></div>
-    <div><small>🌌 Пыль</small><b id="farmDust">0</b></div>
-    <div><small>💎 Алмазы</small><b id="farmStars">0</b></div>
-  </section>
+  <!-- Центральна сцена — планета -->
+  <div class="nf-planet-scene">
+    <!-- Дрони -->
+    <div class="nf-drone nf-drone-1">🚀</div>
+    <div class="nf-drone nf-drone-2">🚀</div>
+    <div class="nf-drone nf-drone-3">🚀</div>
 
-  <section class="farm-panel farm-status-panel">
-    <img src="images/star-farm.png" alt="Star Farm">
-    <div>
-      <h2 id="farmPlanet">Орбитальная грядка</h2>
-      <p id="farmStatus">Грядка свободна</p>
-      <p id="farmDroneInfo">0 шт. / сбор 0%</p>
+    <!-- Прогрес росту (кільце) -->
+    <svg class="nf-progress-ring" viewBox="0 0 200 200">
+      <circle class="nf-ring-bg" cx="100" cy="100" r="88"/>
+      <circle class="nf-ring-fill" id="farmProgressRing" cx="100" cy="100" r="88"
+        stroke-dasharray="553" stroke-dashoffset="553"/>
+    </svg>
+
+    <!-- Планета -->
+    <div class="nf-planet" id="nfPlanet">
+      <div class="nf-planet-glow"></div>
+      <div class="nf-planet-surface">
+        <span class="nf-planet-emoji">🌍</span>
+      </div>
+      <!-- Індикатор статусу -->
+      <div class="nf-planet-status" id="farmStatus">Грядка вільна</div>
     </div>
-  </section>
 
-  <section class="farm-actions">
-    <button id="farmHarvestBtn">⭐ Собрать урожай</button>
-    <button id="farmSpeedBtn">💎 Ускорить</button>
-    <button id="farmDailyBtn">🎁 Ежедневный бонус</button>
-    <button id="farmLeaderboardBtn">🏆 Рейтинг фермеров</button>
-  </section>
+    <!-- Кнопка збору (z'являється коли готово) -->
+    <button class="nf-harvest-cta" id="farmHarvestBtn" disabled>
+      ⭐ Зібрати!
+    </button>
 
-  <section class="farm-panel">
-    <h2>🌱 Посадить культуру</h2>
-    <div id="farmCrops" class="farm-list"></div>
-  </section>
+    <!-- Інфо дронів -->
+    <div class="nf-drone-info" id="farmDroneInfo">0 дронів · 0%</div>
+  </div>
 
-  <section class="farm-panel">
-    <h2>🛠 Улучшения</h2>
-    <button id="farmUpgradeBtn" class="farm-wide-btn">Улучшить ферму · <span id="farmUpgradeCost">0</span></button>
-    <button id="farmDroneBtn" class="farm-wide-btn">🚀 Дроны · <span id="farmDroneCost">0</span></button>
-  </section>
+  <!-- Головні кнопки дій -->
+  <div class="nf-action-grid">
+    <button class="nf-action-btn" id="nfBtnCrops">
+      <span class="nf-action-icon">🌱</span>
+      <span class="nf-action-lbl">Посадити</span>
+    </button>
+    <button class="nf-action-btn" id="farmSpeedBtn">
+      <span class="nf-action-icon">💎</span>
+      <span class="nf-action-lbl">Прискорити</span>
+    </button>
+    <button class="nf-action-btn" id="nfBtnUpgrades">
+      <span class="nf-action-icon">🛠️</span>
+      <span class="nf-action-lbl">Апгрейди</span>
+    </button>
+    <button class="nf-action-btn" id="farmDailyBtn">
+      <span class="nf-action-icon">🎁</span>
+      <span class="nf-action-lbl">Бонус</span>
+    </button>
+  </div>
 
-  <section class="farm-panel">
-    <h2>🪐 Планеты</h2>
-    <div id="farmPlanets" class="farm-list"></div>
-  </section>
+  <!-- Планети — горизонтальний скрол -->
+  <div class="nf-section">
+    <div class="nf-section-title">🪐 Планети</div>
+    <div class="nf-planets-scroll" id="farmPlanets"></div>
+  </div>
 
-  <section class="farm-panel">
-    <h2>ℹ️ Помощь</h2>
-    <p class="farm-help">Сажай культуры, жди созревания и собирай урожай. Энергия развивает ферму, пыль открывает крупные улучшения, алмазы ускоряют рост и усиливают дронов. Дроны повышают часть автоматического сбора, а редкие планеты усиливают доход.</p>
-    <p id="farmLog" class="farm-log">Ферма готова к запуску.</p>
-  </section>
+  <!-- Лог -->
+  <div class="nf-log-wrap">
+    <p id="farmLog" class="nf-log">Ферма готова до запуску.</p>
+  </div>
 
-  <section class="farm-panel">
-    <h2>🏆 Рейтинг фермеров</h2>
+  <!-- Рейтинг -->
+  <div class="nf-section">
+    <div class="nf-section-title">🏆 Рейтинг фермерів</div>
     <div id="farmLeaderboard" class="farm-leaderboard">
-      <div class="farm-muted">Нажми «Рейтинг фермеров», чтобы обновить список.</div>
+      <div class="farm-muted">Натисни «🏆» щоб оновити рейтинг.</div>
     </div>
-  </section>
+  </div>
+
+  <!-- DRAWER: Посадити культуру -->
+  <div class="nf-drawer-overlay" id="nfDrawerCropsOverlay"></div>
+  <div class="nf-drawer" id="nfDrawerCrops">
+    <div class="nf-drawer-handle"></div>
+    <div class="nf-drawer-title">🌱 Оберіть культуру</div>
+    <div id="farmCrops" class="nf-crops-grid"></div>
+  </div>
+
+  <!-- DRAWER: Апгрейди -->
+  <div class="nf-drawer-overlay" id="nfDrawerUpgradesOverlay"></div>
+  <div class="nf-drawer" id="nfDrawerUpgrades">
+    <div class="nf-drawer-handle"></div>
+    <div class="nf-drawer-title">🛠️ Апгрейди</div>
+
+    <!-- Ферма -->
+    <div class="nf-upgrade-card">
+      <div class="nf-upgrade-icon">🏗️</div>
+      <div class="nf-upgrade-info">
+        <div class="nf-upgrade-name">Ферма</div>
+        <div class="nf-upgrade-cost" id="farmUpgradeCost">0</div>
+      </div>
+      <button class="nf-upgrade-btn" id="farmUpgradeBtn">↑</button>
+    </div>
+
+    <!-- Дрони -->
+    <div class="nf-upgrade-card">
+      <div class="nf-upgrade-icon">🚀</div>
+      <div class="nf-upgrade-info">
+        <div class="nf-upgrade-name">Дрони</div>
+        <div class="nf-upgrade-cost" id="farmDroneCost">0</div>
+      </div>
+      <button class="nf-upgrade-btn" id="farmDroneBtn">↑</button>
+    </div>
+
+    <!-- Реактор -->
+    <div class="nf-upgrade-card nf-upgrade-reactor">
+      <div class="nf-upgrade-icon">⚡</div>
+      <div class="nf-upgrade-info">
+        <div class="nf-upgrade-name">Реактор <span id="farmReactorLevel">LVL 0</span> <span id="farmReactorBonus" class="nf-upgrade-bonus">+0%</span></div>
+        <div class="nf-upgrade-cost" id="farmReactorCost">0</div>
+      </div>
+      <button class="nf-upgrade-btn nf-upgrade-btn-reactor" id="farmReactorBtn">↑</button>
+    </div>
+  </div>
+
 </div>
 
 
@@ -484,36 +585,104 @@
 
     
     <nav class="bottom-nav">
+      <!-- Головна -->
       <button class="active" data-screen="home">
-        <i class="fa-solid fa-house"></i>
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
         <span data-i18n="main">Головна</span>
       </button>
+      <!-- Завдання -->
       <button data-screen="tasks">
-        <i class="fa-solid fa-list-check"></i>
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="5" width="18" height="2.5" rx="1.25" fill="currentColor"/>
+          <rect x="3" y="10.75" width="18" height="2.5" rx="1.25" fill="currentColor"/>
+          <rect x="3" y="16.5" width="12" height="2.5" rx="1.25" fill="currentColor"/>
+          <circle cx="20" cy="17.75" r="2.5" fill="currentColor"/>
+        </svg>
         <span data-i18n="tasks">Завдання</span>
       </button>
-      <button data-screen="drops">
-        <i class="fa-solid fa-briefcase"></i>
+      <!-- Дропи (центральна кнопка) -->
+      <button data-screen="drops" class="nav-center-btn">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3C12 3 6 9.5 6 14a6 6 0 0012 0c0-4.5-6-11-6-11z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="currentColor" fill-opacity="0.15"/>
+          <path d="M9 16a3 3 0 006 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
         <span data-i18n="drops">Дропи</span>
       </button>
+      <!-- Друзі -->
       <button data-screen="friends">
-        <i class="fa-solid fa-user-group"></i>
-       <span data-i18n="friends">Друзі</span>
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="9" cy="7" r="3.5" stroke="currentColor" stroke-width="2"/>
+          <path d="M2 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M17 11a3 3 0 100-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M22 20c0-3-1.5-5.5-4-6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span data-i18n="friends">Друзі</span>
       </button>
+      <!-- Картки -->
       <button data-screen="cards">
-        <i class="fa-solid fa-layer-group"></i>
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="6" width="10" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="8" y="4" width="10" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="currentColor" fill-opacity="0.08"/>
+          <path d="M7 11h4M7 14h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
         <span data-i18n="cards">Картки</span>
       </button>
     </nav>
 
     
+    <!-- ПРЕМІАЛЬНА АНІМАЦІЯ ВІДКРИТТЯ ДРОПУ -->
     <div class="drop-modal" id="dropModal">
-      <div class="drop-modal-box">
+      <!-- Стара рулетка (прихована, не видаляється) -->
+      <div class="drop-modal-box" style="display:none">
         <div class="case-roulette" id="caseRoulette">
           <div class="roulette-line"></div>
           <div class="roulette-track" id="rouletteTrack"></div>
         </div>
         <button id="closeDropModal" style="display:none;" data-i18n="claim">Забрати</button>
+      </div>
+    </div>
+
+    <!-- НОВИЙ ПРЕМІАЛЬНИЙ OVERLAY -->
+    <div id="premiumDropOverlay">
+      <canvas id="premiumDropCanvas"></canvas>
+      <div id="premiumDropFlash"></div>
+
+      <div id="premiumCaseWrap">
+        <div id="premiumCaseBox">
+          <div id="premiumCaseAura"></div>
+          <div class="pcase-ring"></div>
+          <div class="pcase-ring"></div>
+          <div class="pcase-ring"></div>
+          <div id="premiumCaseRays"></div>
+
+          <!-- CSS кейс -->
+          <div class="pcase-body"></div>
+          <div class="pcase-lid"></div>
+          <div class="pcase-ribbon-h"></div>
+          <div class="pcase-ribbon-v"></div>
+          <div class="pcase-bow-l"></div>
+          <div class="pcase-bow-r"></div>
+          <div class="pcase-bow-c"></div>
+
+          <div id="premiumOpenLabel">Відкриваємо...</div>
+        </div>
+      </div>
+
+      <div id="premiumCardResult">
+        <div id="premiumCard">
+          <div id="premiumCardAura"></div>
+          <div id="premiumCardFace">
+            <div id="premiumCardShine"></div>
+            <img id="premiumCardImg" src="" alt="">
+            <div id="premiumCardRarity">LEGENDARY</div>
+            <div id="premiumCardName">Void King</div>
+          </div>
+        </div>
+        <div id="premiumRewardLabel"></div>
+        <button id="premiumClaimBtn">&#10024; <span data-i18n="claim">Забрати</span></button>
       </div>
     </div>
 
